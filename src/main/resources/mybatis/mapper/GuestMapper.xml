@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.skillspace.sgs.member.guest.GuestMapper">
+
+<select id="idCheck" parameterType="String" resultType="String">
+	select 
+		user_id
+	from 
+		userinfo
+	where 
+		user_id = #{user_id}
+</select>
+
+<!-- 
+<insert id="join" parameterType="com.ezen.shop.member.MemberVO">
+	insert into 
+		user_tbl(
+					user_id,	user_name,		user_email,	user_password,	user_zipcode,
+					user_addr,	user_deaddr,	user_phone, user_nick,		user_receive)
+	values(
+			#{user_id},		#{user_name},	#{user_email},	#{user_password},	#{user_zipcode},
+			#{user_addr},	#{user_deaddr}, #{user_phone},	#{user_nick},		#{user_receive})
+		
+</insert>
+
+<select id="login" parameterType="String" resultType="com.ezen.shop.member.MemberVO">
+	select
+		user_id, user_name,	user_email,	user_password, user_lastlogin, user_nick
+	from 
+		user_tbl
+	where 
+		user_id = #{user_id}
+</select>
+
+<select id="modify" parameterType="String" resultType="com.ezen.shop.member.MemberVO">
+	select
+		user_id,		user_name,		user_email,
+		user_password,	user_zipcode,	user_addr,
+		user_deaddr,	user_phone,		user_nick,
+		user_receive,	user_point,		user_lastlogin,
+		user_datesub,	user_updatedate
+	from
+		user_tbl
+	where
+		user_id = #{user_id}
+</select>
+
+<update id="modify_save" parameterType="com.ezen.shop.member.MemberVO">
+	
+</update>
+
+<update id="pwchange" parameterType="Map">
+	
+</update>
+
+<select id="idsearch" parameterType="Map" resultType="String">
+	
+</select>
+
+<select id="pwtemp" parameterType="Map" resultType="String">
+	
+</select>
+ -->
+</mapper>

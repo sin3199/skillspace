@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:laout="http://www.ultraq.net.nz/thymeleaf/laout"
+   layout:decorate="~{layouts/layout1}">
+
+
+<th:block layout:fragment="scriptTop">
+
+</th:block>
+<th:block layout:fragment="css">
+
+</th:block>
+
+<th:block layout:fragment="content">
+   <h1 class="mt-3 mb-4 text-center">회원가입</h1>
+   <div class="row w-75 mx-auto container-sm">
+      <div class="col">
+         <div class="card card-info">
+            <div class="card-header">
+               <h3 class="card-title">Join Form</h3>
+            </div>
+
+            <form class="needs-validation" method="" action="" novalidate>
+               <div class="card-body">
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="user_id" class="col-form-label">아이디</label>
+                     </div>
+                     <div class="col-10">
+                        <div class="input-group">
+                           <!-- 아이디 입력 -->
+                           <input type="text" class="form-control" id="user_id" name="user_id" placeholder="아이디"
+                              required>
+                           <!-- ID 중복체크 -->
+                           <button type="button" class="btn btn-outline-primary ms-2 w-25" id="btnIDCheck">ID
+                              중복체크</button>
+                           <!-- 유효성 검사 오류 메시지 -->
+                           <div class="invalid-feedback">아이디를 입력하세요</div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="user_pw" class="col-form-label">비밀번호</label>
+                     </div>
+                     <div class="col-10">
+                        <!-- 비밀번호 입력 -->
+                        <input type="password" class="form-control" id="user_pw" name="user_pw" placeholder="비밀번호"
+                           required pattern="^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,16}$">
+
+                        <!-- 비밀번호 확인 -->
+                        <input type="password" class="form-control" id="user_pw2" name="user_pw2" placeholder="비밀번호 확인"
+                           required>
+
+                        <!-- 유효성 검사 오류 메시지들 -->
+                        <div class="form-text text-muted" id="passwordHelp">영문, 숫자, 특수문자를 포함하여 8자~16자 이내로 입력해주세요.</div>
+                        <div class="invalid-feedback" id="passwordError">비밀번호를 입력해주세요</div>
+                        <div class="invalid-feedback" id="passwordMatchError">비밀번호가 일치하지 않습니다.</div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="user_name" class="col-form-label">이름</label>
+                     </div>
+                     <div class="col-10">
+                        <!-- 이름 입력 -->
+                        <input type="text" class="form-control" id="user_name" name="user_name" placeholder="이름"
+                           required>
+                        <!-- 유효성 검사 오류 메시지 -->
+                        <div class="invalid-feedback">이름을 입력하세요</div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="user_nick" class="col-form-label">닉네임</label>
+                     </div>
+                     <div class="col-10">
+                        <!-- 닉네임 입력 -->
+                        <input type="text" class="form-control" id="user_nick" name="user_nick" placeholder="닉네임"
+                           required>
+                        <!-- 유효성 검사 오류 메시지 -->
+                        <div class="invalid-feedback">닉네임을 입력하세요</div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="user_email" class="col-form-label">이메일</label>
+                     </div>
+                     <div class="col-10">
+                        <div class="input-group">
+                           <!-- 이메일 입력 -->
+                           <input type="text" class="form-control" id="user_email" name="user_email" placeholder="이메일"
+                              required>
+                           <!-- 메일인증 요청 -->
+                           <button type="button" class="btn btn-outline-primary ms-2 w-25" id="btnMailAuthcode">메일인증
+                              요청</button>
+                           <!-- 유효성 검사 오류 메시지 -->
+                           <div class="invalid-feedback">이메일을 입력하세요</div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="user_email" class="col-form-label">인증 확인</label>
+                     </div>
+                     <div class="col-10">
+                        <div class="input-group">
+                           <!-- 인증 코드 입력 -->
+                           <input type="text" class="form-control" id="user_email" name="user_email" placeholder="인증코드"
+                              required>
+                           <!-- 인증 코드 확인 -->
+                           <button type="button" class="btn btn-outline-primary ms-2 w-25" id="btnConfirmAuth">인증확인</button>
+                           <!-- 유효성 검사 오류 메시지 -->
+                           <div class="invalid-feedback">인증코드를 입력하세요</div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="sample2_postcode" class="col-form-label">우편번호</label>
+                     </div>
+                     <div class="col-10">
+                        <div class="input-group">
+                           <!-- 우편번호 입력 -->
+                           <input type="text" class="form-control" id="sample2_postcode" name="user_zipcode"
+                              placeholder="우편번호" required>
+                           <!-- 우편번호 찾기 -->
+                           <button type="button" class="btn btn-outline-primary ms-2 w-25" onclick="sample2_execDaumPostcode()">우편번호
+                              찾기</button>
+                           <!-- 유효성 검사 오류 메시지 -->
+                           <div class="invalid-feedback">우편번호를 입력하세요</div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="sample2_address" class="col-form-label">기본주소</label>
+                     </div>
+                     <div class="col-10">
+                        <!-- 기본주소 입력 -->
+                        <input type="text" class="form-control" id="sample2_address" name="user_addr" placeholder="기본주소"
+                           required>
+                        <!-- 유효성 검사 오류 메시지 -->
+                        <div class="invalid-feedback">기본주소를 입력하세요</div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="sample2_detailAddress" class="col-form-label">상세주소</label>
+                     </div>
+                     <div class="col-10">
+                        <!-- 상세주소 입력 -->
+                        <input type="text" class="form-control" id="sample2_detailAddress" name="user_addrdetail"
+                           placeholder="상세주소" required>
+                        <!-- 유효성 검사 오류 메시지 -->
+                        <div class="invalid-feedback">상세주소를 입력하세요</div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="user_phone" class="col-form-label">전화번호</label>
+                     </div>
+                     <div class="col-10">
+                        <!-- 전화번호 입력 -->
+                        <input type="text" class="form-control" id="user_phone" name="user_phone" placeholder="전화번호"
+                           required>
+                        <!-- 유효성 검사 오류 메시지 -->
+                        <div class="invalid-feedback">전화번호를 입력하세요</div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="user_phone" class="col-form-label">메일 수신</label>
+                     </div>
+                     <div class="col-10">
+                        <!-- 메일 수신 체크 -->
+                        <div class="form-check form-check-inline">
+                           <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio1"
+                              value="Y" checked>
+                           <label class="form-check-label" for="inlineRadio1">수신</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                           <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio2"
+                              value="N">
+                           <label class="form-check-label" for="inlineRadio2">수신거부</label>
+                        </div>
+
+                     </div>
+                  </div>
+
+
+               </div>
+
+
+               <div class="card-footer"> <!--  id="btnJoin"  -->
+                  <button type="submit" class="btn btn-info" id="">Sign up</button>
+                  <button type="reset" class="btn btn-danger">Cancel</button>
+               </div>
+
+
+
+            </form>
+
+
+         </div>
+      </div>
+   </div>
+
+
+
+</th:block>
+<th:block layout:fragment="scriptBottom">
+   <script>
+      (() => {
+         'use strict'
+
+         // 모든 .needs-validation 클래스를 가진 폼 선택
+         const forms = document.querySelectorAll('.needs-validation')
+
+         // 폼에 대해 유효성 검사 적용
+         Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+               let valid = true;
+
+               // 비밀번호와 비밀번호 확인 필드 선택
+               const password = form.querySelector('#user_pw');
+               const passwordConfirm = form.querySelector('#user_pw2');
+               const passwordHelp = form.querySelector('#passwordHelp');
+               const passwordError = form.querySelector('#passwordError');
+               const passwordMatchError = form.querySelector('#passwordMatchError');
+               const passwordPattern = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,16}$/;
+
+               // 비밀번호 확인: 일치하지 않으면 오류 메시지 표시
+               if (password.value !== passwordConfirm.value) {
+                  passwordMatchError.style.display = 'block';
+                  valid = false;
+               } else {
+                  passwordMatchError.style.display = 'none';
+               }
+
+               // 비밀번호 조건 확인: 영문, 숫자, 특수문자 포함, 8자~16자
+               if (!passwordPattern.test(password.value)) {
+                  passwordHelp.classList.remove('text-muted'); // 원래 상태에서 텍스트 색 제거
+                  passwordHelp.classList.add('text-danger'); // 오류 상태에서 텍스트 색 변경
+                  valid = false;
+               } else {
+                  passwordHelp.classList.remove('text-danger'); // 오류 색상 제거
+                  passwordHelp.classList.add('text-muted'); // 원래 상태로 돌아감
+               }
+
+               if (!password.value) {
+                  passwordError.style.display = 'block'; // 입력값이 없을 때 오류 메시지 표시
+                  valid = false;
+               } else {
+                  passwordError.style.display = 'none'; // 입력값이 있을 때 오류 메시지 제거
+               }
+
+               // 기본 유효성 검사 (required 등) 처리
+               if (!form.checkValidity() || !valid) {
+                  event.preventDefault()  // 기본 제출 동작 차단
+                  event.stopPropagation()  // 이벤트 전파 중지
+               }
+
+               // 유효성 검사 결과 스타일 적용
+               form.classList.add('was-validated')
+            }, false)
+         })
+      })()
+   </script>
+
+   <script>
+      $(document).ready(function () {
+
+         // 전역변수
+         let id_check = false;
+         let email_auth = false;
+
+         // 아이디 중복체크 클릭설정.  id="btnIDCheck"
+         $("#btnIDCheck").on("click", function () {
+
+            let user_id = $("#user_id");
+
+            if (user_id.val() == "") {
+               alert("ID를 입력하세요.");
+               user_id.focus();
+               return;
+            }
+            
+            $.ajax({
+               url: "/guest/idCheck",
+               type: "get",
+               data: { user_id: user_id.val() },
+               dataType: "text",
+               success: function (result) {
+                  if (result == "no") {
+                     alert("중복된 ID입니다.");
+                     user_id.val("");
+                     user_id.focus();
+                  } else {
+                     alert("사용할 수 있는 ID입니다.");
+                     id_check = true;
+                  }
+               }
+            });
+         });
+
+
+         // 메일 인증요청.  id="btnMailAuthcode",  id="user_email"
+         $("#btnMailAuthcode").on("click", function () {
+            if ($("#user_email").val() == "") {
+               alert("메일을 입력하세요.");
+               return;
+            }
+
+            $.ajax({
+               url: "/email/authcode",
+               type: "get",
+               data: {
+                  receiverMail: $("#user_email").val(),
+                  type: "authcode"
+               },
+               dataType: "text",
+               success: function (result) {
+                  if (result == "success") {
+                     alert("메일로 인증코드가 발급 되었습니다.")
+                  }
+               }
+            });
+
+         });
+
+         // 인증확인.  id="btnConfirmAuth",  id="user_authcode
+         $("#btnConfirmAuth").on("click", function () {
+            if ($("#user_authcode").val() == "") {
+               alert("인증코드를 입력하세요.");
+               return;
+            }
+
+            $.ajax({
+               url: "/email/confirm_authcode",
+               type: "get",
+               data: { authcode: $("#user_authcode").val() },
+               dataType: "text",
+               success: function (result) {
+                  if (result == "success") {
+                     alert("인증이 확인되었습니다.");
+                     email_auth = true;
+                  } else if (result == "fail") {
+                     alert("인증코드가 일치되지 않습니다.\n인증코드를 다시 확인하시거나 재발급 하세요.");
+                  }
+               }
+            });
+         });
+
+
+         // 회원가입.  id="btnJoin"
+         $("#btnJoin").on("click", function () {
+
+            // 클라이언트 유효성검사(Validation)
+            // id="joinForm"
+            let joinForm = $("#joinForm");  // <form>태그 참조
+
+            // 아이디 중복체크여부
+            if (id_check == false) {
+               alert("ID 중복체크를 확인해 주세요.");
+               return;
+            }
+
+            // 메일인증 확인여부
+            if (email_auth == false) {
+               alert("메일 인증을 확인해 주세요.");
+               return;
+            }
+
+            joinForm.submit();
+         });
+
+
+      });
+   </script>
+</th:block>
+
+</html>
