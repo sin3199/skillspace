@@ -11,17 +11,43 @@
 		user_id = #{user_id}
 </select>
 
-<!-- 
-<insert id="join" parameterType="com.ezen.shop.member.MemberVO">
+<select id="nickCheck" parameterType="String" resultType="String">
+	select 
+		user_nick
+	from 
+		userinfo
+	where 
+		user_nick = #{user_nick}
+</select>
+
+<insert id="join" parameterType="com.skillspace.sgs.member.guest.GuestVO">
 	insert into 
-		user_tbl(
-					user_id,	user_name,		user_email,	user_password,	user_zipcode,
-					user_addr,	user_deaddr,	user_phone, user_nick,		user_receive)
-	values(
-			#{user_id},		#{user_name},	#{user_email},	#{user_password},	#{user_zipcode},
-			#{user_addr},	#{user_deaddr}, #{user_phone},	#{user_nick},		#{user_receive})
+		UserInfo(user_id,
+				 user_pw,
+				 user_name,
+				 user_nick,
+				 user_email,
+				 user_phone,
+				 user_zipcode,
+				 user_addr,
+				 user_addrdetail,
+				 user_email_receive
+				)
+		values(
+				#{user_id},
+				#{user_pw},	
+				#{user_name},
+				#{user_nick},
+				#{user_email},
+				#{user_phone},
+				#{user_zipcode},
+				#{user_addr},
+				#{user_addrdetail},
+				#{user_email_receive}
+				)
 		
 </insert>
+<!-- 
 
 <select id="login" parameterType="String" resultType="com.ezen.shop.member.MemberVO">
 	select

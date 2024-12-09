@@ -14,4 +14,13 @@ public class GuestService {
 		return guestMapper.idCheck(user_id);
 	}
 
+	public String nickCheck(String user_nick) {
+		return guestMapper.nickCheck(user_nick);
+	}
+
+	public void join(GuestVO vo) {
+		guestMapper.join(vo);
+	}
+	
+
 }

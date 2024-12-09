@@ -1,21 +1,26 @@
 # skillspace 프로젝트 DB
 
+# skillspace 프로젝트 DB
+
 -- 회원 테이블
 CREATE TABLE `UserInfo` (
 	`user_id`			varchar(30)		NOT NULL,
 	`user_pw`			varchar(60)		NOT NULL,
 	`user_name`			varchar(50)		NOT NULL,
-	`user_nick`			varchar(30)		NOT NULL,
+	`user_nick`			varchar(30)		NOT NULL	unique,
 	`user_email`		varchar(100) 	NOT null	unique,
 	`user_phone`		varchar(13)		NOT NULL,
 	`user_zipcode`		char(5)			NOT NULL,
 	`user_addr`			varchar(100)	NOT NULL,
 	`user_addrdetail`	varchar(100)	NOT NULL,
-	`role`				char(1)			NOT NULL	COMMENT '게스트 g, 호스트 h',
+	`user_email_receive`char(1)			NOT NULL	COMMENT 'Y,  N',
+	`role`				char(1)			NOT NULL	default 'G' COMMENT '게스트 G, 호스트 H',
 	`created_at`		datetime		NOT NULL	DEFAULT now(),
 	`updated_at`		datetime		NOT NULL	DEFAULT now(),
-	`user_status`		tinyint			NOT NULL	DEFAULT 1	COMMENT '활동 : 1, 휴면 : 2, 탈퇴 : 3, 정지 : 4'
+	`user_status`		tinyint			NOT NULL	DEFAULT 1	COMMENT '활동 : 1, 휴면 : 2, 탈퇴 : 3, 정지 : 4',
+	`user_email_receive`char(1)			NOT NULL	COMMENT 'Y, N'
 );
+
 
 ALTER TABLE `UserInfo` 
 ADD CONSTRAINT `PK_USERINFO` 
