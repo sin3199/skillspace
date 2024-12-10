@@ -37,7 +37,7 @@ public class GuestController {
 		// DB 저장
 		guestService.join(vo);
 		
-		return "redirect:/guset/login";
+		return "redirect:/guest/login";
 	}
 	
 	
@@ -77,4 +77,7 @@ public class GuestController {
 		
 		return entity;
 	}
+	
+	@GetMapping("/login")
+	public void login() {}
 }
