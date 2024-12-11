@@ -21,6 +21,12 @@ public class GuestService {
 	public void join(GuestVO vo) {
 		guestMapper.join(vo);
 	}
+
+	public GuestVO login(String user_id) {
+		return guestMapper.login(user_id);
+	}
+
+	
 	
 
 }

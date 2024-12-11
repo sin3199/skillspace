@@ -47,17 +47,22 @@
 				)
 		
 </insert>
-<!-- 
 
-<select id="login" parameterType="String" resultType="com.ezen.shop.member.MemberVO">
+<select id="login" parameterType="String" resultType="com.skillspace.sgs.member.guest.GuestVO">
 	select
-		user_id, user_name,	user_email,	user_password, user_lastlogin, user_nick
+		user_id,
+		user_pw, 
+		user_name,	
+		user_nick, 
+		user_status,
+		role
 	from 
-		user_tbl
+		userinfo
 	where 
 		user_id = #{user_id}
 </select>
 
+<!-- 
 <select id="modify" parameterType="String" resultType="com.ezen.shop.member.MemberVO">
 	select
 		user_id,		user_name,		user_email,

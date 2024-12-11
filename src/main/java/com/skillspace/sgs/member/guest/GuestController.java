@@ -7,7 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -80,4 +82,32 @@ public class GuestController {
 	
 	@GetMapping("/login")
 	public void login() {}
+	
+	@PostMapping("/login")
+	public String loginProcess(LoginDTO dto, HttpSession session, RedirectAttributes rttr) throws Exception {
+		
+		String url = "";
+		String status = "";
+		GuestVO vo = guestService.login(dto.getUser_id());
+		
+		if(vo != null) {	// 아이디가 일치하면
+			if(passwordEncoder.matches(dto.getUser_pw(), vo.getUser_pw())) {	// 비밀번호 일치하면
+				session.setAttribute("login_auth", vo);
+				url = "/";
+			}else {	// 비밀번호가 틀릴 경우
+				url = "/guest/login";
+				status = "pwFail";
+			}
+		}else {	// 아이디가 틀릴 경우
+			url = "/guest/login";
+			status = "idFail";
+		}
+		
+		rttr.addFlashAttribute("status", status);
+		
+		
+		return "redirect:" + url;
+	}
+	
+	
 }

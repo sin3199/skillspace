@@ -10,7 +10,7 @@
                aria-label="Toggle navigation">
                <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand mx-auto fw-bold fs-3" href="#">SkillSpace</a>
+            <a class="navbar-brand mx-auto fw-bold fs-3" href="/">SkillSpace</a>
             <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbarLight"
                aria-labelledby="offcanvasNavbarLightLabel">
                <div class="offcanvas-header flex-column">
@@ -19,7 +19,7 @@
                      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                   </div>
                   <div class="d-flex gap-2 w-100 px-2">
-                     <button type="button" class="btn btn-primary flex-grow-1">로그인</button>
+                     <button type="button" class="btn btn-primary flex-grow-1" id="btn_login">로그인</button>
                      <button type="button" class="btn btn-secondary flex-grow-1" id="btn_join">회원가입</button>
                   </div>
                </div>
@@ -56,14 +56,21 @@
          </div>
       </nav>
 	</header>
+  
+</th:block>
+<th:block th:fragment="headerScript">
    <script>
       $(document).ready(function(){
          $('#btn_join').click(function(){
-            location.href = 'guest/join';
+            location.href = '/guest/join';
+         });
+
+         $('#btn_login').click(function(){
+            location.href = '/guest/login';
          });
       });
    </script>
-  
 </th:block>
+
 
 </html>

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="h-100" data-bs-theme="auto"
+<html lang="en"
 	  xmlns:th="http://www.thymeleaf.org"
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
@@ -20,6 +20,7 @@
 	
 	<th:block layout:fragment="scriptTop"></th:block>
 	<th:block layout:fragment="css"></th:block>
+	<th:block th:replace="~{fragments/header::headerScript}"></th:block>
 </head>
 <body class="d-flex flex-column h-100">
 	<th:block th:replace="~{fragments/header::header}"></th:block>
