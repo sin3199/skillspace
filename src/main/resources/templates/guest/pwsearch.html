@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:laout="http://www.ultraq.net.nz/thymeleaf/layout"
+   layout:decorate="~{layouts/layout1}">
+
+<th:block layout:fragment="content">
+   <section class="bg-body-tertiary p-3 p-md-4 p-xl-5">
+      <div class="container">
+         <div class="row justify-content-center">
+            <div class="col-12 col-md-9 col-lg-7 col-xl-6 col-xxl-5">
+               <div class="card border-0 shadow-sm rounded-4">
+                  <div class="card-body p-3 p-md-4 p-xl-5">
+                     <div class="row">
+                        <div class="col-12">
+                           <div class="mb-3 text-center">
+                              <h3>가입정보 찾기</h3>
+                           </div>
+                        </div>
+                     </div>
+                     <form>
+                        <div class="row gy-3 overflow-hidden">
+                           <div class="d-flex gap-2 w-100 px-2">
+                              <a href="/guest/idsearch" class="btn btn-outline-primary flex-grow-1">아이디 찾기</a>
+                              <a href="/guest/pwsearch" class="btn btn btn-primary flex-grow-1">비밀번호 찾기</a>
+                           </div>
+                           <div class="col-12">
+                              <div class="form-floating">
+                                 <input type="text" class="form-control" name="user_name" id="user_name" required>
+                                 <label for="user_name" class="form-label">아이디</label>
+                              </div>
+                           </div>
+                           <div class="col-12">
+                              <div class="form-floating">
+                                 <input type="email" class="form-control" name="user_email" id="user_email" required>
+                                 <label for="user_email" class="form-label">이메일</label>
+                              </div>
+                           </div>
+                           
+                           <div class="col-12">
+                              <div class="d-grid">
+                                 <button class="btn bsb-btn-2xl btn-primary" type="button" id="idsearch">아이디 찾기</button>
+                              </div>
+                           </div>
+                        </div>
+                     </form>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </section>
+
+</th:block>
+<th:block layout:fragment="scriptBottom">
+   <script>
+      $(document).ready(function () {
+
+         // 아이디 찾기.  button : id="idsearch"
+         $("#idsearch").on("click", function () {
+
+            $.ajax({
+               url: "/guest/idsearch-ok",
+               type: "get",
+               data: {
+                  user_name: $("#user_name").val(),
+                  user_email: $("#user_email").val()
+               },	// 자바스크립트 Object문법
+               dataType: "text",
+               success: function (user_id) {
+                  if (user_id) {
+                     alert("회원님의 아이디는 : " + user_id + " 입니다.");
+                     location.href = "/guest/login";
+                  } else {
+                     alert("입력하신 정보와 일치되는 아이디가 없습니다.")
+                     $("#user_name").val("");	// 이름 지우기
+                     $("#user_email").val("");	// 메일 지우기
+                  }
+               }
+            });
+         });
+
+         // 임시 비밀번호 발급.  button : id="pwtemp"
+         $("#pwtemp").on("click", function () {
+
+            $.ajax({
+               url: "/userinfo/pwtemp",
+               type: "get",
+               data: {
+                  u_id: $("#u_id").val(),
+                  u_email: $("#u_email2").val()
+               },	// 자바스크립트 Object문법
+               dataType: "text",
+               success: function (result) {
+                  if (result == "success") {
+                     alert("임시 비밀번호를 메일로 발송했습니다.");
+                     location.href = "/userinfo/login"
+                  } else if (result == "fail") {
+                     alert("아이디 또는 이메일이 틀렸습니다.")
+                     $("#u_id").val("");	// 이름 지우기
+                     $("#u_email2").val("");	// 메일 지우기
+                  }
+               }
+            });
+         });
+      });
+   </script>
+</th:block>
+
+</html>

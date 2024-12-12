@@ -26,6 +26,10 @@ public class GuestService {
 		return guestMapper.login(user_id);
 	}
 
+	public String idsearch(String user_name, String user_email) {
+		return guestMapper.idsearch(user_name, user_email);
+	}
+
 	
 	
 

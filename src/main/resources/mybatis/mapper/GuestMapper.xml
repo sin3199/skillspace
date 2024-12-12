@@ -62,6 +62,16 @@
 		user_id = #{user_id}
 </select>
 
+<select id="idsearch" parameterType="Map" resultType="String">
+	select 
+		user_id 
+	from 
+		userinfo 
+	where 
+		user_name = #{user_name} 
+	and 
+		user_email = #{user_email}
+</select>
 <!-- 
 <select id="modify" parameterType="String" resultType="com.ezen.shop.member.MemberVO">
 	select
@@ -84,9 +94,6 @@
 	
 </update>
 
-<select id="idsearch" parameterType="Map" resultType="String">
-	
-</select>
 
 <select id="pwtemp" parameterType="Map" resultType="String">
 	

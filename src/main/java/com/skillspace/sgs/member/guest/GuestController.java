@@ -24,9 +24,11 @@ public class GuestController {
 	// 비밀번호 암호화 기능.
 	private final PasswordEncoder passwordEncoder;
 	
+	// 회원가입 폼
 	@GetMapping("/join")
 	public void join() {}
 	
+	// 회원가입 처리
 	@PostMapping("/join")
 	public String join(GuestVO vo) {
 		
@@ -43,9 +45,7 @@ public class GuestController {
 	}
 	
 	
-	@GetMapping("/join1")
-	public void join1() {}
-	
+	// 아이디 중복 체크
 	@GetMapping("/idCheck")
 	public ResponseEntity<String> idCheck(String user_id) throws Exception {
 		ResponseEntity<String> entity = null;
@@ -63,6 +63,7 @@ public class GuestController {
 		return entity;
 	}
 	
+	// 닉네임 중복체크
 	@GetMapping("/nickCheck")
 	public ResponseEntity<String> nickCheck(String user_nick) throws Exception {
 		ResponseEntity<String> entity = null;
@@ -80,9 +81,11 @@ public class GuestController {
 		return entity;
 	}
 	
+	// 로그인 폼
 	@GetMapping("/login")
 	public void login() {}
 	
+	// 로그인 처리
 	@PostMapping("/login")
 	public String loginProcess(LoginDTO dto, HttpSession session, RedirectAttributes rttr) throws Exception {
 		
@@ -105,9 +108,35 @@ public class GuestController {
 		
 		rttr.addFlashAttribute("status", status);
 		
-		
 		return "redirect:" + url;
 	}
+	
+	// 로그아웃
+	@GetMapping("/logout")
+	public String logout(HttpSession session) {
+		session.invalidate();
+		
+		return "redirect:/";
+	}
+	
+	// 아이디 찾기 폼
+	@GetMapping("/idsearch")
+	public void idSearch() {}
+	
+	// 아이디 찾기 처리
+	@GetMapping("/idsearch-ok")
+	public ResponseEntity<String> idsearch_ok(String user_name, String user_email){
+		
+		ResponseEntity<String> entity = null;
+		String user_id = guestService.idsearch(user_name, user_email);
+		
+		entity = new ResponseEntity<String>(user_id, HttpStatus.OK);
+		
+		return entity;
+	}
+	
+	@GetMapping("/pwsearch")
+	public void pwSearch() {}
 	
 	
 }
