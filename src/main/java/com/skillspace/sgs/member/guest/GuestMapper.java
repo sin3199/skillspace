@@ -30,6 +30,6 @@ public interface GuestMapper {
 	String idsearch(@Param("user_name") String user_name, @Param("user_email") String user_email);
 	
 	// 임시 비밀번호, 아이디 이메일 일치 되는 이메일 리턴
-	String pwtemp(@Param("user_id") String user_id, @Param("user_email") String user_email);
+	String pwtemp_confirm(@Param("user_id") String user_id, @Param("user_email") String user_email);
 
 }

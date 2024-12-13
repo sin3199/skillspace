@@ -18,9 +18,9 @@ public class EmailDTO {
 	private String message;			// 내용
 
 	public EmailDTO() {
-		this.senderMail = "EzenMall";
-		this.senderName = "Ezen Mall";
-		this.subject 	= "Ezen Mall 회원가입 메일인증코드입니다.";
+		this.senderMail = "SkillSpace";
+		this.senderName = "Skill Space";
+		this.subject 	= "Skill Space 회원가입 메일인증코드입니다.";
 		this.message 	= "메일 인증코드를 확인하시고, 회원가입시 인증코드 입력란에 입력바랍니다.";
 	}
 }

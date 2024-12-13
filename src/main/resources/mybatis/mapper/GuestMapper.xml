@@ -62,6 +62,26 @@
 		user_id = #{user_id}
 </select>
 
+<select id="modify" parameterType="String" resultType="com.skillspace.sgs.member.guest.GuestVO">
+	select
+		user_id,
+		user_pw,
+		user_name,
+		user_nick,
+		user_email,
+		user_phone,
+		user_zipcode,
+		user_addr,
+		user_addrdetail,
+		created_at,
+		updated_at,
+		user_email_receive
+	from
+		userinfo
+	where
+		user_id = #{user_id}
+</select>
+
 <select id="idsearch" parameterType="Map" resultType="String">
 	select 
 		user_id 
@@ -72,31 +92,33 @@
 	and 
 		user_email = #{user_email}
 </select>
-<!-- 
-<select id="modify" parameterType="String" resultType="com.ezen.shop.member.MemberVO">
-	select
-		user_id,		user_name,		user_email,
-		user_password,	user_zipcode,	user_addr,
-		user_deaddr,	user_phone,		user_nick,
-		user_receive,	user_point,		user_lastlogin,
-		user_datesub,	user_updatedate
-	from
-		user_tbl
-	where
-		user_id = #{user_id}
+
+<select id="pwtemp_confirm" parameterType="Map" resultType="String">
+	select 
+		user_email 
+	from 
+		userinfo 
+	where 
+		user_id = #{user_id} 
+	and 
+		user_email = #{user_email}
 </select>
+
+<update id="pwchange" parameterType="Map">
+	update 
+		userinfo 
+	set	
+		user_pw  = #{user_pw}
+	where 
+		user_id = #{user_id} 
+</update>
+<!-- 
 
 <update id="modify_save" parameterType="com.ezen.shop.member.MemberVO">
 	
 </update>
 
-<update id="pwchange" parameterType="Map">
-	
-</update>
 
 
-<select id="pwtemp" parameterType="Map" resultType="String">
-	
-</select>
  -->
 </mapper>

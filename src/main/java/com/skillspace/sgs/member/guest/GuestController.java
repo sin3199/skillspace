@@ -4,10 +4,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.skillspace.sgs.mail.EmailDTO;
+import com.skillspace.sgs.mail.EmailService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 public class GuestController {
 	
 	private final GuestService guestService;
-	
 	// 비밀번호 암호화 기능.
 	private final PasswordEncoder passwordEncoder;
+	// 이메일 기능
+	private final EmailService emailService;
 	
 	// 회원가입 폼
 	@GetMapping("/join")
@@ -119,6 +124,15 @@ public class GuestController {
 		return "redirect:/";
 	}
 	
+	// 회원 정보 수정
+	@GetMapping("/modify")
+	public void modify(Model model, HttpSession session) {
+		
+		GuestVO vo = guestService.modify(((GuestVO)session.getAttribute("login_auth")).getUser_id());
+		model.addAttribute("guestVO", vo);
+		
+	}
+	
 	// 아이디 찾기 폼
 	@GetMapping("/idsearch")
 	public void idSearch() {}
@@ -128,15 +142,38 @@ public class GuestController {
 	public ResponseEntity<String> idsearch_ok(String user_name, String user_email){
 		
 		ResponseEntity<String> entity = null;
-		String user_id = guestService.idsearch(user_name, user_email);
 		
-		entity = new ResponseEntity<String>(user_id, HttpStatus.OK);
+		entity = new ResponseEntity<String>(guestService.idsearch(user_name, user_email), HttpStatus.OK);
 		
 		return entity;
 	}
 	
 	@GetMapping("/pwsearch")
 	public void pwSearch() {}
+	
+	@GetMapping("/pwtemp")
+	public ResponseEntity<String> pwtemp(String user_id, String user_email) {
+		
+		ResponseEntity<String> entity = null;
+		
+		String db_email = guestService.pwtemp_confirm(user_id, user_email);
+		
+		if(db_email != null) {
+			
+			String tmep_pw = emailService.createAuthCode();	// 8자리의 랜덤 조합
+			guestService.pwchange(user_id, passwordEncoder.encode(tmep_pw));
+			
+			EmailDTO emailDTO = new EmailDTO();
+			
+			emailDTO.setReceiverMail(db_email);
+			emailDTO.setSubject("SkillSpace 에서 임시 비밀번호를 보내드립니다.");
+			
+			emailService.sendMail("/mail/pwtemp", emailDTO, tmep_pw);
+		}
+		entity = new ResponseEntity<String>(db_email, HttpStatus.OK);
+		
+		return entity;
+	}
 	
 	
 }

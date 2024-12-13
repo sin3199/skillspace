@@ -24,8 +24,8 @@
                            </div>
                            <div class="col-12">
                               <div class="form-floating">
-                                 <input type="text" class="form-control" name="user_name" id="user_name" required>
-                                 <label for="user_name" class="form-label">아이디</label>
+                                 <input type="text" class="form-control" name="user_id" id="user_id" required>
+                                 <label for="user_id" class="form-label">아이디</label>
                               </div>
                            </div>
                            <div class="col-12">
@@ -37,7 +37,7 @@
                            
                            <div class="col-12">
                               <div class="d-grid">
-                                 <button class="btn bsb-btn-2xl btn-primary" type="button" id="idsearch">아이디 찾기</button>
+                                 <button class="btn bsb-btn-2xl btn-primary" type="button" id="pwtemp">비밀번호 찾기</button>
                               </div>
                            </div>
                         </div>
@@ -54,49 +54,25 @@
    <script>
       $(document).ready(function () {
 
-         // 아이디 찾기.  button : id="idsearch"
-         $("#idsearch").on("click", function () {
-
-            $.ajax({
-               url: "/guest/idsearch-ok",
-               type: "get",
-               data: {
-                  user_name: $("#user_name").val(),
-                  user_email: $("#user_email").val()
-               },	// 자바스크립트 Object문법
-               dataType: "text",
-               success: function (user_id) {
-                  if (user_id) {
-                     alert("회원님의 아이디는 : " + user_id + " 입니다.");
-                     location.href = "/guest/login";
-                  } else {
-                     alert("입력하신 정보와 일치되는 아이디가 없습니다.")
-                     $("#user_name").val("");	// 이름 지우기
-                     $("#user_email").val("");	// 메일 지우기
-                  }
-               }
-            });
-         });
-
          // 임시 비밀번호 발급.  button : id="pwtemp"
          $("#pwtemp").on("click", function () {
 
             $.ajax({
-               url: "/userinfo/pwtemp",
+               url: "/guest/pwtemp",
                type: "get",
                data: {
-                  u_id: $("#u_id").val(),
-                  u_email: $("#u_email2").val()
+                  user_id: $("#user_id").val(),
+                  user_email: $("#user_email").val()
                },	// 자바스크립트 Object문법
                dataType: "text",
-               success: function (result) {
-                  if (result == "success") {
-                     alert("임시 비밀번호를 메일로 발송했습니다.");
-                     location.href = "/userinfo/login"
-                  } else if (result == "fail") {
+               success: function (user_email) {
+                  if (user_email) {
+                     alert("임시 비밀번호를 " + user_email + "메일로 발송했습니다.");
+                     location.href = "/guest/login"
+                  } else {
                      alert("아이디 또는 이메일이 틀렸습니다.")
-                     $("#u_id").val("");	// 이름 지우기
-                     $("#u_email2").val("");	// 메일 지우기
+                     $("#user_id").val("");	   // 이름 지우기
+                     $("#user_email").val("");	// 메일 지우기
                   }
                }
             });
