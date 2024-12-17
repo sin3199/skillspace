@@ -11,7 +11,7 @@
                <h3 class="card-title text-center">정보 수정</h3>
             </div>
 
-            <form class="needs-validation" method="post" action="#!" novalidate>
+            <form class="needs-validation" method="post" action="#" novalidate>
                <div class="card-body">
                   <div class="row form-group mb-2">
                      <div class="col-2">
@@ -35,6 +35,7 @@
                         <div class="form-text text-muted" id="passwordHelp">
                            정보수정시 비밀번호를 입력해주세요.
                         </div>
+                        <!-- 유효성 검사 오류 메시지 -->
                         <div class="invalid-feedback" id="passwordError">비밀번호를
                            입력해주세요</div>
                         <div class="invalid-feedback" id="passwordMatchError">비밀번호가
@@ -60,7 +61,7 @@
                      <div class="col-10">
                         <div class="input-group">
                            <!-- 닉네임 입력 -->
-                           <input type="text" class="form-control" id="user_nick" name="user_nick" placeholder="닉네임"
+                           <input type="text" class="form-control" id="user_nick" name="user_nick" th:value="${guestVO.user_nick}" placeholder="닉네임"
                               required>
                            <!-- 닉네임 중복체크 -->
                            <button type="button" class="btn btn-outline-primary ms-2 w-25" id="btnNickCheck">Nick
@@ -77,7 +78,7 @@
                      <div class="col-10">
                         <div class="input-group">
                            <!-- 이메일 입력 -->
-                           <input type="text" class="form-control" id="user_email" name="user_email" placeholder="이메일"
+                           <input type="email" class="form-control" id="user_email" name="user_email" placeholder="이메일"
                               required>
                            <!-- 메일인증 요청 -->
                            <button type="button" class="btn btn-outline-primary ms-2 w-25" id="btnMailAuthcode">메일인증
@@ -111,7 +112,7 @@
                      <div class="col-10">
                         <div class="input-group">
                            <!-- 우편번호 입력 -->
-                           <input type="text" class="form-control" id="sample2_postcode" name="user_zipcode"
+                           <input type="text" class="form-control" id="sample2_postcode" name="user_zipcode" th:value="${guestVO.user_zipcode}"
                               placeholder="우편번호" required maxlength="6">
                            <!-- 우편번호 찾기 -->
                            <button type="button" class="btn btn-outline-primary ms-2 w-25"
@@ -127,7 +128,7 @@
                      </div>
                      <div class="col-10">
                         <!-- 기본주소 입력 -->
-                        <input type="text" class="form-control" id="sample2_address" name="user_addr" placeholder="기본주소"
+                        <input type="text" class="form-control" id="sample2_address" name="user_addr" th:value="${guestVO.user_addr}" placeholder="기본주소"
                            required>
                         <!-- 유효성 검사 오류 메시지 -->
                         <div class="invalid-feedback">기본주소를 입력하세요</div>
@@ -139,7 +140,7 @@
                      </div>
                      <div class="col-10">
                         <!-- 상세주소 입력 -->
-                        <input type="text" class="form-control" id="sample2_detailAddress" name="user_addrdetail"
+                        <input type="text" class="form-control" id="sample2_detailAddress" name="user_addrdetail" th:value="${guestVO.user_addrdetail}"
                            placeholder="상세주소" required> <input type="hidden" id="sample2_extraAddress"
                            placeholder="참고항목">
                         <!-- 유효성 검사 오류 메시지 -->
@@ -152,7 +153,7 @@
                      </div>
                      <div class="col-10">
                         <!-- 전화번호 입력 -->
-                        <input type="text" class="form-control" id="user_phone" name="user_phone"
+                        <input type="text" class="form-control" id="user_phone" name="user_phone" th:value="${guestVO.user_phone}"
                            placeholder="전화번호 - 빼고 숫자만 입력" maxlength="11" required>
                         <!-- 유효성 검사 오류 메시지 -->
                         <div class="invalid-feedback">전화번호를 입력하세요</div>
@@ -165,12 +166,12 @@
                      <div class="col-10">
                         <!-- 메일 수신 체크 -->
                         <div class="form-check form-check-inline">
-                           <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio1"
-                              value="Y" checked>
+                           <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio1" th:checked= "${guestVO.user_email_receive == 'Y'}"
+                              value="Y">
                            <label class="form-check-label" for="inlineRadio1">수신</label>
                         </div>
                         <div class="form-check form-check-inline">
-                           <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio2"
+                           <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio2" th:checked= "${guestVO.user_email_receive == 'N'}"
                               value="N">
                            <label class="form-check-label" for="inlineRadio2">수신거부</label>
                         </div>
@@ -183,9 +184,7 @@
 
 
                <div class="card-footer">
-                  <!--  id="btnJoin"  -->
-                  <button type="submit" class="btn btn-info" id="btnJoin">Sign
-                     up</button>
+                  <button type="submit" class="btn btn-info">Sign up</button>
                   <button type="reset" class="btn btn-danger">Cancel</button>
                </div>
 
@@ -214,14 +213,15 @@
          'use strict'
 
          const validationState = {
-            idChecked: false,
-            nickChecked: false,
-            emailAuth: false,
+            idChecked: true,
+            nickChecked: true,
+            emailAuth: true,
             input_id: null,
             input_nick: null,
             input_email: null,
          };
 
+         const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
          // 모든 .needs-validation 클래스를 가진 폼 선택
          const forms = document.querySelectorAll('.needs-validation')
@@ -263,6 +263,7 @@
                } else {
                   passwordError.style.display = 'none'; // 입력값이 있을 때 오류 메시지 제거
                }
+
 
                // 입력 ID 확인
                if (validationState.input_id && validationState.input_id !== $("#user_id").val()) {
@@ -353,6 +354,10 @@
 
             if (!userEmail) {
                alert("메일을 입력하세요.");
+               return;
+            }
+            if (!emailPattern.test(userEmail)){
+               alert("이메일 형식을 확인하세요.");
                return;
             }
 
