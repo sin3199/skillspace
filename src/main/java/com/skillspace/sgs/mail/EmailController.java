@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.skillspace.sgs.member.guest.GuestService;
+
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,27 +19,35 @@ import lombok.extern.slf4j.Slf4j;
 public class EmailController {
 
 private final EmailService emailService;
+private final GuestService guestService;
 	
 	// 메일 인증코드 발급
 	@GetMapping("/authcode")
-	public ResponseEntity<String> authcode(String type, EmailDTO dto, HttpSession session) {
+	public ResponseEntity<String> authcode(String type, EmailDTO dto, HttpSession session) throws Exception {
 		
 		ResponseEntity<String> entity = null;
 		
-		// type : 메일 템플릿 파일명(어떤 종류의 메일인지).  "authcode"
-		type = "mail/" + type;
+		String msg = "";
 		
-		// 랜덤 인증코드 생성
-		String authcode = ((EmailService)emailService).createAuthCode();
-		log.info("메일 인증코드 : " + authcode);
-		
-		// 메일 인증코드를 세션에 저장.
-		session.setAttribute("authcode", authcode);
-		
-		// 메일 발송
+		if(guestService.emailCheck(dto.getReceiverMail()) == null) {
+			msg = "email_fail";
+		}else {
+			// type : 메일 템플릿 파일명(어떤 종류의 메일인지).  "authcode"
+			type = "mail/" + type;
+			
+			// 랜덤 인증코드 생성
+			String authcode = ((EmailService)emailService).createAuthCode();
+			log.info("메일 인증코드 : " + authcode);
+			
+			// 메일 인증코드를 세션에 저장.
+			session.setAttribute("authcode", authcode);
+			
+			msg = "success";
+			// 메일 발송
 //		emailService.sendMail(type, dto, authcode);
+		}
 		
-		entity = new ResponseEntity<String>("success", HttpStatus.OK);
+		entity = new ResponseEntity<String>(msg, HttpStatus.OK);
 		
 		return entity;
 	}

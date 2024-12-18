@@ -1,6 +1,5 @@
 package com.skillspace.sgs.member.guest;
 
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -41,6 +40,14 @@ public class GuestService {
 
 	public GuestVO modify(String user_id) {
 		return guestMapper.modify(user_id);
+	}
+
+	public String emailCheck(String user_email) {
+		return guestMapper.emailCheck(user_email);
+	}
+
+	public void modify_save(GuestVO vo) {
+		guestMapper.modify_save(vo);
 	}
 
 	

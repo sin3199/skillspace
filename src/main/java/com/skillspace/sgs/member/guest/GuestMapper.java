@@ -32,4 +32,6 @@ public interface GuestMapper {
 	// 임시 비밀번호, 아이디 이메일 일치 되는 이메일 리턴
 	String pwtemp_confirm(@Param("user_id") String user_id, @Param("user_email") String user_email);
 
+	String emailCheck(String user_email);
+
 }

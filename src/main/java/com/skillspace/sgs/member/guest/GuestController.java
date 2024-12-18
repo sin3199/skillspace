@@ -124,13 +124,21 @@ public class GuestController {
 		return "redirect:/";
 	}
 	
-	// 회원 정보 수정
+	// 회원 정보 수정 폼
 	@GetMapping("/modify")
 	public void modify(Model model, HttpSession session) {
 		
 		GuestVO vo = guestService.modify(((GuestVO)session.getAttribute("login_auth")).getUser_id());
 		model.addAttribute("guestVO", vo);
+	}
+	
+	// 회원 정보 수정 처리
+	@PostMapping("/modify")
+	public String modify_save(GuestVO vo) throws Exception {
 		
+		guestService.modify_save(vo);
+		
+		return "redirect:/guest/modify";
 	}
 	
 	// 아이디 찾기 폼
@@ -148,9 +156,11 @@ public class GuestController {
 		return entity;
 	}
 	
+	// 비밀번호 찾기 폼
 	@GetMapping("/pwsearch")
 	public void pwSearch() {}
 	
+	// 임시 비밀번호 발급
 	@GetMapping("/pwtemp")
 	public ResponseEntity<String> pwtemp(String user_id, String user_email) {
 		
@@ -175,5 +185,22 @@ public class GuestController {
 		return entity;
 	}
 	
+	// 비밀번호 확인
+	@PostMapping("/check-password")
+	public ResponseEntity<String> checkPassword(String password, String user_pw){
+		
+		ResponseEntity<String> entity = null;
+		String msg = "";
+		
+		if(passwordEncoder.matches(password, user_pw)) {
+			msg = "success";
+		}else {
+			msg = "fail";
+		}
+		
+		entity = new ResponseEntity<String>(msg, HttpStatus.OK);
+		
+		return entity;
+	}
 	
 }

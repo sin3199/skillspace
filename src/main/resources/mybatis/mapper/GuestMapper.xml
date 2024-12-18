@@ -20,6 +20,15 @@
 		user_nick = #{user_nick}
 </select>
 
+<select id="emailCheck" parameterType="String" resultType="String">
+	select 
+		user_email
+	from 
+		userinfo
+	where 
+		user_email = #{user_email}
+</select>
+
 <insert id="join" parameterType="com.skillspace.sgs.member.guest.GuestVO">
 	insert into 
 		UserInfo(user_id,
@@ -112,13 +121,25 @@
 	where 
 		user_id = #{user_id} 
 </update>
-<!-- 
 
-<update id="modify_save" parameterType="com.ezen.shop.member.MemberVO">
-	
+
+<update id="modify_save" parameterType="com.skillspace.sgs.member.guest.GuestVO">
+	update 
+		userinfo
+	set 
+		user_name = #{user_name},
+		user_nick = #{user_nick},
+		user_email = #{user_email},
+		user_phone = #{user_phone},
+		user_zipcode = #{user_zipcode},
+		user_addr = #{user_addr},
+		user_addrdetail = #{user_addrdetail},
+		updated_at = now(),
+		user_email_receive = #{user_email_receive}
+	where 
+		user_id = #{user_id}
 </update>
 
 
 
- -->
 </mapper>
