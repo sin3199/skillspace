@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.skillspace.sgs.admin.category.AdminCategoryMapper">
+
+<select id="getMaxSortOrderByLevel" parameterType="int" resultType="Integer">
+	select
+		coalesce(max(sort_order), 0)
+    from 
+    	category
+    where 
+    	level = #{level}
+</select>
+
+<insert id="createCategory" parameterType="com.skillspace.sgs.admin.category.CategoryDTO">
+	insert into 
+		category(
+				cate_prtcode, 
+				cate_name, 
+				level,
+				sort_order
+			)
+		values(
+			#{cate_prtcode}, 
+			#{cate_name}, 
+			#{level},
+			#{sort_order}
+			)
+</insert>
+
+<select id="getFirstCategory" resultType="com.skillspace.sgs.admin.category.CategoryDTO">
+	select 
+		cate_id, 
+		cate_prtcode, 
+		cate_name, 
+		level, 
+		sort_order
+	from 
+		category
+	where 
+		cate_prtcode is null
+	order by 
+		sort_order
+</select>
+
+<select id="getSubCategory" parameterType="int" resultMap="CategoryResultMap">
+	select 
+		c.cate_id, 
+		c.cate_prtcode, 
+		c.cate_name, 
+		c.level, 
+		c.sort_order,
+		i.image_id,
+        i.entity_type,
+        i.entity_id,
+        i.image_up_folder,
+        i.image_name,
+        i.created_at
+	from 
+		category c
+	left outer join
+		images i
+	on
+		c.cate_id = i.entity_id and i.entity_type = 'category'
+	where 
+		c.cate_prtcode = ${cate_prtcode}
+	order by 
+		c.sort_order
+</select>
+
+<resultMap id="CategoryResultMap" type="com.skillspace.sgs.admin.category.CategoryDTO" >
+	<id property="cate_id" column="cate_id"/>
+    <result property="cate_prtcode" column="cate_prtcode"/>
+    <result property="cate_name" column="cate_name"/>
+    <result property="level" column="level"/>
+    <result property="sort_order" column="sort_order"/>
+    <collection property="images" ofType="com.skillspace.sgs.admin.images.ImagesDTO">
+        <id property="image_id" column="image_id"/>
+        <result property="entity_type" column="entity_type"/>
+        <result property="entity_id" column="entity_id"/>
+        <result property="image_up_folder" column="image_up_folder"/>
+        <result property="image_name" column="image_name"/>
+        <result property="created_at" column="created_at"/>
+    </collection>
+</resultMap>
+
+<select id="getSubCategory_All" resultMap="CategoryResultMap">
+	select 
+		c.cate_id, 
+		c.cate_prtcode, 
+		c.cate_name, 
+		c.level, 
+		c.sort_order,
+		i.image_id,
+        i.entity_type,
+        i.entity_id,
+        i.image_up_folder,
+        i.image_name,
+        i.created_at
+	from 
+		category c
+	left outer join
+		images i
+	on
+		c.cate_id = i.entity_id and i.entity_type = 'category'
+	where 
+		c.cate_prtcode is not null
+	order by 
+		c.sort_order
+</select>
+
+<select id="getCategoryById" parameterType="int" resultType="com.skillspace.sgs.admin.category.CategoryDTO">
+	select 
+		cate_id, 
+		cate_prtcode, 
+		cate_name, 
+		level, 
+		sort_order
+	from 
+		category
+	where 
+		cate_id = ${cate_id}
+</select>
+
+<update id="updateSortOrder" parameterType="Map">
+	update 
+		category
+	set 
+		sort_order = #{sort_order}
+	where 
+		cate_id = #{cate_id}
+</update>
+
+<delete id="deleteSubCategory" parameterType="int">
+	delete from 
+		category 
+	where 
+		cate_prtcode = #{cate_id}
+</delete>
+
+<delete id="deleteCategory" parameterType="int">
+	delete from 
+		category
+	where
+		cate_id = #{cate_id}
+</delete>
+
+<update id="updateCategory" parameterType="com.skillspace.sgs.admin.category.CategoryDTO">
+	update 
+		category
+	set 
+		cate_name = #{cate_name}
+	where
+		cate_id = #{cate_id}
+</update>
+
+
+</mapper>

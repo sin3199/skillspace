@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100" data-bs-theme="auto">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="canonical" href="https://getbootstrap.kr/docs/5.3/examples/navbar-fixed/">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        body {
+            padding-top: 57px;
+        }
+        #scrollspy_nav {
+            background: white;
+            padding: 10px 0;
+            z-index: 1020;
+            top: 57px;
+        }
+    </style>
+    <style>
+        /* 캐러셀 이미지 설정*/
+        /* 캐러셀 이미지의 고정 높이 설정 */
+        .carousel-image {
+            height: 400px; /* 원하는 고정 높이 */
+            object-fit: cover; /* 이미지 비율을 유지하며 영역 채우기 */
+        }
+
+        /* 반응형 디자인: 작은 화면에서는 높이 축소 */
+        @media (max-width: 768px) {
+            .carousel-image {
+                height: 250px; /* 모바일 화면에서 이미지 높이 조정 */
+            }
+        }
+    </style>
+    <style>
+        /* md 사이즈 이상일 때 적용되는 스타일 */
+        @media (min-width: 768px) {
+            .custom-grid {
+                display: grid !important;
+                align-items: start;
+                grid-template-columns: repeat(12, 1fr);
+                grid-template-rows: min-content 1fr; /* 1행: 콘텐츠 높이만큼, 2행: 남은 공간 차지 */
+                width: 100%;
+            }
+            
+            /* 왼쪽 영역 스타일 */
+            #left {
+                grid-column: 1 /  9; /* 8열 차지 */
+                grid-row: 1; /* 1번 행 */
+                height: min-content;
+            }
+            
+            /* 오른쪽 영역 스타일 */
+            #right {
+                top: 57px;  /* 상단 네비게이션바 높이만큼 여백 */
+                border: 2px solid #dee2e6;  /* 구분선 추가 */
+                padding: 10px;  /* 여백 추가 */
+                background-color: #f8f9fa;  /* 배경색 추가 */
+                box-shadow: -3px 0 5px -5px rgba(0,0,0,0.2);  /* 왼쪽 그림자 효과 */
+                border-radius: 8px;  /* 모서리 둥글게 */
+                grid-column: 9 /  13; /* 4열 차지 */
+                grid-row: 1 /  3; /* 1-2행 차지 */
+                height: min-content; /* 오른쪽 영역 전체 높이 채우기 */
+                overflow-y: auto; /* 내용이 넘칠 경우 스크롤 생성 */
+            }
+
+            #bottom {
+                grid-column: 1 /  9;
+                grid-row: 2;
+            }
+        }
+
+        /* 모바일 환경에서 결제 버튼 고정 스타일 */
+        @media (max-width: 768px) {
+            #btn-payment {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background-color: #fff;
+                padding: 10px;
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+                z-index: 1030;
+            }
+            /* 버튼 위로 컨텐츠가 가려지지 않도록 하단 여백 추가 */
+            #main-row {
+                padding-bottom: 100px;
+            }
+
+            /* 버튼 스타일 */
+            #btn-payment .btn {
+                border-radius: 4px;
+                margin: 0 10px;
+            }
+        }
+
+    </style>
+
+    <style>
+        /* 스크롤스파이 네비게이션 스타일 */
+        .nav-link {
+            color: #666;
+            border: none;
+        }
+
+        .nav-link.active {
+            color: #6c5ce7;
+            border-bottom: 2px solid #6c5ce7;
+            background: none;
+        }
+
+        .sticky-top {
+            top: 58px;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column h-100">
+    <main class="container">
+        <div class="row my-4 shadow-lg border-0" id="main-row">
+            <div class="col-12">
+                <!-- 상단 네비게이션 -->
+                <div class="mb-3">
+                    <h2>[홍대 합정] 올인어스 연습실</h2>
+                    <p class="text-muted">새벽 50% 할인 이벤트! 깔끔한 연습실</p>
+                    
+                    <!-- 태그 목록 -->
+                    <div class="tags">
+                        <span class="badge rounded-pill bg-light text-dark">#화려한연습실</span>
+                        <span class="badge rounded-pill bg-light text-dark">#댄스연습실</span>
+                        <span class="badge rounded-pill bg-light text-dark">#연습장대여</span>
+                        <span class="badge rounded-pill bg-light text-dark">#합정연습실</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="row custom-grid">
+                    <div class="col-12 mb-3" id="left">
+                        <div class="my-4">
+                            <!-- Bootstrap 5 Carousel for Shopping Mall Homepage -->
+                            <div id="carouselExampleIndicators" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                                
+                            
+                                <!-- Carousel Inner (Slides) -->
+                                <div class="carousel-inner">
+                                    <!-- First Slide -->
+                                    <div class="carousel-item active">
+                                        <!-- Placeholder image for the first slide -->
+                                        <img src="https://cdn.pixabay.com/photo/2024/08/24/02/13/ai-generated-8993116_1280.jpg" class="d-block w-100 carousel-image" alt="First Slide">
+                                    </div>
+                            
+                                    <!-- Second Slide -->
+                                    <div class="carousel-item">
+                                        <!-- Placeholder image for the second slide -->
+                                        <img src="https://cdn.pixabay.com/photo/2024/12/30/13/06/moped-9300285_640.jpg" class="d-block w-100 carousel-image" alt="Second Slide">
+                                    </div>
+                            
+                                    <!-- Third Slide -->
+                                    <div class="carousel-item">
+                                        <!-- Placeholder image for the third slide -->
+                                        <img src="https://cdn.pixabay.com/photo/2024/05/30/08/48/pattern-8798134_640.png" class="d-block w-100 carousel-image" alt="Third Slide">
+                                    </div>
+                                </div>
+                            
+                                <!-- Carousel Controls (Previous and Next Buttons) -->
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
+                                    data-bs-slide="prev">
+                                    <!-- Icon for previous button -->
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
+                                    data-bs-slide="next">
+                                    <!-- Icon for next button -->
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    
+                    <!-- 오른쪽 세부공간 선택 영역 -->
+                    <div class="col-12 mb-3" id="right">
+                        <div class="overflow-auto" style="max-height: calc(100vh - 80px);">
+                            <h4 class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-primary">세부공간 선택</span>
+                                <span class="badge bg-primary rounded-pill">♡찜</span>
+                            </h4>
+                    
+                            <div class="accordion" id="accordionExample">
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                            세부공간 1호실
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+                                        <div class="accordion-body">
+                                            <div>
+                                                <img src="https://cdn.pixabay.com/photo/2015/12/04/22/20/gear-1077550_640.png"
+                                                    style="height: 100px; object-fit: cover;">
+                                                세부공간 이미지
+                                            </div>
+                                            <div>
+                                                세부공간 설명
+                                            </div>
+                                            <hr>
+                                            <div>
+                                                공간 정보 : 공간 유형, 면적, 예약 시간, 수용인원 등
+                                            </div>
+                                            <hr>
+                                            <div>
+                                                <div>예약 시간 선택</div>
+                                                <div>달력</div>
+                                                <div>시간 선택</div>
+                                                <div>예약 인원</div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- 콜랩스 end -->
+                                </div> <!-- 아이템 end -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseOne2" aria-expanded="true" aria-controls="collapseOne">
+                                            세부공간 1호실
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOne2" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                        <div class="accordion-body">
+                                            <div>
+                                                <img src="https://cdn.pixabay.com/photo/2015/12/04/22/20/gear-1077550_640.png"
+                                                    style="height: 100px; object-fit: cover;">
+                                                세부공간 이미지
+                                            </div>
+                                            <div>
+                                                세부공간 설명
+                                            </div>
+                                            <hr>
+                                            <div>
+                                                공간 정보 : 공간 유형, 면적, 예약 시간, 수용인원 등
+                                            </div>
+                                            <hr>
+                                            <div>
+                                                <div>예약 시간 선택</div>
+                                                <div>달력</div>
+                                                <div>시간 선택</div>
+                                                <div>예약 인원</div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- 콜랩스 end -->
+                                </div> <!-- 아이템 end -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#collapseOne3" aria-expanded="true" aria-controls="collapseOne">
+                                            세부공간 1호실
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOne3" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                        <div class="accordion-body">
+                                            <div>
+                                                <img src="https://cdn.pixabay.com/photo/2015/12/04/22/20/gear-1077550_640.png"
+                                                    style="height: 100px; object-fit: cover;"
+                                                    name="detail_imag">
+                                                세부공간 이미지
+                                            </div>
+                                            <div>
+                                                세부공간 설명
+                                            </div>
+                                            <hr>
+                                            <div>
+                                                공간 정보 : 공간 유형, 면적, 예약 시간, 수용인원 등
+                                            </div>
+                                            <hr>
+                                            <div>
+                                                <div>예약 시간 선택</div>
+                                                <div>달력</div>
+                                                <div>시간 선택</div>
+                                                <div>예약 인원</div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- 콜랩스 end -->
+                                </div> <!-- 아이템 end -->
+                            </div><!-- 아코디언  end -->
+
+                            
+                            <div class="d-grid" id="btn-payment">
+                                <button type="button" class="btn btn-secondary">결제 버튼</button>
+                            </div>
+                        </div>
+                    </div><!-- 세부공간 end-->
+
+                    <!-- 네비게이션 탭 -->
+                    <div class="col-12 mb-3" id="bottom">
+                        <nav class="nav nav-fill sticky-top" id="">
+                            <a class="nav-link" href="#space_info">공간 소개</a>
+                            <a class="nav-link" href="#space_facility">시설 안내</a>
+                            <a class="nav-link" href="#space_qa">Q&A</a>
+                            <a class="nav-link" href="#space_review">이용 후기</a>
+                        </nav>
+
+                        <div id="scrollspy_content" data-bs-spy="scroll" data-bs-target="#scrollspy_nav">
+                            <h4 id="space_info">공간 소개</h4>
+                            <p>...</p>
+                            <div style="height: 300px;"></div>
+                            <h4 id="space_facility">시설 안내</h4>
+                            <p>...</p>
+                            <div style="height: 300px;"></div>
+                            <h4 id="space_qa">Q&A</h4>
+                            <p>...</p>
+                            <div style="height: 300px;"></div>
+                            <h4 id="space_review">이용 후기</h4>
+                            <p>...</p>
+                            <div style="height: 300px;"></div>
+                        </div>
+                    </div>
+
+                </div> <!-- row end -->
+            </div>
+        </div> <!-- shodow row end -->
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

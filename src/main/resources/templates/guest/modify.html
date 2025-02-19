@@ -20,7 +20,7 @@
                      <div class="col-10">
                         <div class="input-group">
                            <!-- 아이디 입력 -->
-                           <input type="text" class="form-control" id="user_id" name="user_id" th:value="${guestVO.user_id}" readonly>
+                           <input type="text" class="form-control" id="user_id" name="user_id" th:value="${guestDTO.user_id}" readonly>
                         </div>
                      </div>
                   </div>
@@ -47,7 +47,7 @@
                      <div class="col-10">
                         <!-- 이름 입력 -->
                         <input type="text" class="form-control" id="user_name" name="user_name" 
-                                 th:value="${guestVO.user_name}" placeholder="이름" required>
+                                 th:value="${guestDTO.user_name}" placeholder="이름" required>
                         <!-- 유효성 검사 오류 메시지 -->
                         <div class="invalid-feedback">이름을 입력하세요</div>
                      </div>
@@ -59,7 +59,7 @@
                      <div class="col-10">
                         <div class="input-group">
                            <!-- 닉네임 입력 -->
-                           <input type="text" class="form-control" id="user_nick" name="user_nick" th:value="${guestVO.user_nick}" placeholder="닉네임"
+                           <input type="text" class="form-control" id="user_nick" name="user_nick" th:value="${guestDTO.user_nick}" placeholder="닉네임"
                               required>
                            <!-- 닉네임 중복체크 -->
                            <button type="button" class="btn btn-outline-primary ms-2 w-25" id="btnNickCheck">Nick
@@ -78,7 +78,7 @@
                      <div class="col-10">
                         <div class="input-group">
                            <!-- 이메일 입력 -->
-                           <input type="email" class="form-control" id="user_email" name="user_email" th:value="${guestVO.user_email}" placeholder="이메일"
+                           <input type="email" class="form-control" id="user_email" name="user_email" th:value="${guestDTO.user_email}" placeholder="이메일"
                               required>
                            <!-- 메일인증 요청 -->
                            <button type="button" class="btn btn-outline-primary ms-2 w-25" id="btnMailAuthcode">메일인증
@@ -112,7 +112,7 @@
                      <div class="col-10">
                         <div class="input-group">
                            <!-- 우편번호 입력 -->
-                           <input type="text" class="form-control" id="sample2_postcode" name="user_zipcode" th:value="${guestVO.user_zipcode}"
+                           <input type="text" class="form-control" id="sample2_postcode" name="user_zipcode" th:value="${guestDTO.user_zipcode}"
                               placeholder="우편번호" required maxlength="6">
                            <!-- 우편번호 찾기 -->
                            <button type="button" class="btn btn-outline-primary ms-2 w-25"
@@ -128,7 +128,7 @@
                      </div>
                      <div class="col-10">
                         <!-- 기본주소 입력 -->
-                        <input type="text" class="form-control" id="sample2_address" name="user_addr" th:value="${guestVO.user_addr}" placeholder="기본주소"
+                        <input type="text" class="form-control" id="sample2_address" name="user_addr" th:value="${guestDTO.user_addr}" placeholder="기본주소"
                            required>
                         <!-- 유효성 검사 오류 메시지 -->
                         <div class="invalid-feedback">기본주소를 입력하세요</div>
@@ -140,7 +140,7 @@
                      </div>
                      <div class="col-10">
                         <!-- 상세주소 입력 -->
-                        <input type="text" class="form-control" id="sample2_detailAddress" name="user_addrdetail" th:value="${guestVO.user_addrdetail}"
+                        <input type="text" class="form-control" id="sample2_detailAddress" name="user_addrdetail" th:value="${guestDTO.user_addrdetail}"
                            placeholder="상세주소" required> <input type="hidden" id="sample2_extraAddress"
                            placeholder="참고항목">
                         <!-- 유효성 검사 오류 메시지 -->
@@ -153,7 +153,7 @@
                      </div>
                      <div class="col-10">
                         <!-- 전화번호 입력 -->
-                        <input type="text" class="form-control" id="user_phone" name="user_phone" th:value="${guestVO.user_phone}"
+                        <input type="text" class="form-control" id="user_phone" name="user_phone" th:value="${guestDTO.user_phone}"
                            placeholder="전화번호 - 빼고 숫자만 입력" maxlength="11" required>
                         <!-- 유효성 검사 오류 메시지 -->
                         <div class="invalid-feedback">전화번호를 입력하세요</div>
@@ -166,12 +166,12 @@
                      <div class="col-10">
                         <!-- 메일 수신 체크 -->
                         <div class="form-check form-check-inline">
-                           <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio1" th:checked= "${guestVO.user_email_receive == 'Y'}"
+                           <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio1" th:checked= "${guestDTO.user_email_receive == 'Y'}"
                               value="Y">
                            <label class="form-check-label" for="inlineRadio1">수신</label>
                         </div>
                         <div class="form-check form-check-inline">
-                           <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio2" th:checked= "${guestVO.user_email_receive == 'N'}"
+                           <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio2" th:checked= "${guestDTO.user_email_receive == 'N'}"
                               value="N">
                            <label class="form-check-label" for="inlineRadio2">수신거부</label>
                         </div>
@@ -215,8 +215,8 @@
          const validationState = {
             nickChecked: true,
             emailAuth: true,
-            input_nick: [[${guestVO.user_nick}]],
-            input_email: [[${guestVO.user_email}]]
+            input_nick: [[${guestDTO.user_nick}]],
+            input_email: [[${guestDTO.user_email}]]
          };
 
          const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -236,8 +236,8 @@
                const nickError          = form.querySelector('#nickError');
                const nickCheckError     = form.querySelector('#nickCheckError');
 
-               // let user_nick  = [[${guestVO.user_nick}]];
-               // let user_email = [[${guestVO.user_email}]];
+               // let user_nick  = [[${guestDTO.user_nick}]];
+               // let user_email = [[${guestDTO.user_email}]];
 
                if (!password.value) {
                   passwordError.style.display = 'block'; // 입력값이 없을 때 오류 메시지 표시
@@ -247,7 +247,7 @@
                   $.ajax({
                      url: '/guest/check-password', 
                      type: 'POST',
-                     data: { password: password.value, user_pw: [[${guestVO.user_pw}]] },
+                     data: { password: password.value, user_pw: [[${guestDTO.user_pw}]] },
                      async: false, // 동기 요청으로 설정하여 Ajax 완료 후 계속 진행
                      success: function(result) {
                         if (result == "fail") {

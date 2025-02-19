@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.skillspace.sgs.guest.GuestMapper">
+
+<select id="idCheck" parameterType="String" resultType="String">
+	select 
+		user_id
+	from 
+		userinfo
+	where 
+		user_id = #{user_id}
+</select>
+
+<select id="nickCheck" parameterType="String" resultType="String">
+	select 
+		user_nick
+	from 
+		userinfo
+	where 
+		user_nick = #{user_nick}
+</select>
+
+<select id="emailCheck" parameterType="String" resultType="String">
+	select 
+		user_email
+	from 
+		userinfo
+	where 
+		user_email = #{user_email}
+</select>
+
+<insert id="join" parameterType="com.skillspace.sgs.guest.GuestDTO">
+	insert into 
+		UserInfo(user_id,
+				 user_pw,
+				 user_name,
+				 user_nick,
+				 user_email,
+				 user_phone,
+				 user_zipcode,
+				 user_addr,
+				 user_addrdetail,
+				 user_email_receive
+				)
+		values(
+				#{user_id},
+				#{user_pw},	
+				#{user_name},
+				#{user_nick},
+				#{user_email},
+				#{user_phone},
+				#{user_zipcode},
+				#{user_addr},
+				#{user_addrdetail},
+				#{user_email_receive}
+				)
+		
+</insert>
+
+<select id="login" parameterType="String" resultType="com.skillspace.sgs.guest.GuestDTO">
+	select
+		user_id,
+		user_pw, 
+		user_name,	
+		user_nick, 
+		user_status,
+		role
+	from 
+		userinfo
+	where 
+		user_id = #{user_id}
+</select>
+
+<select id="modify" parameterType="String" resultType="com.skillspace.sgs.guest.GuestDTO">
+	select
+		user_id,
+		user_pw,
+		user_name,
+		user_nick,
+		user_email,
+		user_phone,
+		user_zipcode,
+		user_addr,
+		user_addrdetail,
+		created_at,
+		updated_at,
+		user_email_receive
+	from
+		userinfo
+	where
+		user_id = #{user_id}
+</select>
+
+<select id="idsearch" parameterType="Map" resultType="String">
+	select 
+		user_id 
+	from 
+		userinfo 
+	where 
+		user_name = #{user_name} 
+	and 
+		user_email = #{user_email}
+</select>
+
+<select id="pwtemp_confirm" parameterType="Map" resultType="String">
+	select 
+		user_email 
+	from 
+		userinfo 
+	where 
+		user_id = #{user_id} 
+	and 
+		user_email = #{user_email}
+</select>
+
+<update id="pwchange" parameterType="Map">
+	update 
+		userinfo 
+	set	
+		user_pw  = #{user_pw}
+	where 
+		user_id = #{user_id} 
+</update>
+
+
+<update id="modify_save" parameterType="com.skillspace.sgs.guest.GuestDTO">
+	update 
+		userinfo
+	set 
+		user_name = #{user_name},
+		user_nick = #{user_nick},
+		user_email = #{user_email},
+		user_phone = #{user_phone},
+		user_zipcode = #{user_zipcode},
+		user_addr = #{user_addr},
+		user_addrdetail = #{user_addrdetail},
+		updated_at = now(),
+		user_email_receive = #{user_email_receive}
+	where 
+		user_id = #{user_id}
+</update>
+
+
+
+</mapper>

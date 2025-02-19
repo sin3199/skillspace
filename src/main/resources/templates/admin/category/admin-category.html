@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	   layout:decorate="~{admin/layouts/admin-layout}">
+
+<th:block layout:fragment="content">
+
+<style>
+	button {
+		white-space: nowrap;
+		/* 버튼 내부 텍스트가 줄바꿈되지 않도록 설정 */
+	}
+
+	.list-group-item.list-group-item-success.active {
+	color: #0f5132 !important;
+    background-color: #62bd94 !important;
+    border-color: #a3cfbb;
+	font-weight: bold;
+	}
+
+
+	.img-fluid {
+		object-fit: cover;
+		width: 100%;
+		height: auto;
+		max-width: 70px;
+		max-height: 70px;
+	}
+
+
+</style>
+	<h3>카테고리 관리</h3>
+	<hr>
+
+	<div class="row">
+		<!-- 1차 카테고리 -->
+		<div class="col-md-6" name="cate_div">
+			<div class="d-flex justify-content-between align-items-center mb-3">
+				<h4>1차 카테고리</h4>
+				<button name="addCategory" class="btn btn-success btn-sm" data-level="1" data-bs-toggle="modal" data-bs-target="#categoryModal">추가</button>
+			</div>
+			<ul id="firstCategoryList" name="categoryList" class="list-group">
+				<!-- 카테고리가 없을 경우 표시 -->
+				<li th:if="${first_cate_list.size() == 0}" class="list-group-item list-group-item-success text-center">카테고리를 생성해 주세요.</li>
+				<!-- 카테고리 목록 -->
+				<li th:each= "first_cate:${first_cate_list}" name="li_cate_list" class="list-group-item list-group-item-action list-group-item-success">
+					<div class="row align-items-center">
+						<!-- 히든 필드 -->
+						<input type="hidden" name="cate_id" 	 th:value="${first_cate.cate_id}">
+						<input type="hidden" name="cate_prtcode" th:value="${first_cate.cate_prtcode}">
+						<input type="hidden" name="cate_name"    th:value="${first_cate.cate_name}">
+						<!-- 카테고리명 -->
+						<div class="col-8" th:text="${first_cate.cate_name}">피아노</div>
+						<!-- 버튼 그룹 -->
+						<div class="col-4 text-end d-flex justify-content-end gap-1">
+							<button class="btn btn-outline-secondary btn-sm" name="btn_swap">↑</button>
+							<button class="btn btn-outline-secondary btn-sm" name="btn_swap">↓</button>
+							<button class="btn btn-outline-primary btn-sm" name="btn_cate_edit" data-bs-toggle="modal" data-bs-target="#categoryModal">수정</button>
+							<button class="btn btn-outline-danger btn-sm" name="btn_cate_delete">삭제</button>
+						</div>
+					</div>
+				</li>
+			</ul>			
+		</div>
+
+		<!-- 2차 카테고리 -->
+		<div class="col-md-6 mt-4 mt-md-0" name="cate_div">
+			<div class="d-flex justify-content-between align-items-center mb-3">
+				<h4>2차 카테고리</h4>
+				<button name="addCategory" id="subCategory" class="btn btn-success btn-sm" data-level="2" data-bs-toggle="modal" data-bs-target="#categoryModal" style="display: none;">추가</button>
+			</div>
+			<ul id="subCategoryList" name="categoryList" class="list-group">
+				<li class="list-group-item list-group-item-info text-center">카테고리를 선택해 주세요.</li>
+			</ul>
+		</div>
+
+	</div>
+
+
+	<!-- 카테고리 모달 -->
+	<div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" insert>
+		<div class="modal-dialog">
+		<div class="modal-content">
+			<!-- 모달 헤더 -->
+			<div class="modal-header">
+				<h5 class="modal-title" id="categoryModalLabel">카테고리 추가</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			
+			<!-- 모달 바디 -->
+			<div class="modal-body">
+				<div class="mb-3">
+					<label for="cate_name" class="form-label">카테고리 이름</label>
+					<input type="text" class="form-control" id="cate_name" name="cate_name" placeholder="카테고리 이름을 입력하세요">
+					<input type="hidden" id="level">
+					<input type="hidden" id="cate_prtcode">
+					<input type="hidden" id="cate_id">
+				</div>
+			</div>
+			
+			<!-- 모달 푸터 -->
+			<div class="modal-footer d-flex justify-content-end">
+				<button type="button" class="btn btn-primary" id="btn_modal_ok">추가</button>
+				<button type="button" class="btn btn-success" id="btn_modal_edit" style="display: none;">수정</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+			</div>
+		</div>
+		</div>
+	</div>
+
+	<!-- 이미지 업로드를 위한 모달 -->
+	<div class="modal fade" id="imageUploadModal" tabindex="-1" aria-labelledby="imageUploadModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="imageUploadModalLabel">카테고리 아이콘 이미지 업로드</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<form id="imageUploadForm" method="post" enctype="multipart/form-data">
+					<div class="modal-body">
+						<!-- 파일 입력 필드 -->
+						<div class="mb-3">
+							<label for="image_file" class="form-label">이미지 파일 선택</label>
+							<input type="file" class="form-control" id="image_file" name="image_file" 
+							accept="image/jpeg,image/png,image/gif" required>
+							<div class="form-text">JPG, PNG, GIF 파일만 업로드 가능합니다.</div>
+						</div>
+						
+						<!-- 이미지 미리보기 영역 -->
+						<div class="text-center mb-3">
+							<img id="imagePreview" src="" alt="이미지 미리보기" 
+								class="img-fluid rounded" style="max-width: 200px; max-height: 200px; display: none;">
+						</div>
+						
+						<!-- 히든 필드 -->
+						<input type="hidden" id="cateId" name="entity_id">
+						<input type="hidden" name="entity_type" value="category">
+						<input type="hidden" name="image_id" id="image_id">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+						<button type="submit" class="btn btn-primary">저장</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+
+<script>
+	$(document).ready(function() {
+
+		// 이미지 클릭 시 모달 표시
+		$(document).on('click', 'a#category-icon', function(e) {
+			e.preventDefault();
+			const image_id = $(this).attr("href");
+			const cateId = $(this).closest('li').find('input[name="cate_id"]').val();
+			$('#cateId').val(cateId);
+			$('#image_id').val(image_id);
+			$('#imagePreview')
+			.attr('src', '') // 이미지 초기화
+			.css('display', 'none'); // 미리보기 숨김
+			$("#image_file").val("");
+			
+			if (image_id && image_id !== "#") {
+				$.ajax({
+					url: `/api/image/category/${cateId}`, // 이미지 조회 API 호출
+					type: 'GET',
+					dataType: 'json',
+					success: function (images) {
+						if (images && images.length > 0) {
+							const imageUrl = `/api/image/display/${images[0].image_up_folder}/${images[0].image_name}`;
+							$('#imagePreview')
+								.attr('src', imageUrl) // 이미지 URL 설정
+								.css('display', 'block'); // 미리보기 표시
+						}
+					},
+					error: function (xhr, status, error) {
+						console.error("이미지 로딩 오류:", error);
+						$('#imagePreview')
+							.attr('src', '') // 이미지 초기화
+							.css('display', 'none'); // 미리보기 숨김
+					}
+				});
+			}
+			$('#imageUploadModal').modal('show');
+    	});
+    
+		// 이미지 파일 선택 시 미리보기
+		$('#image_file').change(function() {
+			const file = this.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = function(e) {
+					$('#imagePreview')
+						.attr('src', e.target.result)
+						.css('display', 'block');
+				};
+				reader.readAsDataURL(file);
+			}
+		});
+		
+		// 폼 제출 처리
+		$('#imageUploadForm').submit(function(e) {
+			e.preventDefault();
+			
+			const formData = new FormData(this);
+			
+			$.ajax({
+				url: '/api/image/upload',
+				type: 'POST',
+				data: formData,
+				processData: false,
+				contentType: false,
+				success: function(response) {
+					alert('이미지가 성공적으로 업로드되었습니다.');
+					$('#imageUploadModal').modal('hide');
+					location.reload(); // 페이지 새로고침
+				},
+				error: function(xhr, status, error) {
+					alert('이미지 업로드 중 오류가 발생했습니다.');
+				}
+			});
+		});
+
+		// 카테고리 추가 버튼 클릭.  name="addCategory"
+		$("button[name='addCategory'").on("click", function() {
+
+			$("#categoryModal").removeAttr("insert");
+			$("#categoryModalLabel").html("카테고리 추가");
+			$("#btn_modal_ok").show();
+			$("#btn_modal_edit").hide();
+
+			let level = $(this).data("level");
+			let cate_prtcode = $("#cate_prtcode");
+			$("#level").val(level);
+
+			if(level == 1) cate_prtcode.val("");
+		});
+
+		$("ul[name='categoryList']").on("click", function(e) {
+			// 카테고리 수정 버튼 클릭.  name="btn_cate_edit"
+			let target = $(e.target);
+			if(target.is("button[name='btn_cate_edit']")){
+				// console.log("수정버튼 클릭");
+				const clickedBtn_edit = target.closest("button[name='btn_cate_edit']");
+
+				let cate_id = clickedBtn_edit.closest("li").find("input[name='cate_id']").val();
+				let cate_prtcode = clickedBtn_edit.closest("li").find("input[name='cate_prtcode']").val();
+				let cate_name = clickedBtn_edit.closest("li").find("input[name='cate_name']").val();
+				$("input#cate_id").val(cate_id);
+				$("input#cate_prtcode").val(cate_prtcode);
+				$("#categoryModalLabel").html("카테고리 수정 : " + cate_name);
+				$("#categoryModal").removeAttr("insert");
+				$("#btn_modal_ok").hide();
+				$("#btn_modal_edit").show();
+
+			// 카테고리 항목 클릭시 active 효과
+			}else if(!target.is("button") && (target.closest("li[name='li_cate_list']").length > 0)){
+				// 클릭 효과
+				// console.log("li 클릭");
+				const clickedLi = target.closest("li[name='li_cate_list']");
+
+				$('[name="li_cate_list"]').removeClass('active');
+				clickedLi.addClass('active');
+
+				let level = clickedLi.closest("div[name='cate_div']").find("button[name='addCategory']").data("level");
+				
+				$("#subCategory").show();
+				if(level == 1) {
+					let cate_prtcode = clickedLi.find("input[name='cate_id']").val();
+					$("input#cate_prtcode").val(cate_prtcode);
+					reloadSubCategories(cate_prtcode);
+				}
+
+			// 카테고리 위치 변경
+			}else if(target.is("button[name='btn_swap']")) {
+				// console.log("swap 버튼");
+				const clickedBtn_swap = target.closest("button[name='btn_swap']");
+
+				const isUp = clickedBtn_swap.text() === "↑";
+				const currentItem = clickedBtn_swap.closest("li");
+				const siblingItem = isUp ? currentItem.prev() : currentItem.next();
+
+				// 카테고리 항목이 제일 위와 아래일 때
+				if (siblingItem.length === 0) return;
+				
+				const current_cate_id = currentItem.find("input[name='cate_id']").val();
+				const target_cate_id = siblingItem.find("input[name='cate_id']").val();
+				
+				let cate_prtcode = currentItem.find("input[name='cate_prtcode']").val();
+				cate_prtcode = cate_prtcode === "" ? null : cate_prtcode;
+				// console.log(current_cate_id, target_cate_id, cate_prtcode);
+
+				$.ajax({
+					url: "/api/categories/swap",
+					type: "POST",
+					contentType: "application/json",
+					data: JSON.stringify({ 
+						current_cate_id: current_cate_id, 
+						target_cate_id: target_cate_id 
+					}),
+					success: function(result) {
+						if(result == "success") {
+							if(!cate_prtcode) {	// 1차 카테고리 일때
+								console.log("1차 swap ajax");
+								reloadFirstCategories(); 
+							}else { // 2차 카테고리 일때
+								console.log("2차 swap ajax");
+								reloadSubCategories(cate_prtcode);
+							}
+						}
+					},
+					error: function(xhr) {
+						alert("순서 변경 중 오류 발생: " + xhr.responseText);
+					}
+				});
+			}
+		});
+
+		// 카테고리 삭제 버튼 클릭.  name="btn_cate_delete"
+		$("ul[name='categoryList']").on("click", "button[name='btn_cate_delete']", function(e) {
+			e.stopPropagation(); //  부모요소에 이벤트 전파 중단
+
+			if(!confirm("카테고리를 삭제 하시겠습니까?")) return;
+
+			let cate_id = $(this).closest("li").find("input[name='cate_id']").val();
+			let cate_prtcode = $(this).closest("li").find("input[name='cate_prtcode']").val();
+
+			$.ajax({
+				url: '/api/categories/' + cate_id,
+				type: 'DELETE',
+				success: function(result) {
+					if(result == "success") {
+						if(!cate_prtcode) {
+							reloadFirstCategories();
+						}
+						reloadSubCategories(cate_prtcode);
+					}
+				},
+				error: function(xhr) {
+					alert("카테고리 삭제 중 오류 발생: " + xhr.responseText);
+				}
+			});
+
+
+		});
+
+		// 모달의 추가 버튼 클릭.  id="btn_modal_ok"
+		$("#btn_modal_ok").on("click keydown", function() {
+
+			let level = $("#level").val();
+			let cate_prtcode = $("#cate_prtcode").val();
+			let cate_name = $("#cate_name").val();
+
+			let categoryData = {
+				cate_prtcode: cate_prtcode,
+				cate_name: cate_name,
+				level: level
+			};
+
+			$.ajax({
+				url: '/api/categories',
+				type: 'post',
+				contentType: 'application/json',
+				data: JSON.stringify(categoryData),
+				success: function(result) {
+					if(result == "success") {
+						if(level == 1) {
+							reloadFirstCategories();
+						}else {
+							reloadSubCategories(cate_prtcode);
+						}
+						$("#categoryModal").modal("hide");
+						$("#categoryModal").attr("insert", "");
+						$("#cate_name").val("");
+					}
+				}
+			});
+		});
+
+		// 모달의 수정버튼 클릭.  id="btn_modal_edit"
+		$("#btn_modal_edit").on("click", function() {
+			let cate_prtcode = $("#cate_prtcode").val();
+			$.ajax({
+				url: '/api/categories',
+				type: 'put',
+				headers: {
+					"Content-Type" : "application/json",
+					"X-HTTP-Method-Override" : "PUT"
+				},
+				data: JSON.stringify({
+					cate_id : $("#cate_id").val(),
+					cate_name : $("#cate_name").val()
+				}),
+				dataType: 'text',
+				success: function(result) {
+					if(result == "success") {
+						if(cate_prtcode) {
+							reloadSubCategories(cate_prtcode);
+						}else reloadFirstCategories();
+						$("#categoryModal").modal("hide");
+						$("#categoryModal").attr("insert", "");
+						$("#cate_name").val("");
+					}
+				}
+			});
+		});
+
+		// 모달 포커스
+		$("#categoryModal").on("shown.bs.modal", function() {
+       		$("#cate_name").focus();
+    	});
+
+		// 1차 카테고리 목록 갱신 함수
+		function reloadFirstCategories() {
+			$.ajax({
+				url: '/api/categories/first',
+				type: 'GET',
+				dataType: 'json',
+				success: function(firstCategories) {
+					let firstCategoryList = $("#firstCategoryList");
+					firstCategoryList.empty();
+
+					if (firstCategories.length > 0) {
+						firstCategories.forEach(function(category) {
+							// cate_prtcode가 null일 경우 빈 문자열로 처리
+							let cate_prtcode = category.cate_prtcode === null ? "" : category.cate_prtcode;
+							let listItem = `
+								<li name="li_cate_list" class="list-group-item list-group-item-action list-group-item-success">
+									<div class="row align-items-center">
+										<input type="hidden" name="cate_id" 	 value="${category.cate_id}">
+										<input type="hidden" name="cate_prtcode" value="${cate_prtcode}">
+										<input type="hidden" name="cate_name"    value="${category.cate_name}">
+										<div class="col-8">${category.cate_name}</div>
+										<div class="col-4 text-end d-flex justify-content-end gap-1">
+											<button class="btn btn-outline-secondary btn-sm" name="btn_swap">↑</button>
+											<button class="btn btn-outline-secondary btn-sm" name="btn_swap">↓</button>
+											<button class="btn btn-outline-primary btn-sm" name="btn_cate_edit" data-bs-toggle="modal" data-bs-target="#categoryModal">수정</button>
+											<button class="btn btn-outline-danger btn-sm" name="btn_cate_delete">삭제</button>
+										</div>
+									</div>
+								</li>`;
+							firstCategoryList.append(listItem); // 목록에 항목 추가
+						});
+					} else {
+						firstCategoryList.append('<li class="list-group-item list-group-item-success text-center">카테고리를 생성해 주세요.</li>');
+					}
+				},
+				error: function(xhr, status, error) {
+					console.error("Error occurred : ", error);
+					alert("2차 카테고리를 불러오는 중 오류");
+				}
+			});
+		}
+
+		// 2차 카테고리 목록 갱신 함수
+		function reloadSubCategories(cate_prtcode) {
+			let subCateList = $("#subCategoryList");
+			subCateList.empty();
+
+			if (!cate_prtcode) {
+				subCateList.append('<li class="list-group-item list-group-item-info text-center">카테고리를 선택해 주세요.</li>');
+				return;
+			}
+
+			$.ajax({
+				url: '/api/categories/sub/' + cate_prtcode,
+				type: 'GET',
+				dataType: 'json',
+				success: function (subCategories) {
+					if (subCategories.length > 0) {
+						subCategories.forEach(function (category) {
+							// 카테고리 이미지 조회
+							$.ajax({
+								url: `/api/image/category/${category.cate_id}`,
+								type: 'GET',
+								async: false,
+								success: function (images) {
+									console.log("이미지" , images);
+									let imageUrl = '/images/no-image.png'; // 기본 이미지 경로
+									let image_id = "";
+
+									// 이미지가 존재하면 첫 번째 이미지 사용
+									if (images && images.length > 0) {
+										imageUrl = `/api/image/display/${images[0].image_up_folder}/${images[0].image_name}`;
+										image_id = images[0].image_id;
+									}
+
+									let listItem = `
+									<li class="list-group-item list-group-item-action list-group-item-info">
+										<div class="row align-items-center">
+											<input type="hidden" name="cate_id"      value="${category.cate_id}">
+											<input type="hidden" name="cate_prtcode" value="${category.cate_prtcode}">
+											<input type="hidden" name="cate_name"    value="${category.cate_name}">
+											<div class="col-2">
+												<a href="${image_id}" id="category-icon">
+													<img src="${imageUrl}"
+														class="img-fluid rounded"
+														alt="카테고리 아이콘">
+												</a>
+											</div>
+											<div class="col-6">${category.cate_name}</div>
+											<div class="col-4 text-end d-flex justify-content-end gap-1">
+												<button class="btn btn-outline-secondary btn-sm" name="btn_swap">↑</button>
+												<button class="btn btn-outline-secondary btn-sm" name="btn_swap">↓</button>
+												<button class="btn btn-outline-primary btn-sm" name="btn_cate_edit" data-bs-toggle="modal" data-bs-target="#categoryModal">수정</button>
+												<button class="btn btn-outline-danger btn-sm" name="btn_cate_delete">삭제</button>
+											</div>
+										</div>
+									</li>`;
+									subCateList.append(listItem);
+								},
+								error: function (xhr, status, error) {
+									console.error("이미지 로딩 중 오류 발생:", error);
+									// 이미지 로딩 실패시 기본 이미지로 항목 추가
+									let listItem = getDefaultListItem(category);
+									subCateList.append(listItem);
+								}
+							});
+						});
+					} else {
+						subCateList.append('<li class="list-group-item list-group-item-info text-center">2차 카테고리가 없습니다.</li>');
+					}
+				},
+				error: function (xhr, status, error) {
+					console.error("Error occurred : ", error);
+					alert("2차 카테고리를 불러오는 중 오류");
+				}
+			});
+		}
+
+		// 기본 리스트 아이템 생성 함수(이미지 로딩 실패 시)
+		function getDefaultListItem(category) {
+			return `
+        <li class="list-group-item list-group-item-action list-group-item-info">
+            <div class="row align-items-center">
+                <input type="hidden" name="cate_id"      value="${category.cate_id}">
+                <input type="hidden" name="cate_prtcode" value="${category.cate_prtcode}">
+                <input type="hidden" name="cate_name"    value="${category.cate_name}">
+                <div class="col-2">
+                    <a href="#" id="category-icon">
+                        <img src="/images/no-image.png"
+                            class="img-fluid rounded"
+                            alt="카테고리 아이콘">
+                    </a>
+                </div>
+                <div class="col-6">${category.cate_name}</div>
+                <div class="col-4 text-end d-flex justify-content-end gap-1">
+                    <button class="btn btn-outline-secondary btn-sm" name="btn_swap">↑</button>
+                    <button class="btn btn-outline-secondary btn-sm" name="btn_swap">↓</button>
+                    <button class="btn btn-outline-primary btn-sm" name="btn_cate_edit" data-bs-toggle="modal" data-bs-target="#categoryModal">수정</button>
+                    <button class="btn btn-outline-danger btn-sm" name="btn_cate_delete">삭제</button>
+                </div>
+            </div>
+        </li>`;
+		}
+
+
+
+	}); // ready event end
+</script>
+</th:block>
+</html>

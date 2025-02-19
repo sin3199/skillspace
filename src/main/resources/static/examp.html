@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en" class="h-100" data-bs-theme="auto">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SkillSpace 어서오시오</title>
+
+    <link rel="canonical" href="https://getbootstrap.kr/docs/5.3/examples/navbar-fixed/">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+    <!-- <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" > -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+    <!-- JQuery -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <!-- Custom styles for this template -->
+    <!-- <link href="/css/navbar-fixed.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            padding-top: 57px;
+        }
+
+
+
+
+/* 여행/레저 카테고리 */
+.travel-category .nav-link:hover {
+    background-color: #A8D5E3; /* 밝은 청록색 */
+    color: #0A1828;
+}
+
+
+/* 카테고리 메뉴 스타일 */
+.nav-item .nav-link {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    padding: 0.8rem 1rem;
+}
+
+/* 드롭다운 메뉴 스타일 */
+.dropdown-menu {
+    background-color: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 0.5rem 0;
+    transition: all 0.3s;
+}
+
+/* 하위 카테고리 스타일 */
+.dropdown-item {
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: #4B5563;
+    padding: 0.625rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #c6d3eb;
+    color: #0951ec;
+    font-weight: bold;
+}
+
+/* 구분선 스타일 */
+.dropdown-divider {
+    margin: 0.5rem 0;
+    border-top: 1px solid #E5E7EB;
+}
+    </style>
+
+    <style>
+        /* 캐러셀 이미지 설정*/
+        /* 캐러셀 이미지의 고정 높이 설정 */
+        .carousel-image {
+            height: 400px; /* 원하는 고정 높이 */
+            object-fit: cover; /* 이미지 비율을 유지하며 영역 채우기 */
+        }
+
+        /* 반응형 디자인: 작은 화면에서는 높이 축소 */
+        @media (max-width: 768px) {
+            .carousel-image {
+                height: 250px; /* 모바일 화면에서 이미지 높이 조정 */
+            }
+        }
+    </style>
+
+    <!-- 카테고리 스타일 -->
+    <style>
+        .category-btn {
+            border: 1px solid #dee2e6;
+            background-color: white;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+    
+        .category-btn:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    
+        .category-img-wrapper {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto;
+        }
+    
+        .category-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+    
+        .category-name {
+            display: block;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            color: #495057;
+        }
+    
+        /* 반응형 디자인 */
+        @media (max-width: 992px) {
+            .row-cols-5 {
+                --bs-rows-cols: 4;
+            }
+        }
+    
+        @media (max-width: 768px) {
+            .row-cols-5 {
+                --bs-rows-cols: 3;
+            }
+        }
+    
+        @media (max-width: 576px) {
+            .row-cols-5 {
+                --bs-rows-cols: 2;
+            }
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column h-100">
+    <header>
+        <!-- Main Navbar -->
+        <nav class="navbar bg-body-tertiary fixed-top pb-0" aria-label="Light offcanvas navbar">
+            <div class="container-fluid">
+                <button class="navbar-toggler p-1" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasNavbarLight" aria-controls="offcanvasNavbarLight" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <a class="navbar-brand mx-auto fw-bold fs-3" href="/">SkillSpace</a>
+                <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbarLight"
+                    aria-labelledby="offcanvasNavbarLightLabel">
+                    <!-- 오프캔버스 헤더 -->
+                    <div class="offcanvas-header border-bottom">
+                        <h5 class="offcanvas-title" id="offcanvasNavbarLightLabel">SkillSpace</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+        
+                    <!-- 오프캔버스 바디 -->
+                    <div class="offcanvas-body">
+                        <!-- 로그인 섹션 -->
+                        <div class="user-section border-bottom pb-3 mb-3">
+                            <th:block th:if="${session.login_auth == null}">
+                                <p class="mb-3">로그인하고 다양한 서비스를 이용해보세요!</p>
+                                <div class="d-flex gap-2">
+                                    <a href="/guest/login" class="btn btn-outline-primary flex-grow-1">로그인</a>
+                                    <a href="/guest/join" class="btn btn-outline-primary flex-grow-1">회원가입</a>
+                                </div>
+                            </th:block>
+                            <th:block th:if="${session.login_auth != null}">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="flex-grow-1 ms-3">
+                                        <p class="fw-bold mb-0" th:text="${session.login_name}">사용자명</p>
+                                        <small class="text-muted" th:text="${session.login_email}">이메일</small>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a href="/guest/mypage" class="btn btn-outline-secondary flex-grow-1">마이페이지</a>
+                                    <a href="/guest/logout" class="btn btn-outline-secondary flex-grow-1">로그아웃</a>
+                                </div>
+                            </th:block>
+                        </div>
+        
+                        <!-- 카테고리 메뉴 -->
+                        <ul class="navbar-nav">
+                            <!-- 전체 카테고리 드롭다운 -->
+                            <li class="nav-item  travel-category">
+                                <a class="nav-link dropdown-toggle d-flex justify-content-between align-items-center" 
+                                href="#" 
+                                role="button" 
+                                data-bs-toggle="dropdown" 
+                                aria-expanded="false">
+                                    전체 카테고리
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="/category/all">전체보기</a></li>
+                                    <li><a class="dropdown-item" href="/category/popular">인기 클래스</a></li>
+                                    <li><a class="dropdown-item" href="/category/new">신규 클래스</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/category/programming">프로그래밍</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- 고객지원 -->
+                            <li class="nav-item travel-category">
+                                <a class="nav-link dropdown-toggle d-flex justify-content-between align-items-center" 
+                                href="#" 
+                                role="button" 
+                                data-bs-toggle="dropdown" 
+                                aria-expanded="false">
+                                    고객지원
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="/host/become">호스트 되기</a></li>
+                                    <li><a class="dropdown-item" href="/help">고객센터</a></li>
+                                    <li><a class="dropdown-item" href="/faq">자주 묻는 질문</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+
+        
+                        <!-- 검색 폼 -->
+                        <form class="mt-3" role="search">
+                            <div class="input-group">
+                                <input class="form-control" type="search" placeholder="클래스 검색" aria-label="Search">
+                                <button class="btn btn-outline-primary" type="submit">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    
+        <!-- Bottom Header (Utility Bar) -->
+        <div class="bg-light  border-bottom">
+            <div class="container d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted">SkillSpace에 오신 것을 환영합니다!</span>
+                </div>
+                <div class="d-flex gap-3">
+                    <th:block th:if="${session.login_auth == null}">
+                        <a href="/guest/login" class="text-muted text-decoration-none">로그인</a>
+                    </th:block>
+                    <th:block th:if="${session.login_auth != null}">
+                        <a href="/guest/mypage" class="text-muted text-decoration-none">마이페이지</a>
+                        <a href="/guest/modify" class="text-muted text-decoration-none">정보수정</a>
+                        <a href="/guest/logout" class="text-muted text-decoration-none">로그아웃</a>
+                    </th:block>
+                    <a href="/guest/join" class="text-muted text-decoration-none">회원가입</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <main class="container-fluid">
+        
+        <div class="row mt-5">
+            <!-- Bootstrap 5 Carousel for Shopping Mall Homepage -->
+            <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+                <!-- Indicators for Carousel Navigation -->
+                <div class="carousel-indicators">
+                    <!-- Active indicator for the first slide -->
+                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
+                        aria-current="true" aria-label="Slide 1"></button>
+                    <!-- Indicators for the second and third slides -->
+                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
+                        aria-label="Slide 2"></button>
+                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
+                        aria-label="Slide 3"></button>
+                </div>
+            
+                <!-- Carousel Inner (Slides) -->
+                <div class="carousel-inner">
+                    <!-- First Slide -->
+                    <div class="carousel-item active">
+                        <!-- Placeholder image for the first slide -->
+                        <img src="https://cdn.pixabay.com/photo/2024/08/24/02/13/ai-generated-8993116_1280.jpg" class="d-block w-100 carousel-image" alt="First Slide">
+                    </div>
+            
+                    <!-- Second Slide -->
+                    <div class="carousel-item">
+                        <!-- Placeholder image for the second slide -->
+                        <img src="https://cdn.pixabay.com/photo/2024/12/30/13/06/moped-9300285_640.jpg" class="d-block w-100 carousel-image" alt="Second Slide">
+                    </div>
+            
+                    <!-- Third Slide -->
+                    <div class="carousel-item">
+                        <!-- Placeholder image for the third slide -->
+                        <img src="https://cdn.pixabay.com/photo/2024/05/30/08/48/pattern-8798134_640.png" class="d-block w-100 carousel-image" alt="Third Slide">
+                    </div>
+                </div>
+            
+                <!-- Carousel Controls (Previous and Next Buttons) -->
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
+                    data-bs-slide="prev">
+                    <!-- Icon for previous button -->
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
+                    data-bs-slide="next">
+                    <!-- Icon for next button -->
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+
+  
+
+        <div class="card m-5">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" id="categoryTabs">
+                    <li class="nav-item">
+                        <a name="cate_all" class="nav-link active" aria-current="true" href="#">전체</a>
+                    </li>
+                    <li class="nav-item" th:each= "item:${first_cate}">
+                        <a name="first_cate_name" class="nav-link" href="#">1차 카테고리 이름</a>
+                    </li>
+                    <li class="nav-item">
+                        <a name="first_cate_name" class="nav-link" href="#">1차 카테고리 이름</a>
+                    </li>
+                    <div class="col-12 text-center"><p>1차 카테고리가 없습니다.</p></div>
+                    
+                </ul>
+            </div>
+            <div class="card-body">
+                <div id="second_cate" class="container">
+                    <div class="row row-cols-5 g-4">
+                        <!-- 카테고리 아이템 반복 -->
+                        <div class="col" th:each="category : ${categories}">
+                            <button type="button" class="btn category-btn p-2 w-100" 
+                                    th:data-category-id="${category.cateid}">
+                                <!-- 카테고리 이미지 -->
+                                <div class="category-img-wrapper mb-2">
+                                    <img th:src="@{'/images/category/' + ${category.imagename}}" 
+                                         th:alt="${category.catename}"
+                                         src="https://cdn.pixabay.com/photo/2024/12/30/13/06/moped-9300285_640.jpg"
+                                         class="category-img">
+                                </div>
+                                <!-- 카테고리 이름 -->
+                                <span class="category-name" th:text="${category.catename}">카테고리명</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col col-lg-6 col-md-9 col-sm-11">
+               <div class="card shadow-lg border-0">
+                  <div class="card-header bg-primary text-white text-center">
+                     <h3 class="card-title">호스트 회원가입</h3>
+                  </div>
+         
+                  <!-- Form 시작 -->
+                  <form class="needs-validation" method="post" action="/guest/join" novalidate>
+                     <div class="card-body">
+                        <!-- 섹션 제목 -->
+                        <h5 class="text-primary mb-3">업체 기본정보 입력</h5>
+         
+                        <!-- 업체명 -->
+                        <div class="mb-3">
+                           <label for="host_name" class="form-label">업체명</label>
+                           <input type="text" class="form-control" id="host_name" name="host_name" placeholder="업체명을 입력하세요" required>
+                           <div class="invalid-feedback">업체명을 입력하세요</div>
+                        </div>
+         
+                        <!-- 우편번호 -->
+                        <div class="mb-3">
+                           <label for="sample2_postcode" class="form-label">우편번호</label>
+                           <div class="input-group">
+                              <input type="text" class="form-control" id="sample2_postcode" name="user_zipcode"
+                                 placeholder="우편번호 (6자리)" required maxlength="6">
+                              <button type="button" class="btn btn-outline-primary ms-2"
+                                 onclick="sample2_execDaumPostcode()">우편번호 찾기</button>
+                              <div class="invalid-feedback">우편번호를 입력하세요</div>
+                           </div>
+                        </div>
+         
+                        <!-- 기본주소 -->
+                        <div class="mb-3">
+                           <label for="sample2_address" class="form-label">기본주소</label>
+                           <input type="text" class="form-control" id="sample2_address" name="user_addr"
+                              placeholder="기본주소를 입력하세요" required>
+                           <div class="invalid-feedback">기본주소를 입력하세요</div>
+                        </div>
+         
+                        <!-- 상세주소 -->
+                        <div class="mb-3">
+                           <label for="sample2_detailAddress" class="form-label">상세주소</label>
+                           <input type="text" class="form-control" id="sample2_detailAddress" name="user_addrdetail"
+                              placeholder="상세주소를 입력하세요" required>
+                           <input type="hidden" id="sample2_extraAddress">
+                           <div class="invalid-feedback">상세주소를 입력하세요</div>
+                        </div>
+         
+                        <!-- 전화번호 -->
+                        <div class="mb-3">
+                           <label for="user_phone" class="form-label">전화번호</label>
+                           <input type="text" class="form-control" id="user_phone" name="user_phone"
+                              placeholder="'-' 없이 숫자만 입력하세요 (최대 11자리)" maxlength="11" required>
+                           <div class="invalid-feedback">전화번호를 입력하세요</div>
+                        </div>
+         
+                        <!-- 메일 수신 여부 -->
+                        <fieldset class="mb-3">
+                           <legend class="col-form-label pt-0">메일 수신 여부</legend>
+                           <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio1"
+                                 value="Y" checked>
+                              <label class="form-check-label" for="inlineRadio1">수신</label>
+                           </div>
+                           <div class="form-check form-check-inline">
+                              <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio2"
+                                 value="N">
+                              <label class="form-check-label" for="inlineRadio2">수신거부</label>
+                           </div>
+                        </fieldset>
+         
+                     </div>
+         
+                     <!-- 버튼 섹션 -->
+                     <div class="card-footer text-center">
+                        <button type="submit" class="btn btn-primary me-2">Sign Up</button>
+                        <button type="reset" class="btn btn-secondary">Cancel</button>
+                     </div>
+         
+                  </form> <!-- Form 종료 -->
+         
+               </div> <!-- Card 종료 -->
+            </div> <!-- Col 종료 -->
+         </div> <!-- Row 종료 -->
+
+
+        <div class="row justify-content-center mt-4">
+            <div class="col col-lg-6 col-md-9 col-sm-11">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-success text-white text-center">
+                        <h3 class="card-title">회원가입</h3>
+                    </div>
+        
+                    <!-- Form 시작 -->
+                    <form class="needs-validation" method="post" action="/guest/join" novalidate>
+                        <div class="card-body">
+                            <!-- 아이디 -->
+                            <div class="mb-3">
+                                <label for="user_id" class="form-label">아이디</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="user_id" name="user_id" placeholder="아이디를 입력하세요"
+                                        required>
+                                    <button type="button" class="btn btn-outline-primary ms-2" id="btnIDCheck">ID
+                                        중복체크</button>
+                                    <div class="invalid-feedback">아이디를 입력하세요</div>
+                                </div>
+                            </div>
+        
+                            <!-- 비밀번호 -->
+                            <div class="mb-3">
+                                <label for="user_pw" class="form-label">비밀번호</label>
+                                <input type="password" class="form-control mb-2" id="user_pw" name="user_pw"
+                                    placeholder="비밀번호를 입력하세요"
+                                    pattern="^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,16}$" required>
+                                <input type="password" class="form-control" id="user_pw2" name="user_pw2"
+                                    placeholder="비밀번호를 다시 입력하세요" required>
+                                <small class="form-text text-muted" id="passwordHelp" >영문, 숫자, 특수문자를 포함하여 8자~16자로 입력해주세요.</small>
+                                <div class="invalid-feedback" id="passwordError">비밀번호를 입력해주세요</div>
+                                <div class="invalid-feedback" id="passwordMatchError">비밀번호가 일치하지 않습니다.</div>
+                            </div>
+                            <!-- 비밀번호 -->
+                            <div class="mb-3">
+                                <label for="user_pw" class="form-label">비밀번호</label>
+                                <input type="password" class="form-control mb-2" id="user_pw" name="user_pw"
+                                    placeholder="비밀번호를 입력하세요"
+                                    pattern="^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,16}$" required>
+                                <input type="password" class="form-control" id="user_pw2" name="user_pw2"
+                                    placeholder="비밀번호를 다시 입력하세요" required>
+                                    <div class="form-text text-muted" id="passwordHelp">영문,
+                                        숫자, 특수문자를 포함하여 8자~16자 이내로 입력해주세요.</div>
+                                <div class="invalid-feedback">비밀번호를 입력해주세요</div>
+                                <div class="invalid-feedback">비밀번호가 일치하지 않습니다.</div>
+                            </div>
+        
+                            <!-- 이름 -->
+                            <div class="mb-3">
+                                <label for="user_name" class="form-label">이름</label>
+                                <input type="text" class="form-control" id="user_name" name="user_name" placeholder="이름을 입력하세요"
+                                    required>
+                                <div class="invalid-feedback">이름을 입력하세요</div>
+                            </div>
+        
+                            <!-- 닉네임 -->
+                            <div class="mb-3">
+                                <label for="user_nick" class="form-label">닉네임</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="user_nick" name="user_nick"
+                                        placeholder="닉네임을 입력하세요" required>
+                                    <button type="button" class="btn btn-outline-primary ms-2 " id="btnNickCheck">닉네임
+                                        중복체크</button>
+                                    <div class="invalid-feedback">닉네임을 입력하세요</div>
+                                </div>
+                            </div>
+        
+                            <!-- 이메일 -->
+                            <div class="mb-3">
+                                <label for="user_email" class="form-label">이메일</label>
+                                <div class="input-group">
+                                    <input type="email" class="form-control" id="user_email" name="user_email"
+                                        placeholder="이메일을 입력하세요" required>
+                                    <button type="button" class="btn btn-outline-primary ms-2" id="btnMailAuthcode">메일 인증
+                                        요청</button>
+                                    <div class="invalid-feedback">이메일을 입력하세요</div>
+                                </div>
+                            </div>
+        
+                            <!-- 인증 코드 -->
+                            <div class="mb-3">
+                                <label for="user_authcode" class="form-label">인증 확인</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="user_authcode" name="user_authcode"
+                                        placeholder="인증 코드를 입력하세요" required>
+                                    <button type="button" class="btn btn-outline-primary ms-2 " id="btnConfirmAuth">인증
+                                        확인</button>
+                                    <div class='invalid-feedback'>인증 코드를 입력하세요</div>
+                                </div>
+                            </div>
+        
+                            <!-- 주소 입력 섹션 -->
+                            <div class="mb-3">
+                                <label for="sample2_postcode" class="form-label">우편번호</label>
+                                <div class="input-group">
+                                    <!-- 우편번호 입력 -->
+                                    <input type="text" class="form-control" id="sample2_postcode" name="user_zipcode"
+                                        placeholder="우편번호를 입력하세요 (6자리)" required maxlength="6">
+                                    <!-- 우편번호 찾기 버튼 -->
+                                    <button type="button" class="btn btn-outline-primary ms-2"
+                                        onclick="sample2_execDaumPostcode()">우편번호 찾기</button>
+                                    <div class="invalid-feedback">우편번호를 입력하세요</div>
+                                </div>
+                            </div>
+        
+                            <div class="mb-3">
+                                <label for="sample2_address" class="form-label">기본주소</label>
+                                <!-- 기본주소 입력 -->
+                                <input type="text" class="form-control" id="sample2_address" name="user_addr"
+                                    placeholder="기본주소를 입력하세요" required>
+                                <div class="invalid-feedback">기본주소를 입력하세요</div>
+                            </div>
+        
+                            <div class="mb-3">
+                                <label for="sample2_detailAddress" class="form-label">상세주소</label>
+                                <!-- 상세주소 입력 -->
+                                <input type="text" class="form-control" id="sample2_detailAddress" name="user_addrdetail"
+                                    placeholder="상세주소를 입력하세요" required>
+                                <!-- 참고항목 (숨김 처리) -->
+                                <input type="hidden" id="sample2_extraAddress">
+                                <div class="invalid-feedback">상세주소를 입력하세요</div>
+                            </div>
+        
+                            <div class="mb-3">
+                                <label for="user_phone" class="form-label">전화번호</label>
+                                <!-- 전화번호 입력 -->
+                                <input type="text" class="form-control" id="user_phone" name="user_phone"
+                                    placeholder="'-' 없이 숫자만 입력하세요 (최대 11자리)" maxlength="11" required>
+                                <div class="invalid-feedback">전화번호를 입력하세요</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label fw-semibold">업체 소개</label>
+                                <textarea class="form-control " 
+                                   id="description" 
+                                   name="description"
+                                   rows="5"
+                                   style="resize: none;"
+                                   placeholder="업체 소개글을 입력하세요 (최대 3000자)"
+                                   maxlength="3000"
+                                   required></textarea>
+                                <div class="form-text text-muted">
+                                   <small>업체의 특징, 서비스, 위치 등 상세한 정보를 입력해주세요.</small>
+                                </div>
+                                <div class="invalid-feedback">업체 소개글을 입력하세요</div>
+                             </div>
+                             
+                            <!-- 메일 수신 체크 -->
+                            <div class="mb-3">
+                                <label class="form-label">메일 수신 여부</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="user_email_receive" id="emailReceiveYes"
+                                        value="Y" checked>
+                                    <label class="form-check-label" for="emailReceiveYes">수신</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="user_email_receive" id="emailReceiveNo"
+                                        value="N">
+                                    <label class="form-check-label" for="emailReceiveNo">수신 거부</label>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Footer 버튼 섹션 -->
+                        <div class="card-footer text-center">
+                            <button type="submit" class="btn btn-primary me-2">회원가입</button>
+                            <button type="reset" class="btn btn-secondary">취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+         
+    </main>
+
+    <footer class="footer mt-auto py-3 bg-body-tertiary">
+        <div class="container">
+            <span class="text-body-secondary">Place sticky footer content here.</span>
+        </div>
+    </footer>
+    <!-- <script src="/bootstrap/js/bootstrap.bundle.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            $("a[name='cate_all']").on("click", function(e) {
+                e.preventDefault();
+
+                $(this).parent().parent().find("a").removeClass("active");
+                let secnod_cate = $("#secnod_cate");
+                secnod_cate.empty();
+                secnod_cate.html("여기다 카테고리 출력");
+
+
+            });
+
+        }); // ready end.
+
+
+
+    </script>
+</body>
+
+</html>

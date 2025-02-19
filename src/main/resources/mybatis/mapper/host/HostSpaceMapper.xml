@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.skillspace.sgs.host.space.HostSpaceMapper">
+
+<insert id="create" parameterType="com.skillspace.sgs.host.space.HostSpaceDTO" 
+	useGeneratedKeys="true" keyProperty="host_space_id">
+	
+	insert into 
+		Host_Space(
+			user_id,
+			cate_id,
+			main_title,
+			sub_title,
+			space_intro,
+			space_guide,
+			space_zipcode,
+			space_addr,
+			space_addrdetail,
+			is_visible
+		)
+		values(
+			#{user_id},
+			#{cate_id},
+			#{main_title},
+			#{sub_title},
+			#{space_intro},
+			#{space_guide},
+			#{space_zipcode},
+			#{space_addr},
+			#{space_addrdetail},
+			#{is_visible}
+		)
+</insert>
+
+<select id="getHostSpaceById" parameterType="Integer" resultMap="SpaceWithImageMap">
+	select 
+		host_space_id,
+		user_id,
+		cate_id,
+		main_title,
+		sub_title,
+		space_intro,
+		space_guide,
+		space_zipcode,
+		space_addr,
+		space_addrdetail,
+		created_at,
+		updated_at,
+		is_visible
+	from
+		host_space
+	where 
+		host_space_id = #{host_space_id}
+</select>
+
+<select id="spaceList" parameterType="Map" resultMap="SpaceWithImageMap">
+	select 
+	    host_space_id,
+	    user_id,
+	    cate_id,
+	    main_title,
+	    sub_title,
+	    space_intro,
+	    space_guide,
+	    space_zipcode,
+	    space_addr,
+	    space_addrdetail,
+	    created_at,
+	    updated_at,
+	    is_visible
+	from
+	    host_space
+	where 
+	    user_id = #{user_id}
+	order by 
+	    host_space_id desc
+	limit
+	    #{cri.pageStart}, #{cri.perPageNum}
+
+</select>
+
+<select id="getCountSpaceByUser_id" parameterType="String" resultType="int">
+	select
+		count(*)
+	from
+		host_space
+	where
+		user_id = #{user_id}
+</select>
+
+<update id="modifyHostSpace" parameterType="com.skillspace.sgs.host.space.HostSpaceDTO">
+	update 
+		host_space
+    set
+	    cate_id = #{cate_id},
+	    main_title = #{main_title},
+	    sub_title = #{sub_title},
+	    space_intro = #{space_intro},
+	    space_guide = #{space_guide},
+	    space_zipcode = #{space_zipcode},
+	    space_addr = #{space_addr},
+	    space_addrdetail = #{space_addrdetail},
+	    is_visible = #{is_visible},
+	    updated_at = now()
+	where 
+		host_space_id = #{host_space_id}
+</update>
+
+<delete id="deleteHostSpace" parameterType="Integer">
+	delete from 
+		host_space 
+	where 
+		host_space_id = #{host_space_id}
+</delete>
+
+<delete id="selectedDelete">
+	delete from 
+		host_space 
+	where 
+		host_space_id in 
+	<foreach collection="host_space_id_arr" item="host_space_id" open="(" separator="," close=")">
+		#{host_space_id}
+	</foreach>
+</delete>
+
+<resultMap id="SpaceWithImageMap" type="com.skillspace.sgs.host.space.HostSpaceDTO">
+	<!-- HostSpaceDTO 기본 정보 -->
+    <id property="host_space_id" column="host_space_id"/> <!-- Review PK -->
+    <result property="user_id" column="user_id"/>
+    <result property="cate_id" column="cate_id"/>
+    <result property="main_title" column="main_title"/>
+    <result property="sub_title" column="sub_title"/>
+    <result property="space_intro" column="space_intro"/>
+    <result property="space_guide" column="space_guide"/>
+    <result property="space_zipcode" column="space_zipcode"/>
+    <result property="space_addr" column="space_addr"/>
+    <result property="space_addrdetail" column="space_addrdetail"/>
+    <result property="created_at" column="created_at"/>
+    <result property="updated_at" column="updated_at"/>
+    <result property="is_visible" column="is_visible"/>
+    
+    <!-- Category 1:1 매핑 -->
+        <association 
+        	property="category" 
+	        javaType="com.skillspace.sgs.admin.category.CategoryDTO" 
+	        column="cate_id" 
+	        select="selectCategory"/>
+    
+     <!-- Images 1:N 매핑 -->
+        <collection 
+        	property="images" 
+        	javaType="java.util.ArrayList" 
+        	ofType="com.skillspace.sgs.admin.images.ImagesDTO" 
+        	column="host_space_id" 
+        	select="selectImages"/>
+</resultMap>
+
+<!-- Category 정보 조회 -->
+<select id="selectCategory" resultType="com.skillspace.sgs.admin.category.CategoryDTO">
+    select
+        cate_id,
+        cate_prtcode,
+        cate_name,
+        level,
+        sort_order
+    from
+        category
+    where
+        cate_id = #{cate_id}
+</select>
+
+<!-- images 목록 조회 -->
+<select id="selectImages" resultType="com.skillspace.sgs.admin.images.ImagesDTO">
+    select
+        image_id,
+        entity_type,
+        entity_id,
+        image_up_folder,
+        image_name,
+        created_at
+    from
+        images
+    where
+        entity_type = 'host_space'
+        and entity_id = #{host_space_id}
+</select>
+
+
+</mapper>

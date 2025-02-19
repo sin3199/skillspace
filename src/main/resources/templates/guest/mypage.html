@@ -1,20 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-	  xmlns:laout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{layouts/layout1}">
 	  
 <th:block layout:fragment="content">
-	<div class="row mt-5">
-		<div class="col-3">
-			<h1>MyPage</h1>
-			<a href="/userinfo/pwchange">비밀번호 변경</a>
-		</div>
-			내용.
-		<div class="col-9">
+	<h1>마이페이지</h1>
 
-		</div>
-	</div>
-
+	<a href="/guest/modify" class="text-muted text-decoration-none">정보수정</a>
+	<a href="/guest/pwchange" class="text-muted text-decoration-none">비밀번호 수정</a>
 	
 </th:block>
 </html>

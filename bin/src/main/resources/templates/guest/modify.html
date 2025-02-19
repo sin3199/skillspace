@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:laout="http://www.ultraq.net.nz/thymeleaf/laout"
+   layout:decorate="~{layouts/layout1}">
+
+<th:block layout:fragment="content">
+   <h1 class="mt-3 mb-4 text-center">마이 페이지</h1>
+   <div class="row w-75 mx-auto container-sm">
+      <div class="col">
+         <div class="card card-info">
+            <div class="card-header">
+               <h3 class="card-title text-center">정보 수정</h3>
+            </div>
+
+            <form class="needs-validation" method="post" action="#" novalidate>
+               <div class="card-body">
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="user_id" class="col-form-label">아이디</label>
+                     </div>
+                     <div class="col-10">
+                        <div class="input-group">
+                           <!-- 아이디 입력 -->
+                           <input type="text" class="form-control" id="user_id" name="user_id" th:value="${guestVO.user_id}" readonly>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="user_pw" class="col-form-label">비밀번호</label>
+                     </div>
+                     <div class="col-10">
+                        <!-- 비밀번호 입력 -->
+                        <input type="password" class="form-control" id="user_pw" name="user_pw" placeholder="비밀번호" required>
+
+                        <div class="form-text text-muted" id="passwordHelp">
+                           정보수정시 비밀번호를 입력해주세요.
+                        </div>
+                        <!-- 유효성 검사 오류 메시지 -->
+                        <div class="invalid-feedback" id="passwordError">비밀번호를 입력해주세요</div>
+                        <div class="invalid-feedback" id="passwordCheckError">비밀번호가 틀립니다.</div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="user_name" class="col-form-label">이름</label>
+                     </div>
+                     <div class="col-10">
+                        <!-- 이름 입력 -->
+                        <input type="text" class="form-control" id="user_name" name="user_name" 
+                                 th:value="${guestVO.user_name}" placeholder="이름" required>
+                        <!-- 유효성 검사 오류 메시지 -->
+                        <div class="invalid-feedback">이름을 입력하세요</div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="user_nick" class="col-form-label">닉네임</label>
+                     </div>
+                     <div class="col-10">
+                        <div class="input-group">
+                           <!-- 닉네임 입력 -->
+                           <input type="text" class="form-control" id="user_nick" name="user_nick" th:value="${guestVO.user_nick}" placeholder="닉네임"
+                              required>
+                           <!-- 닉네임 중복체크 -->
+                           <button type="button" class="btn btn-outline-primary ms-2 w-25" id="btnNickCheck">Nick
+                              중복체크</button>
+                           <!-- 유효성 검사 오류 메시지 -->
+                           <div class="invalid-feedback" id="nickError">닉네임을 입력하세요</div>
+                           <div class="invalid-feedback" id="nickCheckError">변경된 닉네임 중복체크를 해주세요</div>
+
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="user_email" class="col-form-label">이메일</label>
+                     </div>
+                     <div class="col-10">
+                        <div class="input-group">
+                           <!-- 이메일 입력 -->
+                           <input type="email" class="form-control" id="user_email" name="user_email" th:value="${guestVO.user_email}" placeholder="이메일"
+                              required>
+                           <!-- 메일인증 요청 -->
+                           <button type="button" class="btn btn-outline-primary ms-2 w-25" id="btnMailAuthcode">메일인증
+                              요청</button>
+                           <!-- 유효성 검사 오류 메시지 -->
+                           <div class="invalid-feedback">이메일을 입력하세요</div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="user_authcode" class="col-form-label">인증 확인</label>
+                     </div>
+                     <div class="col-10">
+                        <div class="input-group">
+                           <!-- 인증 코드 입력 -->
+                           <input type="text" class="form-control" id="user_authcode" name="user_authcode"
+                              placeholder="인증코드">
+                           <!-- 인증 코드 확인 -->
+                           <button type="button" class="btn btn-outline-primary ms-2 w-25"
+                              id="btnConfirmAuth">인증확인</button>
+                           <!-- 유효성 검사 오류 메시지 -->
+                           <div class="invalid-feedback">인증코드를 입력하세요</div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="sample2_postcode" class="col-form-label">우편번호</label>
+                     </div>
+                     <div class="col-10">
+                        <div class="input-group">
+                           <!-- 우편번호 입력 -->
+                           <input type="text" class="form-control" id="sample2_postcode" name="user_zipcode" th:value="${guestVO.user_zipcode}"
+                              placeholder="우편번호" required maxlength="6">
+                           <!-- 우편번호 찾기 -->
+                           <button type="button" class="btn btn-outline-primary ms-2 w-25"
+                              onclick="sample2_execDaumPostcode()">우편번호 찾기</button>
+                           <!-- 유효성 검사 오류 메시지 -->
+                           <div class="invalid-feedback">우편번호를 입력하세요</div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="sample2_address" class="col-form-label">기본주소</label>
+                     </div>
+                     <div class="col-10">
+                        <!-- 기본주소 입력 -->
+                        <input type="text" class="form-control" id="sample2_address" name="user_addr" th:value="${guestVO.user_addr}" placeholder="기본주소"
+                           required>
+                        <!-- 유효성 검사 오류 메시지 -->
+                        <div class="invalid-feedback">기본주소를 입력하세요</div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="sample2_detailAddress" class="col-form-label">상세주소</label>
+                     </div>
+                     <div class="col-10">
+                        <!-- 상세주소 입력 -->
+                        <input type="text" class="form-control" id="sample2_detailAddress" name="user_addrdetail" th:value="${guestVO.user_addrdetail}"
+                           placeholder="상세주소" required> <input type="hidden" id="sample2_extraAddress"
+                           placeholder="참고항목">
+                        <!-- 유효성 검사 오류 메시지 -->
+                        <div class="invalid-feedback">상세주소를 입력하세요</div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="user_phone" class="col-form-label">전화번호</label>
+                     </div>
+                     <div class="col-10">
+                        <!-- 전화번호 입력 -->
+                        <input type="text" class="form-control" id="user_phone" name="user_phone" th:value="${guestVO.user_phone}"
+                           placeholder="전화번호 - 빼고 숫자만 입력" maxlength="11" required>
+                        <!-- 유효성 검사 오류 메시지 -->
+                        <div class="invalid-feedback">전화번호를 입력하세요</div>
+                     </div>
+                  </div>
+                  <div class="row form-group mb-2">
+                     <div class="col-2">
+                        <label for="user_phone" class="col-form-label">메일 수신</label>
+                     </div>
+                     <div class="col-10">
+                        <!-- 메일 수신 체크 -->
+                        <div class="form-check form-check-inline">
+                           <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio1" th:checked= "${guestVO.user_email_receive == 'Y'}"
+                              value="Y">
+                           <label class="form-check-label" for="inlineRadio1">수신</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                           <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio2" th:checked= "${guestVO.user_email_receive == 'N'}"
+                              value="N">
+                           <label class="form-check-label" for="inlineRadio2">수신거부</label>
+                        </div>
+
+                     </div>
+                  </div>
+
+
+               </div>
+
+
+               <div class="card-footer">
+                  <button type="submit" class="btn btn-info">Sign up</button>
+                  <button type="reset" class="btn btn-danger">Cancel</button>
+               </div>
+
+
+
+            </form>
+
+
+         </div>
+      </div>
+   </div>
+   <!-- iOS에서는 position:fixed 버그가 있음, 적용하는 사이트에 맞게 position:absolute 등을 이용하여 top,left값 조정 필요 -->
+   <div id="layer"
+      style="display: none; position: fixed; overflow: hidden; z-index: 1; -webkit-overflow-scrolling: touch;">
+      <img src="//t1.daumcdn.net/postcode/resource/images/close.png" id="btnCloseLayer"
+         style="cursor: pointer; position: absolute; right: -3px; top: -3px; z-index: 1" onclick="closeDaumPostcode()"
+         alt="닫기 버튼">
+   </div>
+
+
+
+</th:block>
+<th:block layout:fragment="scriptBottom">
+   <script th:inline="javascript">
+      (() => {
+         'use strict'
+
+         const validationState = {
+            nickChecked: true,
+            emailAuth: true,
+            input_nick: [[${guestVO.user_nick}]],
+            input_email: [[${guestVO.user_email}]]
+         };
+
+         const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+         // 모든 .needs-validation 클래스를 가진 폼 선택
+         const forms = document.querySelectorAll('.needs-validation')
+
+         // 폼에 대해 유효성 검사 적용
+         Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+               let valid = true;
+
+               // 비밀번호와 비밀번호 확인 필드 선택
+               const password           = form.querySelector('#user_pw');
+               const passwordError      = form.querySelector('#passwordError');
+               const passwordCheckError = form.querySelector('#passwordCheckError');
+               const nickError          = form.querySelector('#nickError');
+               const nickCheckError     = form.querySelector('#nickCheckError');
+
+               // let user_nick  = [[${guestVO.user_nick}]];
+               // let user_email = [[${guestVO.user_email}]];
+
+               if (!password.value) {
+                  passwordError.style.display = 'block'; // 입력값이 없을 때 오류 메시지 표시
+                  valid = false;
+               } else {
+                  // 비밀번호 확인 Ajax 요청
+                  $.ajax({
+                     url: '/guest/check-password', 
+                     type: 'POST',
+                     data: { password: password.value, user_pw: [[${guestVO.user_pw}]] },
+                     async: false, // 동기 요청으로 설정하여 Ajax 완료 후 계속 진행
+                     success: function(result) {
+                        if (result == "fail") {
+                           passwordCheckError.style.display = 'block'; // 비밀번호 오류 메시지 표시
+                           valid = false;
+                        } else {
+                           passwordCheckError.style.display = 'none'; // 비밀번호 유효 시 오류 메시지 제거
+                        }
+                     },
+                     error: function() {
+                        alert('비밀번호 확인 중 오류가 발생했습니다.');
+                        valid = false;
+                     }
+                  });
+                  passwordError.style.display = 'none'; // 입력값이 있을 때 오류 메시지 제거
+               }
+               
+               // 변경된 닉네임 중복체크 확인
+               if(validationState.input_nick && validationState.input_nick !== $("#user_nick").val()) {
+                  alert("변경된 닉네임 중복체크를 해주세요");
+                  nickCheckError.style.display = 'block';
+                  validationState.nickChecked = false;
+                  valid = false;
+               }else {
+                  nickCheckError.style.display = 'none';
+               }
+
+               // 변경된 이메일 확인
+               if (validationState.input_email && validationState.input_email !== $("#user_email").val()) {
+                  alert("변경된 이메일 인증을 해주세요");
+                  validationState.emailAuth = false;
+                  valid = false;
+               }
+               
+
+               // 기본 유효성 검사 (required 등) 처리
+               if (!form.checkValidity() || !valid) {
+                  event.preventDefault()  // 기본 제출 동작 차단
+                  event.stopPropagation()  // 이벤트 전파 중지
+               }
+
+               // 유효성 검사 결과 스타일 적용
+               form.classList.add('was-validated')
+            }, false)
+         })
+
+         // 닉네임 중복체크
+         $("#btnNickCheck").on("click", function () {
+            const userNick = $("#user_nick").val();
+
+            if (!userNick) {
+               alert("닉네임을 입력하세요.");
+               return;
+            }
+
+            $.ajax({
+               url: "/guest/nickCheck",
+               type: "get",
+               data: { user_nick: userNick },
+               dataType: "text",
+               success: function (result) {
+                  if (result === "no") {
+                     alert("중복된 닉네임입니다.");
+                     $("#user_nick").val("").focus();
+                     validationState.input_nick = null;
+                  } else {
+                     alert("사용할 수 있는 닉네임입니다.");
+                     validationState.nickChecked = true;
+                     validationState.input_nick = userNick;
+                  }
+               },
+            });
+         });
+
+         // 이메일 인증 요청
+         $("#btnMailAuthcode").on("click", function () {
+            const userEmail = $("#user_email").val();
+
+            if (!userEmail) {
+               alert("메일을 입력하세요.");
+               return;
+            }
+            if (!emailPattern.test(userEmail)){
+               alert("이메일 형식을 확인하세요.");
+               return;
+            }
+
+            $.ajax({
+               url: "/email/authcode",
+               type: "get",
+               data: { receiverMail: userEmail, type: "authcode" },
+               dataType: "text",
+               success: function (result) {
+                  if (result === "success") {
+                     alert("메일로 인증코드가 발급되었습니다.");
+                     validationState.input_email = userEmail;
+                  }else if(result === "email_fail"){
+                     alert("중복된 이메일입니다.");
+                  }
+               },
+            });
+         });
+
+         // 이메일 인증 확인
+         $("#btnConfirmAuth").on("click", function () {
+            const authCode = $("#user_authcode").val();
+            const userEmail = $("#user_email").val();
+
+            if (!authCode) {
+               alert("인증코드를 입력하세요.");
+               return;
+            }
+
+            if (validationState.input_email !== userEmail) {
+               alert("이메일이 일치하지 않습니다.");
+               return;
+            }
+
+            $.ajax({
+               url: "/email/confirm_authcode",
+               type: "get",
+               data: { authcode: authCode },
+               dataType: "text",
+               success: function (result) {
+                  if (result === "success") {
+                     alert("인증이 확인되었습니다.");
+                     validationState.emailAuth = true;
+                  } else {
+                     alert("인증코드가 일치하지 않습니다. 재발급하세요.");
+                  }
+               },
+            });
+         });
+
+      })();
+
+
+      // 전화번호 입력 이벤트
+      document.getElementById('user_phone').addEventListener('input', function (e) {
+         let input = e.target.value.replace(/[^0-9]/g, ''); // 숫자가 아닌 문자 제거
+         e.target.value = input;
+      });
+   </script>
+
+
+
+   <!-- 주소 API -->
+   <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+   <script>
+      // 우편번호 찾기 화면을 넣을 element
+      var element_layer = document.getElementById('layer');
+
+      function closeDaumPostcode() {
+         // iframe을 넣은 element를 안보이게 한다.
+         element_layer.style.display = 'none';
+      }
+
+      function sample2_execDaumPostcode() {
+         new daum.Postcode({
+            oncomplete: function (data) {
+               // 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+               // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+               // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+               var addr = ''; // 주소 변수
+               var extraAddr = ''; // 참고항목 변수
+
+               //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+               if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+                  addr = data.roadAddress;
+               } else { // 사용자가 지번 주소를 선택했을 경우(J)
+                  addr = data.jibunAddress;
+               }
+
+               // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+               if (data.userSelectedType === 'R') {
+                  // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                  // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                  if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                     extraAddr += data.bname;
+                  }
+                  // 건물명이 있고, 공동주택일 경우 추가한다.
+                  if (data.buildingName !== '' && data.apartment === 'Y') {
+                     extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                  }
+                  // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                  if (extraAddr !== '') {
+                     extraAddr = ' (' + extraAddr + ')';
+                  }
+                  // 조합된 참고항목을 해당 필드에 넣는다.
+                  document.getElementById("sample2_extraAddress").value = extraAddr;
+
+               } else {
+                  document.getElementById("sample2_extraAddress").value = '';
+               }
+
+               // 우편번호와 주소 정보를 해당 필드에 넣는다.
+               document.getElementById('sample2_postcode').value = data.zonecode;
+               document.getElementById("sample2_address").value = addr;
+               // 커서를 상세주소 필드로 이동한다.
+               document.getElementById("sample2_detailAddress").focus();
+
+               // iframe을 넣은 element를 안보이게 한다.
+               // (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+               element_layer.style.display = 'none';
+            },
+            width: '100%',
+            height: '100%',
+            maxSuggestItems: 5
+         }).embed(element_layer);
+
+         // iframe을 넣은 element를 보이게 한다.
+         element_layer.style.display = 'block';
+         element_layer.style.zIndex = 1000;
+
+         // iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
+         initLayerPosition();
+      }
+
+      // 브라우저의 크기 변경에 따라 레이어를 가운데로 이동시키고자 하실때에는
+      // resize이벤트나, orientationchange이벤트를 이용하여 값이 변경될때마다 아래 함수를 실행 시켜 주시거나,
+      // 직접 element_layer의 top,left값을 수정해 주시면 됩니다.
+      function initLayerPosition() {
+         var width = 300; //우편번호서비스가 들어갈 element의 width
+         var height = 400; //우편번호서비스가 들어갈 element의 height
+         var borderWidth = 5; //샘플에서 사용하는 border의 두께
+
+         // 위에서 선언한 값들을 실제 element에 넣는다.
+         element_layer.style.width = width + 'px';
+         element_layer.style.height = height + 'px';
+         element_layer.style.border = borderWidth + 'px solid';
+         // 실행되는 순간의 화면 너비와 높이 값을 가져와서 중앙에 뜰 수 있도록 위치를 계산한다.
+         element_layer.style.left = (((window.innerWidth || document.documentElement.clientWidth) - width) / 2 - borderWidth) + 'px';
+         element_layer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height) / 2 - borderWidth) + 'px';
+      }
+   </script>
+</th:block>
+
+</html>

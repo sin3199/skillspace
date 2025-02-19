@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-100" data-bs-theme="auto">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>aaa 복사 연습</title>
+
+    <link rel="canonical" href="https://getbootstrap.kr/docs/5.3/examples/navbar-fixed/">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        body {
+            padding-top: 57px;
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        #scrollspy_nav {
+            background: white;
+            padding: 10px 0;
+            z-index: 1020;
+            top: 57px;
+        }
+    </style>
+    <style>
+        /* 캐러셀 이미지 설정*/
+        /* 캐러셀 이미지의 고정 높이 설정 */
+        .carousel-image {
+            width: 100%; /* 부모 너비에 맞춤 */
+            height: auto; /* 컨테이너 높이 상속 */
+            object-fit: cover; /* 종횡비 유지하며 채움 */
+            aspect-ratio: 16/9;
+        }
+    </style>
+    <style>
+        /* md 사이즈 이상일 때 적용되는 스타일 */
+        @media (min-width: 768px) {
+            .custom-grid {
+                display: grid !important;
+                grid-template-columns: repeat(12, 1fr);
+                grid-template-rows: min-content 1fr; /* 1행: 콘텐츠 높이만큼, 2행: 남은 공간 차지 */
+                width: 100%;
+                margin: 0 auto;
+                gap: 10px;
+            }
+            
+            /* 왼쪽 영역 스타일 */
+            #left {
+                grid-column: span 7;
+            }
+            
+            /* 오른쪽 영역 스타일 */
+            #right {
+                padding: 10px;  /* 여백 추가 */
+                grid-column: span 5; /* 4열 차지 */
+                grid-row: span 2; /* 1-2행 차지 */
+                height: min-content; /* 오른쪽 영역 전체 높이 채우기 */
+            }
+
+            #bottom {
+                grid-column: span 7;
+            }
+        }
+
+        /* lh 사이즈 이상일 때 적용되는 스타일 */
+        @media (min-width: 992px) {
+            .custom-grid {
+                display: grid !important;
+                grid-template-columns: repeat(12, 1fr);
+                grid-template-rows: min-content 1fr; /* 1행: 콘텐츠 높이만큼, 2행: 남은 공간 차지 */
+                width: 100%;
+                margin: 0 auto;
+                gap: 10px;
+            }
+            
+            /* 왼쪽 영역 스타일 */
+            #left {
+                grid-column: span 8;
+            }
+            
+            /* 오른쪽 영역 스타일 */
+            #right {
+                padding: 10px;  /* 여백 추가 */
+                grid-column: span 4; /* 4열 차지 */
+                grid-row: span 2; /* 1-2행 차지 */
+                height: min-content; /* 오른쪽 영역 전체 높이 채우기 */
+            }
+
+            #bottom {
+                grid-column: span 8;
+            }
+        }
+
+        /* 모바일 환경에서 결제 버튼 고정 스타일 */
+        @media (max-width: 768px) {
+            #btn-payment {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background-color: #fff;
+                padding: 10px;
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+                z-index: 1030;
+            }
+            /* 버튼 위로 컨텐츠가 가려지지 않도록 하단 여백 추가 */
+            #main-row {
+                padding-bottom: 100px;
+            }
+
+            /* 버튼 스타일 */
+            #btn-payment .btn {
+                padding: 10px 20px;
+                font-size: 16px;
+                font-weight: bold;
+                background-color: #6c5ce7; /* 메인 색상 */
+                color: white;
+                border: none;
+                transition: background-color 0.3s ease-in-out;
+            }
+
+            #btn-payment .btn:hover {
+                background-color: #5a4ec7; /* 호버 색상 */
+            }
+        }
+
+    </style>
+
+    <style>
+        /* 스크롤스파이 네비게이션 스타일 */
+        .nav-link {
+            color: #6c757d;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .nav-link.active {
+            color: #6c5ce7;
+            border-bottom: 2px solid #6c5ce7;
+            font-weight: bold;
+            transform: scale(1.1);
+        }
+  
+    </style>
+
+    <style>
+        h2, h4 {
+            font-weight: bold;
+            color: #343a40;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+
+<style>
+    /* 선택된 detailRoom의 label에 스타일 적용 */
+    .detailRoom-group input[type="radio"]:checked ~ label {
+        background-color: #6c5ce7; /* 배경색 변경 */
+        color: #fff;
+        font-weight: bold;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+        transition: background-color 0.3s ease, box-shadow 0.3s ease; /* 부드러운 전환 효과 */
+    }
+
+</style>
+</head>
+<body class="d-flex flex-column h-100">
+    <main class="container-lg">
+        <div class="row my-4 shadow-lg border-0" id="main-row">
+            <div class="col-12">
+                <!-- 상단 네비게이션 -->
+                <div class="mb-3">
+                    <h2>[홍대 합정] 올인어스 연습실</h2>
+                    <p class="text-muted">새벽 50% 할인 이벤트! 깔끔한 연습실</p>
+                    
+                    <!-- 태그 목록 -->
+                    <div class="tags">
+                        <span class="badge rounded-pill bg-light text-dark">#화려한연습실</span>
+                        <span class="badge rounded-pill bg-light text-dark">#댄스연습실</span>
+                        <span class="badge rounded-pill bg-light text-dark">#연습장대여</span>
+                        <span class="badge rounded-pill bg-light text-dark">#합정연습실</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="row custom-grid">
+                    <div class="col-12 mb-3" id="left">
+                        <div class="card">
+                            <div id="carouse_main" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img src="https://cdn.pixabay.com/photo/2024/08/24/02/13/ai-generated-8993116_1280.jpg" class="d-block w-100 carousel-image" alt="First Slide">
+                                    </div>
+                            
+                                    <div class="carousel-item">
+                                        <img src="https://cdn.pixabay.com/photo/2024/12/30/13/06/moped-9300285_640.jpg" class="d-block w-100 carousel-image" alt="Second Slide">
+                                    </div>
+                            
+                                    <div class="carousel-item">
+                                        <img src="https://cdn.pixabay.com/photo/2024/05/30/08/48/pattern-8798134_640.png" class="d-block w-100 carousel-image" alt="Third Slide">
+                                    </div>
+                                </div>
+                            
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouse_main"
+                                    data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carouse_main"
+                                    data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">새벽 50% 할인 이벤트! 깔끔한 연습실</h5>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    
+                    <!-- 오른쪽 세부공간 선택 영역 -->
+                    <div class="col-12 mb-3" id="right">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h4 class="card-title mb-0 text-primary">새부장소 상세</h4>
+                                    <div>
+                                        <button class="btn btn-link"><i class="bi bi-heart"></i></button>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-info" role="alert">
+                                    <h5 class="mb-0">결제 후 바로 예약확정</h5>
+                                    <small>빠르고 확실한 예약을 위해 스페이스클라우드에서 온라인 결제를 진행하세요 </small>
+                                </div>
+                        
+                                <div class="detailRoom-group" role="group">
+
+                                    <!-- 1번방 -->
+                                    <div class="mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" class="btn-check" name="detailRoom" id="room1" autocomplete="off" checked data-bs-toggle="collapse" data-bs-target="#room1-detail" aria-expanded="true" aria-controls="room1-detail">
+                                            <label class="d-flex justify-content-between align-items-center flex-grow-1 p-2 border rounded-top" for="room1">
+                                                <span class="">1번방 (다목적홀)</span>
+                                                <span class="text-nowrap">₩3,500 / 시간</span>
+                                            </label>
+                                        </div>
+                                        <div id="room1-detail" class="collapse show" aria-labelledby="room1">
+                                            <div class="card border-top-0 rounded-0 rounded-bottom">
+                                                <img src="https://cdn.pixabay.com/photo/2015/12/04/22/20/gear-1077550_640.png" class="card-img-top" alt="1번방 이미지">
+                                                <div class="card-body">
+                                                    <p class="card-text mb-1">
+                                                        <span class="">1번방 [다목적홀] :</span>
+                                                        <span>평수 : 약 6평 (탄성마루, 촬영용 스크린)</span><br>
+                                                        <span class="ms-5">활용 : 연기, 댄스, 회의, 촬영, 레슨</span><br>
+                                                        <span class="ms-5">기본물품 : 촬영용 스크린, 공기청정기, 냉난방기, 블루투스 스피커, 고속충전기, 폰거치대, 테이블 1개, 의자 2개, 두면 전신거울</span>
+                                                    </p>
+                                                    <hr class="my-2">
+                                                    <ul class="list-group list-group-flush">
+                                                        <li class="list-group-item">
+                                                            <i class="bi bi-house-door me-2"></i>공간유형: <span class="">연습실 보컬연습실 댄스연습실</span>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <i class="bi bi-rulers me-2"></i>공간면적: <span class="">20㎡</span> <span class="badge bg-secondary">5평</span>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <i class="bi bi-clock me-2"></i>예약시간: <span class="">최소 1시간 부터</span>
+                                                        </li>
+                                                        <li class="list-group-item">
+                                                            <i class="bi bi-people me-2"></i>수용인원: <span class="">최소 1명 ~ 최대 6명</span>
+                                                        </li>
+                                                    </ul>
+                                                    <hr class="my-2">
+                                                    <div class="row row-cols-3 g-2 mt-1">
+                                                        <div class="col">
+                                                            <div class="text-center">
+                                                                <i class="bi bi-chair me-2"></i>의자/테이블
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="text-center">
+                                                                <i class="bi bi-speaker me-2"></i>건기
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="text-center">
+                                                                <i class="bi bi-building me-2"></i>탈의실
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="text-center">
+                                                                <i class="bi bi-phone me-2"></i>전신거울
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="text-center">
+                                                                <i class="bi bi-door-closed me-2"></i>내부 화장실
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="text-center">
+                                                                <i class="bi bi-slash-circle me-2"></i>금연
+                                                            </div>
+                                                        </div>
+                                                        <div class="col">
+                                                            <div class="text-center">
+                                                                <i class="bi bi-wifi me-2"></i>인터넷/WiFi
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            
+                                    <!-- 2번방 -->
+                                    <div class="mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" class="btn-check" name="detailRoom" id="room2" autocomplete="off" data-bs-toggle="collapse" data-bs-target="#room2-detail" aria-expanded="false" aria-controls="room2-detail">
+                                            <label class="d-flex justify-content-between align-items-center flex-grow-1 p-2 border rounded-top" for="room2">
+                                                <span class="">2번방 (다목적홀)</span>
+                                                <span class=" text-nowrap">₩3,500 / 시간</span>
+                                            </label>
+                                        </div>
+                                        <div id="room2-detail" class="collapse" aria-labelledby="room2">
+                                            <div class="card border-top-0 rounded-0 rounded-bottom">
+                                                <img src="https://via.placeholder.com/800x400?text=Room+2" class="card-img-top" alt="2번방 이미지">
+                                                <div class="card-body">
+                                                    <!-- 2번방 상세 정보 내용 -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 3번방 -->
+                                    <div class="mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <input type="radio" class="btn-check" name="detailRoom" id="room3" autocomplete="off" data-bs-toggle="collapse" data-bs-target="#room3-detail" aria-expanded="false" aria-controls="room3-detail">
+                                            <label class="d-flex justify-content-between align-items-center flex-grow-1 p-2 border rounded-top" for="room3">
+                                                <span class="">3번방 (보컬, 악기, 피아노)</span>
+                                                <span class=" text-nowrap">₩3,000 / 시간</span>
+                                            </label>
+                                        </div>
+                                        <div id="room3-detail" class="collapse" aria-labelledby="room3">
+                                            <div class="card border-top-0 rounded-0 rounded-bottom">
+                                                <img src="https://via.placeholder.com/800x400?text=Room+3" class="card-img-top" alt="3번방 이미지">
+                                                <div class="card-body">
+                                                    <!-- 3번방 상세 정보 내용 -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 추가적인 방은 같은 패턴으로 반복 -->
+                            
+                                </div>
+                            
+                                <!-- 예약선택 -->
+                                <h5 class="mt-5">예약선택</h5>
+                                <div class="d-flex flex-column w-100 mt-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="reserveType" id="timeReserve" checked>
+                                        <label class="form-check-label" for="timeReserve">
+                                            시간 단위 예약하기 (최소 1시간 부터)
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="reserveType" id="packageReserve">
+                                        <label class="form-check-label" for="packageReserve">
+                                            패키지로 예약하기
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="d-grid" id="btn-payment">
+                                    <button type="button" class="btn btn-secondary">결제 버튼</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- 세부공간 end-->
+
+                    <!-- 네비게이션 탭 -->
+                    <div class="col-12 mb-3" id="bottom">
+                        <div class="card">
+                            <div class="card-body">
+                                <nav class="nav nav-fill sticky-top" id="scrollspy_nav">
+                                    <a class="nav-link" href="#space_info">공간 소개</a>
+                                    <a class="nav-link" href="#space_facility">시설 안내</a>
+                                    <a class="nav-link" href="#space_qa">Q&A</a>
+                                    <a class="nav-link" href="#space_review">이용 후기</a>
+                                </nav>
+                                
+                                <div id="scrollspy_content" 
+                                     data-bs-spy="scroll" 
+                                     data-bs-target="#scrollspy_nav"
+                                     >
+                                    <h4 id="space_info">공간 소개</h4>
+                                    <p>...</p>
+                                    <div style="height: 300px;"></div>
+                                    <h4 id="space_facility">시설 안내</h4>
+                                    <p>...</p>
+                                    <div style="height: 300px;"></div>
+                                    <h4 id="space_qa">Q&A</h4>
+                                    <p>...</p>
+                                    <div style="height: 300px;"></div>
+                                    <h4 id="space_review">이용 후기</h4>
+                                    <p>...</p>
+                                    <div style="height: 300px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div> <!-- row end -->
+            </div>
+            <div class="col-12 mt-5">
+                <h2>시간나면 추가할 공간(보류)</h2>
+                <div>호스트의 다른공간</div> 
+                <div>비슷한공간</div>
+            </div>  <!-- row end -->
+        </div> <!-- shodow row end -->
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

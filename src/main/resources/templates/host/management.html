@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{host/layouts/host-layout}">
+
+<th:block layout:fragment="content">
+    <!-- 브레드크럼 -->
+    <nav aria-label="breadcrumb" class="breadcrumb-wrapper">
+        <ol class="breadcrumb mb-0">
+           <li class="breadcrumb-item"><a href="#"><i class="bi bi-house"></i></a></li>
+           <li class="breadcrumb-item">환경설정</li>
+           <li class="breadcrumb-item active">기본설정</li>
+        </ol>
+     </nav>
+     <h3>호스트 관리 페이지</h3>
+     <a href="/guest/login" class="btn btn-outline-success">로그인</a>
+</th:block>
+</html>

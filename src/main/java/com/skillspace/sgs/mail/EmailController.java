@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.skillspace.sgs.member.guest.GuestService;
+import com.skillspace.sgs.guest.GuestService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;

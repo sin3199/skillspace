@@ -2,208 +2,156 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:laout="http://www.ultraq.net.nz/thymeleaf/laout"
    layout:decorate="~{layouts/layout1}">
 
+<th:block layout:fragment="css">
+   <style>
+      /* 버튼 크기 고정 */
+      .btn-size {
+         width: 144px;
+      }
+   </style>
+
+</th:block>
+
 <th:block layout:fragment="content">
-   <h1 class="mt-3 mb-4 text-center"></h1>
-   <div class="row w-75 mx-auto container-sm">
-      <div class="col">
-         <div class="card card-info">
-            <div class="card-header">
-               <h3 class="card-title text-center">회원가입</h3>
+   <div class="row justify-content-center mt-4">
+      <div class="col col-lg-7 col-md-9 col-sm-11">
+         <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white text-center">
+               <h3 class="card-title">회원가입</h3>
             </div>
 
             <form class="needs-validation" method="post" action="/guest/join" novalidate>
                <div class="card-body">
-                  <div class="row form-group mb-2">
-                     <div class="col-2">
-                        <label for="user_id" class="col-form-label">아이디</label>
-                     </div>
-                     <div class="col-10">
-                        <div class="input-group">
-                           <!-- 아이디 입력 -->
-                           <input type="text" class="form-control" id="user_id" name="user_id" placeholder="아이디"
-                              required>
-                           <!-- ID 중복체크 -->
-                           <button type="button" class="btn btn-outline-primary ms-2 w-25" id="btnIDCheck">ID
-                              중복체크</button>
-                           <!-- 유효성 검사 오류 메시지 -->
-                           <div class="invalid-feedback">아이디를 입력하세요</div>
-                        </div>
+                  <!-- 아이디 -->
+                  <div class="mb-3">
+                     <label for="user_id" class="form-label">아이디</label>
+                     <div class="input-group">
+                         <input type="text" class="form-control" id="user_id" name="user_id" placeholder="아이디를 입력하세요"
+                             required>
+                         <button type="button" class="btn btn-outline-primary ms-2 btn-size text-nowrap" id="btnIDCheck">ID
+                             중복체크</button>
+                         <div class="invalid-feedback">아이디를 입력하세요</div>
                      </div>
                   </div>
-                  <div class="row form-group mb-2">
-                     <div class="col-2">
-                        <label for="user_pw" class="col-form-label">비밀번호</label>
+                  
+                  <!-- 비밀번호 -->
+                  <div class="mb-3">
+                     <label for="user_pw" class="form-label">비밀번호</label>
+                     <input type="password" class="form-control mb-2" id="user_pw" name="user_pw"
+                         placeholder="비밀번호를 입력하세요"
+                         pattern="^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,16}$" required>
+                     <input type="password" class="form-control" id="user_pw2" name="user_pw2"
+                         placeholder="비밀번호를 다시 입력하세요" required>
+                     <small class="form-text text-muted" id="passwordHelp" >영문, 숫자, 특수문자를 포함하여 8자~16자로 입력해주세요.</small>
+                     <div class="invalid-feedback" id="passwordError">비밀번호를 입력해주세요</div>
+                     <div class="invalid-feedback" id="passwordMatchError">비밀번호가 일치하지 않습니다.</div>
+                 </div>
+                  
+                   <!-- 이름 -->
+                   <div class="mb-3">
+                     <label for="user_name" class="form-label">이름</label>
+                     <input type="text" class="form-control" id="user_name" name="user_name" placeholder="이름을 입력하세요"
+                         required>
+                     <div class="invalid-feedback">이름을 입력하세요</div>
+                 </div>
+                  <!-- 닉네임 -->
+                  <div class="mb-3">
+                     <label for="user_nick" class="form-label">닉네임</label>
+                     <div class="input-group">
+                         <input type="text" class="form-control" id="user_nick" name="user_nick"
+                             placeholder="닉네임을 입력하세요" required>
+                         <button type="button" class="btn btn-outline-primary ms-2 btn-size text-nowrap" id="btnNickCheck">닉네임
+                             중복체크</button>
+                         <div class="invalid-feedback">닉네임을 입력하세요</div>
                      </div>
-                     <div class="col-10">
-                        <!-- 비밀번호 입력 -->
-                        <input type="password" class="form-control" id="user_pw" name="user_pw" placeholder="비밀번호"
-                           required pattern="^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,16}$">
+                 </div>
 
-                        <!-- 비밀번호 확인 -->
-                        <input type="password" class="form-control" id="user_pw2" name="user_pw2" placeholder="비밀번호 확인"
-                           required>
+                 <!-- 이메일 -->
+                 <div class="mb-3">
+                     <label for="user_email" class="form-label">이메일</label>
+                     <div class="input-group">
+                         <input type="email" class="form-control" id="user_email" name="user_email"
+                             placeholder="이메일을 입력하세요" required>
+                         <button type="button" class="btn btn-outline-primary ms-2 btn-size text-nowrap" id="btnMailAuthcode">메일 인증
+                             요청</button>
+                         <div class="invalid-feedback">이메일을 입력하세요</div>
+                     </div>
+                 </div>
 
-                        <!-- 유효성 검사 오류 메시지들 -->
-                        <div class="form-text text-muted" id="passwordHelp">영문,
-                           숫자, 특수문자를 포함하여 8자~16자 이내로 입력해주세요.</div>
-                        <div class="invalid-feedback" id="passwordError">비밀번호를
-                           입력해주세요</div>
-                        <div class="invalid-feedback" id="passwordMatchError">비밀번호가
-                           일치하지 않습니다.</div>
+                 <!-- 인증 코드 -->
+                 <div class="mb-3">
+                     <label for="user_authcode" class="form-label">인증 확인</label>
+                     <div class="input-group">
+                         <input type="text" class="form-control" id="user_authcode" name="user_authcode"
+                             placeholder="인증 코드를 입력하세요" required>
+                         <button type="button" class="btn btn-outline-primary ms-2 btn-size text-nowrap" id="btnConfirmAuth">인증
+                             확인</button>
+                         <div class='invalid-feedback'>인증 코드를 입력하세요</div>
                      </div>
-                  </div>
-                  <div class="row form-group mb-2">
-                     <div class="col-2">
-                        <label for="user_name" class="col-form-label">이름</label>
-                     </div>
-                     <div class="col-10">
-                        <!-- 이름 입력 -->
-                        <input type="text" class="form-control" id="user_name" name="user_name" placeholder="이름"
-                           required>
-                        <!-- 유효성 검사 오류 메시지 -->
-                        <div class="invalid-feedback">이름을 입력하세요</div>
-                     </div>
-                  </div>
-                  <div class="row form-group mb-2">
-                     <div class="col-2">
-                        <label for="user_nick" class="col-form-label">닉네임</label>
-                     </div>
-                     <div class="col-10">
-                        <div class="input-group">
-                           <!-- 닉네임 입력 -->
-                           <input type="text" class="form-control" id="user_nick" name="user_nick" placeholder="닉네임"
-                              required>
-                           <!-- 닉네임 중복체크 -->
-                           <button type="button" class="btn btn-outline-primary ms-2 w-25" id="btnNickCheck">Nick
-                              중복체크</button>
-                           <!-- 유효성 검사 오류 메시지 -->
-                           <div class="invalid-feedback">닉네임을 입력하세요</div>
-                        </div>
-                     </div>
-                  </div>
-                  <div class="row form-group mb-2">
-                     <div class="col-2">
-                        <label for="user_email" class="col-form-label">이메일</label>
-                     </div>
-                     <div class="col-10">
-                        <div class="input-group">
-                           <!-- 이메일 입력 -->
-                           <input type="text" class="form-control" id="user_email" name="user_email" placeholder="이메일"
-                              required>
-                           <!-- 메일인증 요청 -->
-                           <button type="button" class="btn btn-outline-primary ms-2 w-25" id="btnMailAuthcode">메일인증
-                              요청</button>
-                           <!-- 유효성 검사 오류 메시지 -->
-                           <div class="invalid-feedback">이메일을 입력하세요</div>
-                        </div>
-                     </div>
-                  </div>
-                  <div class="row form-group mb-2">
-                     <div class="col-2">
-                        <label for="user_authcode" class="col-form-label">인증 확인</label>
-                     </div>
-                     <div class="col-10">
-                        <div class="input-group">
-                           <!-- 인증 코드 입력 -->
-                           <input type="text" class="form-control" id="user_authcode" name="user_authcode"
-                              placeholder="인증코드" required>
-                           <!-- 인증 코드 확인 -->
-                           <button type="button" class="btn btn-outline-primary ms-2 w-25"
-                              id="btnConfirmAuth">인증확인</button>
-                           <!-- 유효성 검사 오류 메시지 -->
-                           <div class="invalid-feedback">인증코드를 입력하세요</div>
-                        </div>
-                     </div>
-                  </div>
-                  <div class="row form-group mb-2">
-                     <div class="col-2">
-                        <label for="sample2_postcode" class="col-form-label">우편번호</label>
-                     </div>
-                     <div class="col-10">
-                        <div class="input-group">
-                           <!-- 우편번호 입력 -->
-                           <input type="text" class="form-control" id="sample2_postcode" name="user_zipcode"
-                              placeholder="우편번호" required maxlength="6">
-                           <!-- 우편번호 찾기 -->
-                           <button type="button" class="btn btn-outline-primary ms-2 w-25"
-                              onclick="sample2_execDaumPostcode()">우편번호 찾기</button>
-                           <!-- 유효성 검사 오류 메시지 -->
-                           <div class="invalid-feedback">우편번호를 입력하세요</div>
-                        </div>
-                     </div>
-                  </div>
-                  <div class="row form-group mb-2">
-                     <div class="col-2">
-                        <label for="sample2_address" class="col-form-label">기본주소</label>
-                     </div>
-                     <div class="col-10">
-                        <!-- 기본주소 입력 -->
-                        <input type="text" class="form-control" id="sample2_address" name="user_addr" placeholder="기본주소"
-                           required>
-                        <!-- 유효성 검사 오류 메시지 -->
-                        <div class="invalid-feedback">기본주소를 입력하세요</div>
-                     </div>
-                  </div>
-                  <div class="row form-group mb-2">
-                     <div class="col-2">
-                        <label for="sample2_detailAddress" class="col-form-label">상세주소</label>
-                     </div>
-                     <div class="col-10">
-                        <!-- 상세주소 입력 -->
-                        <input type="text" class="form-control" id="sample2_detailAddress" name="user_addrdetail"
-                           placeholder="상세주소" required> <input type="hidden" id="sample2_extraAddress"
-                           placeholder="참고항목">
-                        <!-- 유효성 검사 오류 메시지 -->
-                        <div class="invalid-feedback">상세주소를 입력하세요</div>
-                     </div>
-                  </div>
-                  <div class="row form-group mb-2">
-                     <div class="col-2">
-                        <label for="user_phone" class="col-form-label">전화번호</label>
-                     </div>
-                     <div class="col-10">
-                        <!-- 전화번호 입력 -->
-                        <input type="text" class="form-control" id="user_phone" name="user_phone"
-                           placeholder="전화번호 - 빼고 숫자만 입력" maxlength="11" required>
-                        <!-- 유효성 검사 오류 메시지 -->
-                        <div class="invalid-feedback">전화번호를 입력하세요</div>
-                     </div>
-                  </div>
-                  <div class="row form-group mb-2">
-                     <div class="col-2">
-                        <label for="user_phone" class="col-form-label">메일 수신</label>
-                     </div>
-                     <div class="col-10">
-                        <!-- 메일 수신 체크 -->
-                        <div class="form-check form-check-inline">
-                           <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio1"
-                              value="Y" checked>
-                           <label class="form-check-label" for="inlineRadio1">수신</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                           <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio2"
-                              value="N">
-                           <label class="form-check-label" for="inlineRadio2">수신거부</label>
-                        </div>
+                 </div>
 
+                 <!-- 주소 입력 섹션 -->
+                 <div class="mb-3">
+                     <label for="sample2_postcode" class="form-label">우편번호</label>
+                     <div class="input-group">
+                         <!-- 우편번호 입력 -->
+                         <input type="text" class="form-control" id="sample2_postcode" name="user_zipcode"
+                             placeholder="우편번호를 입력하세요 (6자리)" required maxlength="6">
+                         <!-- 우편번호 찾기 버튼 -->
+                         <button type="button" class="btn btn-outline-primary ms-2 btn-size text-nowrap"
+                             onclick="sample2_execDaumPostcode()">우편번호 찾기</button>
+                         <div class="invalid-feedback">우편번호를 입력하세요</div>
                      </div>
-                  </div>
+                 </div>
 
+                 <div class="mb-3">
+                     <label for="sample2_address" class="form-label">기본주소</label>
+                     <!-- 기본주소 입력 -->
+                     <input type="text" class="form-control" id="sample2_address" name="user_addr"
+                         placeholder="기본주소를 입력하세요" required>
+                     <div class="invalid-feedback">기본주소를 입력하세요</div>
+                 </div>
 
+                 <div class="mb-3">
+                     <label for="sample2_detailAddress" class="form-label">상세주소</label>
+                     <!-- 상세주소 입력 -->
+                     <input type="text" class="form-control" id="sample2_detailAddress" name="user_addrdetail"
+                         placeholder="상세주소를 입력하세요" required>
+                     <!-- 참고항목 (숨김 처리) -->
+                     <input type="hidden" id="sample2_extraAddress">
+                     <div class="invalid-feedback">상세주소를 입력하세요</div>
+                 </div>
+
+                 <div class="mb-3">
+                     <label for="user_phone" class="form-label">전화번호</label>
+                     <!-- 전화번호 입력 -->
+                     <input type="text" class="form-control" id="user_phone" name="user_phone"
+                         placeholder="'-' 없이 숫자만 입력하세요 (최대 11자리)" maxlength="11" required>
+                     <div class="invalid-feedback">전화번호를 입력하세요</div>
+                 </div>
+
+                 <!-- 메일 수신 체크 -->
+                 <div class="mb-3">
+                     <label class="form-label">메일 수신 여부</label>
+                     <div class="form-check">
+                         <input class="form-check-input" type="radio" name="user_email_receive" id="emailReceiveYes"
+                             value="Y" checked>
+                         <label class="form-check-label" for="emailReceiveYes">수신</label>
+                     </div>
+                     <div class="form-check">
+                         <input class="form-check-input" type="radio" name="user_email_receive" id="emailReceiveNo"
+                             value="N">
+                         <label class="form-check-label" for="emailReceiveNo">수신 거부</label>
+                     </div>
+                 </div>
                </div>
 
-
-               <div class="card-footer">
-                  <!--  id="btnJoin"  -->
-                  <button type="submit" class="btn btn-info">Sign up</button>
-                  <button type="reset" class="btn btn-danger">Cancel</button>
+               <!-- 버튼 섹션 -->
+               <div class="card-footer text-center">
+                  <button type="submit" class="btn btn-primary me-2">Sign Up</button>
+                  <button type="reset" class="btn btn-secondary">Cancel</button>
                </div>
-
-
-
             </form>
-
-
          </div>
       </div>
    </div>

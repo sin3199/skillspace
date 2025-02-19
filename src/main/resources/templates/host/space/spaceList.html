@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{host/layouts/host-layout}">
+
+<th:block layout:fragment="content">
+   <div class="card mb-3">
+      <div class="card-header">
+         <h2>공간 페이지 관리</h2>
+      </div>
+      <div class="card-body">
+         <button class="btn btn-primary" id="btn_create">상품 등록</button>
+      </div>
+   </div>
+   <div class="card">
+      <div class="card-body">
+         <div class="d-flex justify-content-between">
+            <div>
+               <button class="btn btn-outline-danger text-nowrap btn-sm" id="btn_seletedDelete">선택삭제</button>
+            </div>
+            <div class="d-flex gap-1">
+               <select class="form-select" name="" id="">
+                  <option value="">등록일</option>
+               </select>
+               <select class="form-select" name="" id="">
+                  <option value="">10개씩</option>
+               </select>
+            </div>
+         </div>
+         <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+               <thead class="table-light text-center text-nowrap">
+                  <tr>
+                     <th style="width: 5%;"><input type="checkbox" id="checkAll"> <!-- 전체 선택 체크박스 --></th>
+                     <th style="width: 10%;">노출/숨김</th>
+                     <th style="width: 12%;">카테고리</th>
+                     <th style="width: 35%;">제목/부제목</th>
+                     <th style="width: 15%;">공간 이미지</th>
+                     <th style="width: 13%;">등록일</th>
+                     <th style="width: 10%;">관리</th>
+                  </tr>
+               </thead>
+               <tbody class="text-center align-middle">
+                  <tr th:each= "space:${spaceList}">
+                     <td><input type="checkbox" class="itemCheckbox" name="itemCheckbox" th:value="${space.host_space_id}"></td>
+                     <td class="text-center ">
+                        <button class="btn btn-warning rounded-4 fw-bold text-nowrap" th:if= "${space.is_visible == 'Y'}">노출</button>
+                        <button class="btn btn-info rounded-4 fw-bold text-nowrap" th:unless= "${space.is_visible == 'Y'}">숨김</button>
+                     </td>
+                     <td>[[${space.category.cate_name}]]</td>
+                     <td class="text-start">
+                        <div class="fw-bold">[[${space.main_title}]]</div>
+                        <div class="text-muted">[[${space.sub_title}]]</div>
+                     </td>
+                     <td>
+                        <div class="flex-column">
+                           <img th:if= "${!space.images.isEmpty()}" 
+                              th:src="@{'/api/image/display/' + ${space.images[0].image_up_folder} + '/' + 's_' + ${space.images[0].image_name}}"
+                              class="img-fluid rounded"
+                              alt="공간 대표 이미지">
+                           <img th:unless= "${!space.images.isEmpty()}" 
+                              src="/images/no-image.png"
+                              class="img-fluid rounded"
+                              alt="이미지 없음">
+                        </div>
+                     </td>
+                     <td><small>[[${#temporals.format(space.created_at, 'yyyy-MM-dd HH:mm:ss')}]]</small></td>
+                     <td>
+                        <button class="btn btn-outline-success btn-sm text-nowrap" name="btn_modify" th:data-host_space_id="${space.host_space_id}">수정</button>
+                        <button class="btn btn-outline-danger btn-sm text-nowrap" name="btn_delete" th:data-host_space_id="${space.host_space_id}">삭제</button>
+                     </td>
+                  </tr>
+               </tbody>
+   
+            </table>
+         </div>
+      </div><!-- card-body end -->
+      <div class="card-footer d-flex justify-content-center">
+         <ul class="pagination pagination-sm m-0 float-right">
+            <th:block th:if="${pageMaker.prev}">
+               <li class="page-item"><a class="page-link"
+                     th:href="|/admin/product/pro_list${pageMaker.makeSearch(pageMaker.startPage - 1)}|">«</a>
+               </li>
+            </th:block>
+
+            <th:block th:each="num : ${#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}">
+               <li class="page-item" th:classappend="${pageMaker.cri.page == num ? 'active' : ''}"><a
+                     class="page-link" th:href="|/host/space/spaceList${pageMaker.makeSearch(num)}|"
+                     th:text="${num}"></a></li>
+            </th:block>
+
+            <th:block th:if="${pageMaker.next}">
+               <li class="page-item"><a class="page-link"
+                     th:href="|/admin/product/pro_list${pageMaker.makeSearch(pageMaker.endPage + 1)}|">»</a>
+               </li>
+            </th:block>
+         </ul>
+      </div>
+   </div>   <!-- card end -->
+   <!-- 페이징과 검색 파라미터 정보 : 현재 목록 상태를 작업(수정, 삭제)을 하고 돌아왔을 때 페이지 유지-->
+   <form id="criteriaForm" action="" method="get">
+      <!-- 4개의 검색 파라미터 -->
+      <input type="hidden" name="page"       id="page"       th:value="${pageMaker.cri.page}">
+      <input type="hidden" name="perPageNum" id="perPageNum" th:value="${pageMaker.cri.perPageNum}">
+      <input type="hidden" name="searchType" id="searchType" th:value="${pageMaker.cri.searchType}">
+      <input type="hidden" name="keyword"    id="keyword"    th:value="${pageMaker.cri.keyword}">
+      <!-- 수정, 삭제 시 공간 코드 -->
+      <input type="hidden" name="host_space_id" id="host_space_id">
+   </form>
+
+
+</th:block>
+
+<th:block layout:fragment="scriptBottom">
+   <script th:inline="javascript">
+      document.addEventListener("DOMContentLoaded", function() {
+         console.log([[${spaceList}]]);
+         console.log([[${pageMaker}]]);
+
+         // 체크 박스 기능
+         const checkAll = document.getElementById('checkAll'); // 전체 체크박스 요소 가져오기
+         const itemCheckboxes = document.querySelectorAll('.itemCheckbox'); // 개별 체크박스 요소들 가져오기
+
+         // 전체 체크, 해제
+         checkAll.addEventListener('change', function() { // 전체 체크박스 변경 이벤트 리스너
+            itemCheckboxes.forEach(checkbox => { // 모든 개별 체크박스 순회
+               checkbox.checked = this.checked; // 전체 체크박스 상태에 따라 개별 체크박스 상태 변경
+            });
+         });
+
+         // 각각의 체크가 통일되게 선택되어 있으면, 전체 체크 상태 변경
+         itemCheckboxes.forEach(checkbox => { // 각 개별 체크박스 순회하며 이벤트 리스너 추가
+            checkbox.addEventListener('change', function() { // 개별 체크박스 변경 이벤트 리스너
+               const allChecked = Array.from(itemCheckboxes).every(cb => cb.checked); // 모든 개별 체크박스가 선택되었는지 확인
+               checkAll.checked = allChecked; // 모든 개별 체크박스 선택 시 전체 체크박스도 선택 상태로 변경
+            });
+         });
+
+         // 체크된 공간 삭제
+         document.getElementById('btn_seletedDelete').addEventListener('click', function() {
+            if(!confirm("정말로 삭제 하시겠습니까?")) return;
+            
+            const selectedItemId = [];
+            const checkedItems = document.querySelectorAll('.itemCheckbox:checked');   // 체크된 체크박스 요소
+
+            if(checkedItems.length == 0) {
+               alert("선택된 공간이 없습니다.");
+               return;
+            }
+
+            checkedItems.forEach(check => {
+               selectedItemId.push(check.value);   // 체크박스 value 값을 배열에 추가
+            });
+
+            fetch('/host/space/selectedDelete', {
+               method: 'post',
+               headers: {
+                  'Content-type' : 'application/json'
+               },
+               body: JSON.stringify(selectedItemId)
+            })
+            .then(response => {
+               if (!response.ok) { 
+                  throw new Error(`HTTP error! status: ${response.status}`);
+               }
+            })
+            .then(data => {
+               // 서버에서 삭제 성공 응답을 받았을 때
+               alert("선택된 상품이 삭제되었습니다."); 
+               location.reload();
+            })
+            .catch(error => {
+               // 네트워크 에러나 서버 에러 발생 시
+               console.error('삭제 요청 실패:', error); 
+               alert('삭제 처리 중 오류가 발생했습니다.'); 
+            });
+         });
+
+
+         // 기존 페이지 정보 form
+         const criteriaForm = document.getElementById('criteriaForm');
+
+         // 수정 삭제
+         const btnModifyList = document.querySelectorAll('button[name=btn_modify]');
+         const btnDeleteList = document.querySelectorAll('button[name=btn_delete]');
+         
+         // 수정
+         btnModifyList.forEach(btnModify => {
+            btnModify.addEventListener('click', function() {
+               const host_space_id = btnModify.dataset.host_space_id;
+               document.getElementById('host_space_id').setAttribute('value', host_space_id);
+               criteriaForm.setAttribute('action', '/host/space/modifySpace');
+               criteriaForm.submit();
+            });
+         });
+
+         // 삭제
+         btnDeleteList.forEach(btnDelete => {
+            btnDelete.addEventListener('click', function() {
+               if(!confirm("정말로 삭제 하시겠습니까?")) return;
+               const host_space_id = btnDelete.dataset.host_space_id;
+               document.getElementById('host_space_id').setAttribute('value', host_space_id);
+               criteriaForm.setAttribute('action', '/host/space/deleteSpace');
+               criteriaForm.submit();
+            });
+         });
+
+         // 호스트 공간 생성
+         document.getElementById('btn_create').addEventListener('click', function() {
+            criteriaForm.setAttribute('action', '/host/space/createSpace');
+            criteriaForm.submit();
+         });
+
+
+      });   // event end
+   </script>
+
+</th:block>
+</html>

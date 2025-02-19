@@ -1,0 +1,194 @@
+/* 최소 너비 설정 */
+body {
+   min-width: 320px; /* 모바일 최소 너비 설정 */
+   overflow-x: auto; /* 화면이 320px 이하로 줄어들 경우 가로 스크롤 생성 */
+}
+
+.wrapper {
+   display: flex;
+   flex-direction: column;
+   height: 100vh;
+
+}
+
+
+/* content-wrapper 수정 */
+.content-wrapper {
+   flex: 1;
+   flex-direction: column;
+}
+
+
+/* 네비게이션 바 관련 스타일 */
+.navbar {
+   position: fixed;
+   width: 100%;
+   top: 0;
+   z-index: 1000;
+}
+
+.navbar #navbarNav {
+   border-left: 1px solid #ddd; /* 구역 구분을 위한 왼쪽 경계선 */
+   padding-left: 30px;
+}
+
+.navbar-brand {
+   min-width: 180px;
+   font-size: 1.4rem;
+   font-weight: bold;
+}
+
+.nav-underline .nav-link {
+   font-size: 1.1rem;
+   font-weight: bold;
+   color: #000;
+}
+
+.nav-underline .nav-link.active {
+   color: rgba(13, 110, 253, 1);
+}
+
+#content {
+   flex: 1;
+   width: calc(100% - 250px);
+   margin-left: 250px;
+   transition: all 0.3s;
+   margin-top: 56px; /* 네비게이션 바 높이만큼 여백 추가 */
+   padding: 20px;
+}
+
+#content.active {
+   width: 100%;
+   margin-left: 0;
+}
+
+.sidebar {
+   width: 250px;
+   position: fixed;
+   top: 56px; /* 네비게이션 바 높이만큼 여백 설정 */
+   left: 0;
+   height: calc(100vh - 56px); /* 네비게이션 바 높이를 제외한 높이 설정 */
+   z-index: 999;
+   background: #2c3e50;
+   color: #ecf0f1;
+   transition: all 0.3s;
+   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar::-webkit-scrollbar {
+   width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+   background: #34495e;
+   border-radius: 3px;
+}
+
+.sidebar.active {
+   margin-left: -250px;
+}
+
+.sidebar-header {
+   padding: 15px;
+   background: #2c3e50;
+   border-bottom: 1px solid #34495e;
+}
+
+.sidebar ul li a {
+   padding: 10px 20px;
+   display: block;
+   border-radius: 8px;
+   color: #ecf0f1;
+   text-decoration: none;
+   margin: 0 10px;
+}
+
+/* 메뉴 아이콘 스타일 */
+.sidebar ul li a i {
+   margin-right: 10px;
+   width: 20px;
+   text-align: center;
+}
+
+.sidebar ul li a:hover {
+   background: #34495e;
+   color: #3498db;
+   transform: translateX(5px);
+}
+
+/* 활성화된 메뉴 아이템 */
+.sidebar ul li a.active {
+   background: #3498db;
+   color: #ffffff;
+}
+
+/* 서브메뉴 스타일 */
+.sidebar ul ul {
+   background: #34495e;
+   border-radius: 8px;
+   margin: 5px 15px;
+}
+
+.sidebar ul ul a {
+   font-size: 0.95em;
+   padding-left: 30px;
+   margin: 0 10px;
+}
+
+/* 서브메뉴 호버 효과 */
+.sidebar ul ul a:hover {
+   background: #2c3e50;
+   color: #3498db;
+}
+
+.sidebar-solid {
+   border-bottom: 1px solid #34495e;
+}
+
+#sidebarCollapse {
+   background: transparent;
+   border: none;
+}
+
+#sidebarCollapse:hover {
+   background: #e9ecef;
+}
+
+/* 화살표 회전 애니메이션 */
+.bi-chevron-down {
+   display: inline-block;
+   transition: transform 0.3s ease;
+}
+
+
+/* 상단 우측 관리자 정보 영역 */
+.admin-info {
+   margin-left: auto;
+   padding-right: 20px;
+}
+
+/* 브레드크럼 스타일 */
+.breadcrumb-wrapper {
+   background: #f8f9fa;
+   padding: 10px 20px;
+   margin-bottom: 20px;
+   border-radius: 5px;
+}
+
+.admin-footer {
+   background: #f8f9fa;
+   padding: 0.5rem 0;
+   border-top: 1px solid #dee2e6;
+   font-size: 0.875rem;
+   text-align: center;
+   color: #6c757d;
+   width: calc(100% - 250px); /* 사이드바 너비만큼 제외 */
+   margin-left: 250px; /* 사이드바 너비만큼 여백 */
+   transition: all 0.3s;
+}
+
+/* 사이드바가 접혔을 때 */
+.admin-footer.active {
+   width: 100%;
+   margin-left: 0;
+}

@@ -123,6 +123,14 @@
 		    <artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 		
+		<!-- 썸네일 기능 제공 -->
+		<!-- https://mvnrepository.com/artifact/net.coobird/thumbnailator -->
+		<dependency>
+		    <groupId>net.coobird</groupId>
+		    <artifactId>thumbnailator</artifactId>
+		    <version>0.4.20</version>
+		</dependency>
+		
 		
 	</dependencies>
 

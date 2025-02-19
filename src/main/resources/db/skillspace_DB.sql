@@ -1,7 +1,5 @@
 # skillspace 프로젝트 DB
 
-# skillspace 프로젝트 DB
-
 -- 회원 테이블
 CREATE TABLE `UserInfo` (
 	`user_id`			varchar(30)		NOT NULL,
@@ -36,7 +34,9 @@ CREATE TABLE `Hostuserinfo` (
 	`host_addrdetail`	varchar(100)	NOT NULL,
 	`host_phone`		varchar(13)		NOT NULL,
 	`description`		varchar(3000)	NOT NULL,
-	`host_status`		tinyint			NOT NULL	DEFAULT 1	COMMENT '활동 : 1, 휴면 : 2, 탈퇴 : 3, 정지 : 4',
+	`host_status`		tinyint			NOT NULL	DEFAULT 0	COMMENT '대기 : 0, 활동 : 1, 휴면 : 2, 탈퇴 : 3, 정지 : 4',
+	`created_at`		datetime		NOT NULL	DEFAULT now(),
+	`updated_at`		datetime		NOT NULL	DEFAULT now(),
 	`approval`			char(1)			NOT NULL	DEFAULT 'N'	COMMENT 'Y,  N 호스트 승인'
 );
 
@@ -59,25 +59,40 @@ ALTER TABLE `Admin` ADD CONSTRAINT `PK_ADMIN` PRIMARY KEY (`admin_id`);
 
 
 -- 카테고리 테이블
-CREATE TABLE `catagory` (
+drop table category;
+CREATE TABLE `category` (
 	`cate_id`		int 		NOT NULL,
 	`cate_prtcode`	int			NULL		COMMENT '상위 카테고리 참조(참조키 설정)',
 	`cate_name`		varchar(50)	NOT NULL,
-	`cate_level`	tinyint		NOT NULL	COMMENT '상품 카테고리 : 1, 메뉴 카테고리 : 2 ...'
+	`level`			tinyint		NOT NULL	COMMENT '1차 2차 3차 카테고리',
+	`sort_order`	int			NOT NULL DEFAULT 0	COMMENT '정렬 순서'
 );
 
 ALTER TABLE `catagory`
 MODIFY `cate_id` INT NOT NULL AUTO_INCREMENT,
 ADD PRIMARY KEY (`cate_id`);
 
+ALTER TABLE category
+ADD CONSTRAINT FK_catagory
+FOREIGN KEY (cate_prtcode)
+REFERENCES category (cate_id)
+ON DELETE CASCADE;
+
+SHOW CREATE TABLE category;
+ALTER TABLE category AUTO_INCREMENT = 1;
+
+
+
 
 -- 호스트 정보 테이블
-CREATE TABLE `Host_Guide` (
-	`host_guide_id`	int 			NOT NULL,
+CREATE TABLE `Host_Space` (
+	`host_space_id`	int 			NOT NULL,
 	`user_id`		varchar(30)		NOT NULL	COMMENT '호스트 아이디',
 	`cate_id`		int				NOT NULL,
-	`title`			varchar(100)	NOT NULL,
-	`description`	varchar(3000)	NOT NULL,
+	`main_title`	varchar(100)	NOT NULL,
+	`sub_title`		varchar(100)	NOT NULL,
+	`space_intro`	varchar(3000)	NOT NULL,
+	`space_guide`	varchar(3000)	NOT NULL,
 	`location`		varchar(100)	NOT NULL,
 	`phone_number`	varchar(13)		NOT NULL,
 	`created_at`	datetime		NOT NULL	DEFAULT now(),
@@ -273,11 +288,12 @@ REFERENCES `Reservations` (`reservation_id`);
 
 -- 이미지 테이블
 CREATE TABLE `Images` (
-	`image_id`		int 			NOT NULL,
-	`entity_type`	varchar(15)		NOT NULL	COMMENT 'Host_Guide, Products, Reviews',
-	`entity_id`		int				NOT NULL	COMMENT '회원 아이디',
-	`image_url`		varchar(255)	NOT NULL,
-	`created_at`	datetime		NOT NULL	DEFAULT now()
+	`image_id`			int 			NOT NULL,
+	`entity_type`		varchar(30)		NOT NULL	COMMENT 'Host_Guide, Products, Reviews',
+	`entity_id`			int				NOT NULL	COMMENT '테이블 아이디',
+	`image_up_folder`	varchar(255)	NOT NULL,
+	`image_name`		varchar(100)	NOT NULL,
+	`created_at`		datetime		NOT NULL	DEFAULT now()
 );
 
 ALTER TABLE `Images`

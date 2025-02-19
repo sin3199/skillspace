@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+
+	<meta charset="utf-8">
+   	<meta name="viewport" content="width=device-width, initial-scale=1">
+   	<title>SkillSpace 어서오시오</title>
+	
+	<link rel="canonical"  href="https://getbootstrap.kr/docs/5.3/examples/navbar-fixed/">
+   	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+   	<link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" >
+	
+	<!-- Custom styles for this template -->
+	<link href="/css/navbar-fixed.css" rel="stylesheet">
+	
+	<!-- JQuery -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	
+	<th:block layout:fragment="scriptTop"></th:block>
+	<th:block layout:fragment="css"></th:block>
+</head>
+<body class="d-flex flex-column h-100">
+	<th:block th:replace="~{fragments/header::header}"></th:block>
+
+	<!-- Begin page content -->
+	<div class="container">
+		<th:block layout:fragment="content"></th:block>
+	</div>
+
+	<th:block th:replace="~{fragments/footer::footer}"></th:block>
+
+
+	<th:block layout:fragment="scriptBottom"></th:block>
+	<script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

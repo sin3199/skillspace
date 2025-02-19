@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout1}">
+	  
+<th:block layout:fragment="content">
+	<h1 th:text="'해당 카테고리의 상품 페이지 ' + ${cate_id}"></h1>
+	
+</th:block>
+</html>
