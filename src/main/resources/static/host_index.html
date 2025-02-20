@@ -287,179 +287,161 @@
          <!-- 메인 콘텐츠 -->
          <article id="content">
             <div class="card container-fluid">
-               <h2>공간 페이지 관리</h2>
-               <div class="d-flex justify-content-between">
+               <div class="card-header">
+                  <h2>공간 페이지 관리</h2>
+               </div>
+            
+               <div class="card-body">
+                  <form action="" class="">
+                     <div class="row">
+                        <div class="col-2">
+                           <label for="searchType">검색어</label>
+                        </div>
+                        <div class="col-6 d-flex">
+                           <select class="form-select form-select-sm" name="searchType" id="searchType">
+                              <option value="main_title" th:selected="${pageMaker.cri.searchType == 'main_title'}">제목</option>
+                              <option value="sub_title" th:selected="${pageMaker.cri.searchType == 'sub_title'}">부제목</option>
+                              <option value="all" th:selected="${pageMaker.cri.searchType == 'all'}">제목+부제목</option>
+                              <input type="text" class="form-control form-control-sm" name="keyword" id="keyword"
+                                 th:value="${pageMaker.cri.keyword}" placeholder="검색어 입력">
+                           </select>
+                        </div>
+                     </div>
+                  </form>
+                     
+                     
+                     <form id="searchForm" class="row g-1 align-items-center">
+                        <div class="col-auto">
+                           
+                        </div>
+                        <div class="col-auto">
+                        </div>
+                        <div class="col-auto">
+                           <button type="button" class="btn btn-primary btn-sm" id="btn_search">검색</button>
+                        </div>
+                     </form>
                   <div>
-                     <button class="btn btn-outline-danger text-nowrap btn-sm">선택삭제</button>
+                     <button class="btn btn-primary" id="btn_create">상품 등록</button>
                   </div>
-                  <div class="d-11flex gap-1">
-                     <select class="form-select" name="" id="">
-                        <option value="">등록일</option>
-                     </select>
-                     <select class="form-select" name="" id="">
-                        <option value="">10개씩</option>
-                     </select>
+         
+               </div>
+
+
+               
+               <div class="row mb-3">
+                  <div class="col-md-12">
+                      <div class="card p-3">
+                          <div class="row mb-3 align-items-center">
+                              <div class="col-md-2">
+                                  <label for="가입일" class="col-form-label">가입일</label>
+                              </div>
+                              <div class="col-md-10">
+                                  <div class="row">
+                                      <div class="col-4">
+                                          <div class="input-group">
+                                              <input type="date" class="form-control form-control-sm" id="startDate">
+                                              
+                                          </div>
+                                      </div>
+                                      <div class="col-auto align-content-center px-md-0">-</div>
+                                      <div class="col-4">
+                                          <div class="input-group">
+                                              <input type="date" class="form-control form-control-sm" id="endDate">
+                                              
+                                          </div>
+                                      </div>
+                                      <div class="col-md-auto mt-2 mt-md-0 align-content-center">
+                                          <div class="btn-group" role="group">
+                                              <button type="button" class="btn btn-outline-secondary btn-sm date-range-btn" data-range="today">오늘</button>
+                                              <button type="button" class="btn btn-outline-secondary btn-sm date-range-btn" data-range="1week">1주일</button>
+                                              <button type="button" class="btn btn-outline-secondary btn-sm date-range-btn" data-range="1month">1개월</button>
+                                              <button type="button" class="btn btn-outline-secondary btn-sm date-range-btn" data-range="1year">1년</button>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <div class="row align-items-center">
+                              <div class="col-md-2">
+                                  <label for="검색어" class="col-form-label">검색어</label>
+                              </div>
+                              <div class="col-md-10">
+                                  <div class="row">
+                                      <div class="col-md-2 col-3">
+                                          <select class="form-select" id="searchType">
+                                              <option value="ID">ID</option>
+                                              <option value="name">이름</option>
+                                              <!-- 필요한 검색 옵션 추가 -->
+                                          </select>
+                                      </div>
+                                      <div class="col-md-6 col-7">
+                                          <div class="input-group">
+                                              <input type="text" class="form-control" id="searchInput" placeholder="조회할 값을 입력">
+                                              <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                                                  <i class="bi bi-search"></i>
+                                              </button>
+                                          </div>
+                                      </div>
+                                      <div class="col-md-auto">
+                                          <button type="button" class="btn btn-secondary" id="resetButton">초기화</button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
                   </div>
-               </div>
-               <div class="table-responsive">
-                  <table class="table table-bordered table-hover">
-                     <thead class="table-light text-center text-nowrap">
-                        <tr>
-                           <th style="width: 5%;"><input type="checkbox" id="checkAll"> <!-- 전체 선택 체크박스 --></th>
-                           <th style="width: 10%;">노출/숨김</th>
-                           <th style="width: 12%;">카테고리</th>
-                           <th style="width: 35%;">제목/부제목</th>
-                           <th style="width: 15%;">공간 이미지</th>
-                           <th style="width: 13%;">등록일</th>
-                           <th style="width: 10%;">관리</th>
-                        </tr>
-                     </thead>
-                     <tbody class="text-center align-middle">
-                        <tr>
-                           <td><input type="checkbox" class="itemCheckbox" name="itemCheckbox" value="1"></td>
-                           <td class="text-center "><button class="btn btn-warning rounded-4 fw-bold text-nowrap">노출</button></td>
-                           <td>카테고리이름</td>
-                           <td class="text-start">
-                              <div class="fw-bold">강남 머시기 어쩌구 저쩌구</div>
-                              <div class="text-muted">어쩌구저쩌구한 우리가게</div>
-                           </td>
-                           <td>첫번째 이미지 불러오기</td>
-                           <td>2025-01-01</td>
-                           <td>
-                              <button class="btn btn-outline-success btn-sm text-nowrap">수정</button>
-                              <button class="btn btn-outline-danger btn-sm text-nowrap">삭제</button>
-                           </td>
-                        </tr>
-                     </tbody>
-   
-                  </table>
-
-                  
-                  <div class="row mb-3">
-                     <div class="col-lg-4">
-                         <div class="card shadow-sm">
-                             <div class="card-body d-flex flex-column align-items-center">
-                                 <h6 class="card-title">이미지 1</h6>
-                                 <div class="image-preview-container mb-2">
-                                     <img id="preview1" src="#" alt="미리보기" class="img-thumbnail rounded" style="display: none; max-width: 100%; height: auto; object-fit: cover; aspect-ratio: 4/3;">
-                                 </div>
-                                 <input class="form-control form-control-sm" type="file" id="image1" name="imageFiles" accept="image/*">
-                             </div>
-                         </div>
-                     </div>
-                     <div class="col-lg-4">
-                         <div class="card shadow-sm">
-                             <div class="card-body d-flex flex-column align-items-center">
-                                 <h6 class="card-title">이미지 2</h6>
-                                 <div class="image-preview-container mb-2">
-                                     <img id="preview2" src="#" alt="미리보기" class="img-thumbnail rounded" style="display: none; max-width: 100%; height: auto; object-fit: cover; aspect-ratio: 4/3;">
-                                 </div>
-                                 <input class="form-control form-control-sm" type="file" id="image2" name="imageFiles" accept="image/*">
-                             </div>
-                         </div>
-                     </div>
-                     <div class="col-lg-4">
-                         <div class="card shadow-sm">
-                             <div class="card-body d-flex flex-column align-items-center">
-                                 <h6 class="card-title">이미지 3</h6>
-                                 <div class="image-preview-container mb-2">
-                                     <img id="preview3" src="#" alt="미리보기" class="img-thumbnail rounded" style="display: none; max-width: 100%; height: auto; object-fit: cover; aspect-ratio: 4/3;">
-                                 </div>
-                                 <input class="form-control form-control-sm" type="file" id="image3" name="imageFiles" accept="image/*">
-                             </div>
-                         </div>
-                     </div>
-                 </div>
-                 
-                 <script th:inline="javascript">
-                     $(document).ready(function () {
-                         // 이미지 미리보기 함수 (재사용)
-                         function previewImage(inputId, previewId) {
-                             const input = document.getElementById(inputId);
-                             const preview = document.getElementById(previewId);
-                 
-                             input.addEventListener('change', function(event) {
-                                 const file = event.target.files[0];
-                 
-                                 if (file) {
-                                     const reader = new FileReader();
-                                     reader.onload = function(e) {
-                                         preview.src = e.target.result;
-                                         preview.style.display = 'block';
-                                     }
-                                     reader.readAsDataURL(file);
-                                 } else {
-                                     preview.src = '#';
-                                     preview.style.display = 'none';
-                                 }
-                             });
-                         }
-                 
-                         previewImage('image1', 'preview1');
-                         previewImage('image2', 'preview2');
-                         previewImage('image3', 'preview3');
-                 
-                     }); // ready event end
-                 </script>
-                 
-                 <style>
-                     .image-preview-container {
-                         width: 100%;
-                         height: 0;
-                         padding-bottom: 75%; /* 4:3 aspect ratio (height/width * 100%) */
-                         overflow: hidden;
-                         position: relative; /* for absolute positioning of image */
-                         margin-bottom: 0.5rem; /* input과의 간격 조정 */
-                     }
-                 
-                     .image-preview-container img {
-                         position: absolute;
-                         top: 0;
-                         left: 0;
-                         width: 100%;
-                         height: 100%;
-                         object-fit: cover;
-                     }
-                 </style>
-
-
-                  
-                  
-               </div>
-               <div class="d-flex justify-content-center">
-                  
-               </div>
-               <div class="card-footer d-flex justify-content-center align-items-center">
-                  <nav aria-label="Page navigation example">
-                     <ul class="pagination">
-                        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                        <li class="page-item"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                     </ul>
-                  </nav>
-               </div>
+              </div>
             </div>   <!-- card end -->
          </article>
 
          <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const checkAll = document.getElementById('checkAll'); // 전체 체크박스 요소 가져오기
-                const itemCheckboxes = document.querySelectorAll('.itemCheckbox'); // 개별 체크박스 요소들 가져오기
-    
-                checkAll.addEventListener('change', function() { // 전체 체크박스 변경 이벤트 리스너
-                    itemCheckboxes.forEach(checkbox => { // 모든 개별 체크박스 순회
-                        checkbox.checked = this.checked; // 전체 체크박스 상태에 따라 개별 체크박스 상태 변경
-                    });
-                });
-    
-                itemCheckboxes.forEach(checkbox => { // 각 개별 체크박스 순회하며 이벤트 리스너 추가
-                    checkbox.addEventListener('change', function() { // 개별 체크박스 변경 이벤트 리스너
-                        const allChecked = Array.from(itemCheckboxes).every(cb => cb.checked); // 모든 개별 체크박스가 선택되었는지 확인
-                        checkAll.checked = allChecked; // 모든 개별 체크박스 선택 시 전체 체크박스도 선택 상태로 변경
-                    });
-                });
+            document.addEventListener('DOMContentLoaded', function () {
+               // 날짜 범위 버튼 클릭 이벤트
+               const dateRangeButtons = document.querySelectorAll('.date-range-btn');
+               dateRangeButtons.forEach(button => {
+                  button.addEventListener('click', function () {
+                     const range = this.dataset.range;
+                     let startDate = '';
+                     let endDate = '';
+
+                     const today = new Date();
+                     const todayString = today.toISOString().slice(0, 10); // YYYY-MM-DD 형식
+
+                     if (range === 'today') {
+                        startDate = todayString;
+                        endDate = todayString;
+                     } else if (range === '1week') {
+                        const oneWeekAgo = new Date(today);
+                        oneWeekAgo.setDate(today.getDate() - 7);
+                        startDate = oneWeekAgo.toISOString().slice(0, 10);
+                        endDate = todayString;
+                     } else if (range === '1month') {
+                        const oneMonthAgo = new Date(today);
+                        oneMonthAgo.setMonth(today.getMonth() - 1);
+                        startDate = oneMonthAgo.toISOString().slice(0, 10);
+                        endDate = todayString;
+                     } else if (range === '1year') {
+                        const oneYearAgo = new Date(today);
+                        oneYearAgo.setFullYear(today.getFullYear() - 1);
+                        startDate = oneYearAgo.toISOString().slice(0, 10);
+                        endDate = todayString;
+                     }
+
+                     document.querySelector('#startDate').value = startDate;
+                     document.querySelector('#endDate').value = endDate;
+                  });
+               });
+
+               // 초기화 버튼 클릭 이벤트
+               const resetButton = document.querySelector('#resetButton');
+               resetButton.addEventListener('click', function () {
+                  document.querySelector('#startDate').value = '';
+                  document.querySelector('#endDate').value = '';
+                  document.querySelector('#searchType').value = 'ID'; // select box 첫번째 옵션으로 초기화
+                  document.querySelector('#searchInput').value = '';
+               });
             });
-        </script>
+         </script>
       </section>
 
       <!-- 푸터 -->

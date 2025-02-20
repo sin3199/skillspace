@@ -9,21 +9,109 @@
          <h2>공간 페이지 관리</h2>
       </div>
       <div class="card-body">
-         <button class="btn btn-primary" id="btn_create">상품 등록</button>
+         <div class="card p-3">
+            <form action="/host/space/spaceList" method="get" id="searchForm">
+               <div class="row mb-3 align-items-center">
+                  <div class="col-md-2">
+                     <label class="col-form-label">등록일</label>
+                  </div>
+                  <div class="col-md-10">
+                     <div class="row">
+                        <div class="col-4">
+                           <div class="input-group">
+                              <input type="date" class="form-control form-control-sm" id="search_start_date" name="start_date" th:value="${searchItem.start_date}" min="2019-01-01" max="2025-12-31">
+                           </div>
+                        </div>
+                        <div class="col-auto align-content-center px-md-0">-</div>
+                        <div class="col-4">
+                           <div class="input-group">
+                              <input type="date" class="form-control form-control-sm" id="search_end_date" name="end_date" th:value="${searchItem.end_date}" min="2019-01-01" max="2025-12-31">
+                           </div>
+                        </div>
+                        <div class="col-md-auto mt-2 mt-md-0 align-content-center">
+                           <div class="btn-group" role="group">
+                              <button type="button" class="btn btn-outline-secondary btn-sm date-range-btn" data-range="today">오늘</button>
+                              <button type="button" class="btn btn-outline-secondary btn-sm date-range-btn" data-range="1week">1주일</button>
+                              <button type="button" class="btn btn-outline-secondary btn-sm date-range-btn" data-range="1month">1개월</button>
+                              <button type="button" class="btn btn-outline-secondary btn-sm date-range-btn" data-range="1year">1년</button>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               
+               <div class="row mb-3 align-items-center">
+                  <div class="col-md-2">
+                     <label class="col-form-label">노출여부</label>
+                  </div>
+                  <div class="col-md-10">
+                     <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="visible_status" id="visible_status1" value="" checked>
+                        <label class="form-check-label" for="displayStatus1">전체</label>
+                     </div>
+                     <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="visible_status" id="visible_status2" value="Y" th:checked= "${searchItem.visible_status == 'Y'}">
+                        <label class="form-check-label" for="displayStatus1">노출</label>
+                     </div>
+                     <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="visible_status" id="visible_status3" value="N" th:checked= "${searchItem.visible_status == 'N'}">
+                        <label class="form-check-label" for="displayStatus2">숨김</label>
+                  </div>
+               </div>
+
+               <div class="row align-items-center">
+                  <div class="col-md-2">
+                     <label for="keyword" class="col-form-label">검색어</label>
+                  </div>
+                  <div class="col-md-10">
+                     <div class="row">
+                        <div class="col-3 pe-0">
+                           <select class="form-select form-select-sm" name="searchType" id="searchType">
+                              <option value="">검색종류 선택</option>
+                              <option value="main_title" th:selected="${pageMaker.cri.searchType == 'main_title'}">제목</option>
+                              <option value="sub_title" th:selected="${pageMaker.cri.searchType == 'sub_title'}">부제목</option>
+                              <option value="all_title" th:selected="${pageMaker.cri.searchType == 'all_title'}">제목+부제목</option>
+                              <option value="cate_name" th:selected="${pageMaker.cri.searchType == 'cate_name'}">카테고리</option>
+                           </select>
+                        </div>
+                        <div class="col-md-6 col-auto">
+                           <div class="input-group">
+                              <input type="text" class="form-control form-control-sm" name="keyword" id="keyword" th:value="${pageMaker.cri.keyword}" placeholder="검색어 입력">
+                              <button class="btn btn-outline-secondary btn-sm" type="submit">
+                                 <i class="bi bi-search"></i>
+                              </button>
+                           </div>
+                        </div>
+                        <div class="col-md-auto">
+                           <button type="button" class="btn btn-secondary btn-sm" id="btn_searchReset">초기화</button>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+            </form>
+         </div> <!-- 검색 카드 end -->
+      
+      
+      
       </div>
    </div>
    <div class="card">
       <div class="card-body">
-         <div class="d-flex justify-content-between">
+         <div class="d-flex justify-content-between mb-2">
             <div>
                <button class="btn btn-outline-danger text-nowrap btn-sm" id="btn_seletedDelete">선택삭제</button>
+               <button class="btn btn-primary btn-sm fw-bold" id="btn_create">상품 등록</button>
+
             </div>
             <div class="d-flex gap-1">
-               <select class="form-select" name="" id="">
-                  <option value="">등록일</option>
+               <select class="form-select form-select-sm w-auto" id="change_orderBy">
+                  <option value="desc" th:selected= "${pageMaker.cri.orderBy == 'desc'}">등록일 ▼</option>
+                  <option value="" th:selected= "${pageMaker.cri.orderBy == '' || pageMaker.cri.orderBy == null}">등록일 ▲</option>
                </select>
-               <select class="form-select" name="" id="">
-                  <option value="">10개씩</option>
+               <select class="form-select form-select-sm w-auto" id="change_perPageNum">
+                  <option value="5" th:selected= "${pageMaker.cri.perPageNum == 5}">5개씩</option>
+                  <option value="10" th:selected= "${pageMaker.cri.perPageNum == 10}">10개씩</option>
                </select>
             </div>
          </div>
@@ -100,10 +188,17 @@
    <!-- 페이징과 검색 파라미터 정보 : 현재 목록 상태를 작업(수정, 삭제)을 하고 돌아왔을 때 페이지 유지-->
    <form id="criteriaForm" action="" method="get">
       <!-- 4개의 검색 파라미터 -->
-      <input type="hidden" name="page"       id="page"       th:value="${pageMaker.cri.page}">
-      <input type="hidden" name="perPageNum" id="perPageNum" th:value="${pageMaker.cri.perPageNum}">
-      <input type="hidden" name="searchType" id="searchType" th:value="${pageMaker.cri.searchType}">
-      <input type="hidden" name="keyword"    id="keyword"    th:value="${pageMaker.cri.keyword}">
+      <input type="hidden" name="page"           th:value="${pageMaker.cri.page}"         id="page">
+      <input type="hidden" name="perPageNum"     th:value="${pageMaker.cri.perPageNum}"   id="perPageNum">
+      <input type="hidden" name="orderBy"        th:value="${pageMaker.cri.orderBy}"      id="orderBy">
+      <input type="hidden" name="searchType"     th:value="${pageMaker.cri.searchType}">
+      <input type="hidden" name="keyword"        th:value="${pageMaker.cri.keyword}">
+      <!-- 날짜 검색 파라미터 -->
+      <input type="hidden" name="start_date"     th:value="${searchItem.start_date}">
+      <input type="hidden" name="end_date"       th:value="${searchItem.end_date}">
+      <!-- 노출여부 검색 파라미터 -->
+      <input type="hidden" name="visible_status" th:value="${searchItem.visible_status}">
+      
       <!-- 수정, 삭제 시 공간 코드 -->
       <input type="hidden" name="host_space_id" id="host_space_id">
    </form>
@@ -116,6 +211,7 @@
       document.addEventListener("DOMContentLoaded", function() {
          console.log([[${spaceList}]]);
          console.log([[${pageMaker}]]);
+         console.log([[${searchItem}]]);
 
          // 체크 박스 기능
          const checkAll = document.getElementById('checkAll'); // 전체 체크박스 요소 가져오기
@@ -176,7 +272,6 @@
             });
          });
 
-
          // 기존 페이지 정보 form
          const criteriaForm = document.getElementById('criteriaForm');
 
@@ -210,6 +305,76 @@
             criteriaForm.setAttribute('action', '/host/space/createSpace');
             criteriaForm.submit();
          });
+
+
+         // 날짜 범위 버튼 클릭 이벤트
+         const dateRangeButtons = document.querySelectorAll('.date-range-btn');
+         dateRangeButtons.forEach(button => {
+            button.addEventListener('click', function () {
+               const range = this.dataset.range;
+               let startDate = '';
+               let endDate = '';
+
+               const today = new Date();
+               const todayString = today.toISOString().slice(0, 10); // YYYY-MM-DD 형식
+
+               if (range === 'today') {
+                  startDate = todayString;
+                  endDate = todayString;
+               } else if (range === '1week') {
+                  const oneWeekAgo = new Date(today);
+                  oneWeekAgo.setDate(today.getDate() - 7);
+                  startDate = oneWeekAgo.toISOString().slice(0, 10);
+                  endDate = todayString;
+               } else if (range === '1month') {
+                  const oneMonthAgo = new Date(today);
+                  oneMonthAgo.setMonth(today.getMonth() - 1);
+                  startDate = oneMonthAgo.toISOString().slice(0, 10);
+                  endDate = todayString;
+               } else if (range === '1year') {
+                  const oneYearAgo = new Date(today);
+                  oneYearAgo.setFullYear(today.getFullYear() - 1);
+                  startDate = oneYearAgo.toISOString().slice(0, 10);
+                  endDate = todayString;
+               }
+
+               document.querySelector('#search_start_date').value = start_date;
+               document.querySelector('#search_end_date').value = endDate;
+            });
+         });
+
+         // 검색 조건 초기화
+         const searchForm = document.getElementById('searchForm');
+         const btn_searchReset = document.getElementById('btn_searchReset');
+
+         btn_searchReset.addEventListener('click', function () {
+            console.log("리셋");
+            document.getElementById('search_start_date').value = "";
+            document.getElementById('search_end_date').value = "";
+            document.querySelectorAll('visible_status').forEach(function () {
+               this.checked = false;
+            });
+            document.getElementById('visible_status1').checked = true;
+            document.getElementById('searchType').selectedIndex  = 0;
+            document.getElementById('keyword').value = "";
+         });
+
+         // 페이지당 데이터 갯수 변경
+         const change_perPageNum = document.getElementById('change_perPageNum');
+         change_perPageNum.addEventListener('change', function() {
+            document.getElementById('perPageNum').value = this.value;
+            document.getElementById('page').value = 1;
+            criteriaForm.submit();
+         });
+
+         // 데이터 조회 정렬 변경
+         const change_orderBy = document.getElementById('change_orderBy');
+         change_orderBy.addEventListener('change', function() {
+            document.getElementById('orderBy').value = this.value;
+            document.getElementById('page').value = 1;
+            criteriaForm.submit();
+         });
+
 
 
       });   // event end

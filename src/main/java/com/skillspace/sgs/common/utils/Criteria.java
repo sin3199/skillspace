@@ -6,10 +6,12 @@ public class Criteria {
 
 	private int page;		// 사용자가 선택한 페이지 번호
 	private int perPageNum;	// 페이지 별로 출력한 게시물 개수
+	private String orderBy;	// 페이지 정렬
 	
 	public Criteria() {
 		this.page = 1;			// 페이지 초기값 1페이지
-		this.perPageNum = 10;
+		this.perPageNum = 5;
+		this.orderBy = "desc";
 	}
 
 	public int getPage() {
@@ -46,11 +48,21 @@ public class Criteria {
 	public int getPerPageNum() {
 		return perPageNum;
 	}
-	
+
+	public String getOrderBy() {
+		return orderBy;
+	}
+
+	public void setOrderBy(String orderBy) {
+		this.orderBy = orderBy;
+	}
+
 	@Override
 	public String toString() {
-		return "Criteria [page=" + page + ", perPageNum=" + perPageNum + "]";
+		return "Criteria [page=" + page + ", perPageNum=" + perPageNum + ", orderBy=" + orderBy + "]";
 	}
+	
+	
 	
 	
 	

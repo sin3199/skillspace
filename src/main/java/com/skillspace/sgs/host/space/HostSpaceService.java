@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.skillspace.sgs.admin.images.ImagesService;
 import com.skillspace.sgs.common.utils.FileUtils;
 import com.skillspace.sgs.common.utils.SearchCriteria;
+import com.skillspace.sgs.common.utils.SearchItem;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,8 +48,8 @@ public class HostSpaceService {
 		return hostSpaceMapper.getHostSpaceById(host_space_id);
 	}
 
-	public List<HostSpaceDTO> sapceList(String user_id, SearchCriteria cri) {
-		return hostSpaceMapper.spaceList(user_id, cri);
+	public List<HostSpaceDTO> sapceList(String user_id, SearchCriteria cri, SearchItem searchItem) {
+		return hostSpaceMapper.spaceList(user_id, cri, searchItem);
 	}
 
 	public int getCountSpaceByUser_id(String user_id) {

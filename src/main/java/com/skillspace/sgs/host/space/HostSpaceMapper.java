@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.skillspace.sgs.common.utils.SearchCriteria;
+import com.skillspace.sgs.common.utils.SearchItem;
 
 public interface HostSpaceMapper {
 
@@ -15,7 +16,7 @@ public interface HostSpaceMapper {
 	HostSpaceDTO getHostSpaceById(Integer host_space_id);
 
 	// 공간 리스트
-	List<HostSpaceDTO> spaceList(@Param("user_id") String user_id, @Param("cri") SearchCriteria cri);
+	List<HostSpaceDTO> spaceList(@Param("user_id") String user_id, @Param("cri") SearchCriteria cri,@Param("searchItem") SearchItem searchItem);
 	
 	// 공간 리스트 총 갯수
 	int getCountSpaceByUser_id(String user_id);

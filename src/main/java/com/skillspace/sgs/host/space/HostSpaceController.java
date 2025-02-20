@@ -2,7 +2,6 @@ package com.skillspace.sgs.host.space;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,16 +12,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.skillspace.sgs.admin.category.AdminCategoryService;
-import com.skillspace.sgs.admin.images.ImagesDTO;
-import com.skillspace.sgs.admin.images.ImagesService;
 import com.skillspace.sgs.common.utils.PageMaker;
 import com.skillspace.sgs.common.utils.SearchCriteria;
+import com.skillspace.sgs.common.utils.SearchItem;
 import com.skillspace.sgs.guest.GuestDTO;
 
 import jakarta.servlet.http.HttpSession;
@@ -37,23 +34,26 @@ public class HostSpaceController {
 	
 	private final AdminCategoryService adminCategoryService;
 	private final HostSpaceService hostSpaceService;
-	private final ImagesService imagesService;
 	
 	// 호스트 공간 목록
 	@GetMapping("/spaceList")
-	public void spaceList(@ModelAttribute("cir") SearchCriteria cri, Model model, 
+	public void spaceList(SearchCriteria cri, 
+			@ModelAttribute("searchItem") SearchItem searchItem,
+			Model model, 
 			HttpSession session) throws Exception {
+		
+		log.info("검색 정보 : " + cri);
+		log.info("검색아이템 : " + searchItem);
 		
 		// 1) 유저 공간 정보
 		String user_id = ((GuestDTO)session.getAttribute("login_auth")).getUser_id();
 		// 2) 공간 리스트 정보 가져오기(이미지 계층형 데이터로)
-		cri.setPerPageNum(3);
 		PageMaker pageMaker = new PageMaker();
 		pageMaker.setDisplayPageNum(2);
 		pageMaker.setCri(cri);
 		pageMaker.setTotalCount(hostSpaceService.getCountSpaceByUser_id(user_id));
 		
-		List<HostSpaceDTO> spaceList = hostSpaceService.sapceList(user_id, cri);
+		List<HostSpaceDTO> spaceList = hostSpaceService.sapceList(user_id, cri, searchItem);
 		spaceList.forEach(space_info -> {
 			space_info.getImages().forEach(image_info -> {
 				image_info.setImage_up_folder(image_info.getImage_up_folder().replace("\\", "/"));
