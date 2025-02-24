@@ -12,8 +12,8 @@ public interface HostSpaceMapper {
 	// 호스트 공간 정보 저장
 	void create(HostSpaceDTO dto);
 
-	// 공간 아이디로 조회 
-	HostSpaceDTO getHostSpaceById(Integer host_space_id);
+	// 공간 아이디로 이미지 카테고리 함꼐 조회 
+	HostSpaceDTO getHostSpaceWithCateAndImagesById(Integer host_space_id);
 
 	// 공간 리스트
 	List<HostSpaceDTO> spaceList(@Param("user_id") String user_id, @Param("cri") SearchCriteria cri,@Param("searchItem") SearchItem searchItem);
@@ -29,5 +29,8 @@ public interface HostSpaceMapper {
 	
 	// 선택 공간 삭제
 	void selectedDelete(int[] host_space_id_arr);
+
+	// 회원 아이디로 공간 목록 조회
+	List<HostSpaceDTO> getHostSpaceByUserId(String user_id);
 
 }

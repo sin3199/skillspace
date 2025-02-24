@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.skillspace.sgs.host.product.HostProductMapper">
+
+<select id="getCountProductByUser_id" parameterType="String" resultType="int">
+	select
+		count(*)
+	from
+		products
+	where
+		user_id = #{user_id}
+</select>
+
+<select id="productList" parameterType="Map" resultMap="ProductWithImageMap">
+	select
+		product_id,
+		host_space_id,
+		user_id,
+		name,
+		product_intro,
+		price,
+		created_at,
+		updated_at,
+		is_visible 
+	from 
+		products
+	where
+		user_id = #{user_id}
+		
+</select>
+
+<insert id="create" parameterType="com.skillspace.sgs.host.product.HostProductDTO"
+	useGeneratedKeys="true" keyProperty="product_id">
+	insert into 
+		products(
+			host_space_id,
+			user_id,
+			name,
+			product_intro,
+			price,
+			is_visible 
+		)
+		values(
+			#{host_space_id},
+			#{user_id},
+			#{name},
+			#{product_intro},
+			#{price},
+			#{is_visible}
+		)
+</insert>
+
+<resultMap id="ProductWithImageMap" type="com.skillspace.sgs.host.product.HostProductDTO">
+	<!-- HostProductDTO 기본 정보 -->
+    <id property="product_id" column="product_id"/> <!-- Review PK -->
+    <result property="host_space_id" column="host_space_id"/>
+    <result property="name" column="name"/>
+    <result property="product_intro" column="product_intro"/>
+    <result property="price" column="price"/>
+    <result property="created_at" column="created_at"/>
+    <result property="updated_at" column="updated_at"/>
+    
+    <!-- HostSpace 1:1 매핑 -->
+        <association 
+        	property="hostSpace" 
+	        javaType="com.skillspace.sgs.host.space.HostSpaceDTO" 
+	        column="host_space_id" 
+	        select="selectHostSpace"/>
+    
+     <!-- Images 1:N 매핑 -->
+        <collection 
+        	property="images" 
+        	javaType="java.util.ArrayList" 
+        	ofType="com.skillspace.sgs.admin.images.ImagesDTO" 
+        	column="product_id" 
+        	select="selectImages"/>
+</resultMap>
+
+<!-- Category 정보 조회 -->
+<select id="selectHostSpace" resultType="com.skillspace.sgs.host.space.HostSpaceDTO">
+    select 
+	    host_space_id,
+		user_id,
+		cate_id,
+		main_title,
+		sub_title,
+		space_intro,
+		space_guide,
+		space_zipcode,
+		space_addr,
+		space_addrdetail,
+		created_at,
+		updated_at,
+		is_visible
+	from
+	    host_space
+	where 
+	    host_space_id = #{host_space_id}
+</select>
+
+
+<!-- images 목록 조회 -->
+<select id="selectImages" resultType="com.skillspace.sgs.admin.images.ImagesDTO">
+    select
+        image_id,
+        entity_type,
+        entity_id,
+        image_up_folder,
+        image_name,
+        created_at
+    from
+        images
+    where
+        entity_type = 'products'
+        and entity_id = #{product_id}
+</select>
+
+<sql id="search">
+	<if test="cri.searchType != null and !cri.searchType.equals('')">
+	   	<if test="cri.searchType == 'main_title'">
+	   		and s.main_title like concat('%', #{cri.keyword}, '%')
+	   	</if>
+	   	<if test="cri.searchType == 'sub_title'">
+	   		and s.sub_title like concat('%', #{cri.keyword}, '%')
+	   	</if>
+	   	<if test="cri.searchType == 'all_title'">
+	   		and (s.main_title like concat('%', #{cri.keyword}, '%')
+	   		or s.sub_title like concat('%', #{cri.keyword}, '%'))
+	   	</if>
+	   	<if test="cri.searchType == 'cate_name'">
+	   		and c.cate_name like concat('%', #{cri.keyword}, '%') 
+	   	</if>
+	</if>
+</sql>
+
+<sql id="period">
+	<if test="searchItem.start_date != null and !searchItem.start_date.equals('')">
+		<![CDATA[
+			and s.created_at >= date(#{searchItem.start_date})
+			]]>
+	</if>
+	<if test="searchItem.end_date != null and !searchItem.end_date.equals('')">
+		<![CDATA[
+			and s.created_at < date(#{searchItem.end_date}) + 1
+			]]>
+	</if>
+</sql>
+
+<sql id="visible_status">
+	<if test="searchItem.visible_status != null and !searchItem.visible_status.equals('')">
+			and s.is_visible = #{searchItem.visible_status}
+	</if>
+</sql>
+</mapper>

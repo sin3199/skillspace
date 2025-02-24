@@ -95,7 +95,7 @@ public class HostSpaceController {
 	public void modifySpace(Integer host_space_id, @ModelAttribute("cri") SearchCriteria cri, 
 			Model model) throws Exception {
 		
-		HostSpaceDTO hostSpaceDTO = hostSpaceService.getHostSpaceById(host_space_id);
+		HostSpaceDTO hostSpaceDTO = hostSpaceService.getHostSpaceWithCateAndImagesById(host_space_id);
 		hostSpaceDTO.getImages().forEach(image_info -> {
 			image_info.setImage_up_folder(image_info.getImage_up_folder().replace("\\", "/"));
 		});

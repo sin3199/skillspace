@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.skillspace.sgs.admin.images.ImagesService;
-import com.skillspace.sgs.common.utils.FileUtils;
 import com.skillspace.sgs.common.utils.SearchCriteria;
 import com.skillspace.sgs.common.utils.SearchItem;
 
@@ -26,6 +25,7 @@ public class HostSpaceService {
 	private final HostSpaceMapper hostSpaceMapper;
 	private final ImagesService imagesService;
 	
+	// 공간 등록
 	@Transactional
 	public void create(HostSpaceDTO dto, List<MultipartFile> imageFiles) {
 		
@@ -43,19 +43,23 @@ public class HostSpaceService {
 			}
 		}
 	}
-
-	public HostSpaceDTO getHostSpaceById(Integer host_space_id) {
-		return hostSpaceMapper.getHostSpaceById(host_space_id);
+	
+	// 공간 아이디로 조회
+	public HostSpaceDTO getHostSpaceWithCateAndImagesById(Integer host_space_id) {
+		return hostSpaceMapper.getHostSpaceWithCateAndImagesById(host_space_id);
 	}
-
+	
+	// 공간 목록 조회
 	public List<HostSpaceDTO> sapceList(String user_id, SearchCriteria cri, SearchItem searchItem) {
 		return hostSpaceMapper.spaceList(user_id, cri, searchItem);
 	}
-
+	
+	// 전체 공간 게시물 갯수 조회
 	public int getCountSpaceByUser_id(String user_id) {
 		return hostSpaceMapper.getCountSpaceByUser_id(user_id);
 	}
 
+	// 호스트 공간 수정
 	@Transactional
 	public void modifyHostSpace(HostSpaceDTO dto, List<MultipartFile> imageFiles, Integer[] loadImages,
 			Integer[] changeImages) {
@@ -100,6 +104,10 @@ public class HostSpaceService {
 		for(int host_space_id : host_space_id_arr) {
 			imagesService.deleteImageByEntity("host_space", host_space_id);
 		}
+	}
+
+	public List<HostSpaceDTO> getHostSpaceByUserId(String user_id) {
+		return hostSpaceMapper.getHostSpaceByUserId(user_id);
 	}
 
 }

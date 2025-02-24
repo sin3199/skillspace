@@ -18,6 +18,7 @@ public class HostSpaceDTO {
 	private Integer			host_space_id;
 	private String 			user_id;
 	private int 			cate_id;
+	private String 			space_name;
 	private String 			main_title;
 	private String 			sub_title;
 	private String 			space_intro;

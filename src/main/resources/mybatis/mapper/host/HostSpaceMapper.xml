@@ -6,9 +6,10 @@
 	useGeneratedKeys="true" keyProperty="host_space_id">
 	
 	insert into 
-		Host_Space(
+		host_space(
 			user_id,
 			cate_id,
+			space_name,
 			main_title,
 			sub_title,
 			space_intro,
@@ -21,6 +22,7 @@
 		values(
 			#{user_id},
 			#{cate_id},
+			#{space_name},
 			#{main_title},
 			#{sub_title},
 			#{space_intro},
@@ -32,11 +34,12 @@
 		)
 </insert>
 
-<select id="getHostSpaceById" parameterType="Integer" resultMap="SpaceWithImageMap">
+<select id="getHostSpaceWithCateAndImagesById" parameterType="Integer" resultMap="SpaceWithImageMap">
 	select 
 		host_space_id,
 		user_id,
 		cate_id,
+		space_name,
 		main_title,
 		sub_title,
 		space_intro,
@@ -58,6 +61,7 @@
 	    s.host_space_id,
 		s.user_id,
 		s.cate_id,
+		s.space_name,
 		s.main_title,
 		s.sub_title,
 		s.space_intro,
@@ -67,11 +71,7 @@
 		s.space_addrdetail,
 		s.created_at,
 		s.updated_at,
-		s.is_visible,
-        c.cate_prtcode,
-		c.cate_name,
-		c.`level`,
-		c.sort_order
+		s.is_visible
 	from
 	    host_space s
 	inner join
@@ -104,6 +104,7 @@
 		host_space
     set
 	    cate_id = #{cate_id},
+	    space_name = #{space_name},
 	    main_title = #{main_title},
 	    sub_title = #{sub_title},
 	    space_intro = #{space_intro},
@@ -134,11 +135,34 @@
 	</foreach>
 </delete>
 
+<select id="getHostSpaceByUserId" parameterType="String" resultType="com.skillspace.sgs.host.space.HostSpaceDTO">
+	select 
+		host_space_id,
+		user_id,
+		cate_id,
+		space_name,
+		main_title,
+		sub_title,
+		space_intro,
+		space_guide,
+		space_zipcode,
+		space_addr,
+		space_addrdetail,
+		created_at,
+		updated_at,
+		is_visible
+	from
+		host_space
+	where 
+		user_id = #{user_id}
+</select>
+
 <resultMap id="SpaceWithImageMap" type="com.skillspace.sgs.host.space.HostSpaceDTO">
 	<!-- HostSpaceDTO 기본 정보 -->
     <id property="host_space_id" column="host_space_id"/> <!-- Review PK -->
     <result property="user_id" column="user_id"/>
     <result property="cate_id" column="cate_id"/>
+    <result property="space_name" column="space_name"/>
     <result property="main_title" column="main_title"/>
     <result property="sub_title" column="sub_title"/>
     <result property="space_intro" column="space_intro"/>

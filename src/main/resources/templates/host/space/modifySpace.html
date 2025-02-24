@@ -66,9 +66,18 @@
                         카테고리를 선택하세요
                     </div>
                 </div>
-                
 
                 <hr class="my-4">  
+
+                <div class="mb-3 row">
+                    <label for="space_name" class="col-lg-2 col-form-label">공간 이름</label>
+                    <div class="col-lg-10">
+                        <input type="text" class="form-control" id="space_name" name="space_name" th:value="${hostSpaceDTO.space_name}" placeholder="15자 이내로 입력하세요" maxlength="15" required>
+                        <div class="invalid-feedback">공간 이름을 입력하세요</div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
 
                 <div class="mb-3 row">
                     <label for="main_title" class="col-lg-2 col-form-label">공간 제목</label>
@@ -104,6 +113,9 @@
                                         <input type="hidden" id="loadImage1" name="loadImages" value="">
                                         <input type="hidden" id="changeImage1" name="changeImages" value="">
                                     </div>
+                                </div>
+                                <div class="text-center mt-1">
+                                    <span class="badge text-bg-secondary text-center">대표이미지</span>
                                 </div>
                             </div>
                             <div class="col-lg-4 col-6">
@@ -203,6 +215,7 @@
                 <input type="hidden" name="perPageNum" id="perPageNum" th:value="${cri.perPageNum}">
                 <input type="hidden" name="searchType" id="searchType" th:value="${cri.searchType}">
                 <input type="hidden" name="keyword"    id="keyword"    th:value="${cri.keyword}">
+                <input type="hidden" name="orderBy"    id="orderBy"    th:value="${cri.orderBy}">
 
                 <!-- 수정할 공간 아이디 -->
                  <input type="hidden" name="host_space_id" th:value="${hostSpaceDTO.host_space_id}">
@@ -305,7 +318,7 @@
                         CKEDITOR.instances[instanceName].updateElement();
                     }
                 }
-                // rk sk  ek kdk dkdk dkdkkd
+                
                 let valid = true;   // 커스텀 유효성 검사 변수
                 const space_intro = $("#space_intro");
                 const space_intro_invalid = $("#space_intro_invalid");
