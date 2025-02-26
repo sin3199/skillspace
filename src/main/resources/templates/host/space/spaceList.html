@@ -19,13 +19,13 @@
                      <div class="row">
                         <div class="col-4">
                            <div class="input-group">
-                              <input type="date" class="form-control form-control-sm" id="search_start_date" name="start_date" th:value="${searchItem.start_date}" min="2019-01-01" max="2025-12-31">
+                              <input type="date" class="form-control form-control-sm" id="search_start_date" name="start_date" th:value="${pageMaker.cri.start_date}" min="2019-01-01" max="2025-12-31">
                            </div>
                         </div>
                         <div class="col-auto align-content-center px-md-0">-</div>
                         <div class="col-4">
                            <div class="input-group">
-                              <input type="date" class="form-control form-control-sm" id="search_end_date" name="end_date" th:value="${searchItem.end_date}" min="2019-01-01" max="2025-12-31">
+                              <input type="date" class="form-control form-control-sm" id="search_end_date" name="end_date" th:value="${pageMaker.cri.end_date}" min="2019-01-01" max="2025-12-31">
                            </div>
                         </div>
                         <div class="col-md-auto mt-2 mt-md-0 align-content-center">
@@ -50,11 +50,11 @@
                         <label class="form-check-label" for="displayStatus1">전체</label>
                      </div>
                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="visible_status" id="visible_status2" value="Y" th:checked= "${searchItem.visible_status == 'Y'}">
+                        <input class="form-check-input" type="radio" name="visible_status" id="visible_status2" value="Y" th:checked= "${pageMaker.cri.visible_status == 'Y'}">
                         <label class="form-check-label" for="displayStatus1">노출</label>
                      </div>
                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="visible_status" id="visible_status3" value="N" th:checked= "${searchItem.visible_status == 'N'}">
+                        <input class="form-check-input" type="radio" name="visible_status" id="visible_status3" value="N" th:checked= "${pageMaker.cri.visible_status == 'N'}">
                         <label class="form-check-label" for="displayStatus2">숨김</label>
                      </div>
                   </div>
@@ -130,9 +130,9 @@
                <tbody class="text-center align-middle">
                   <tr th:each= "space:${spaceList}">
                      <td><input type="checkbox" class="itemCheckbox" name="itemCheckbox" th:value="${space.host_space_id}"></td>
-                     <td class="text-center ">
-                        <button class="btn btn-warning rounded-4 fw-bold text-nowrap" th:if= "${space.is_visible == 'Y'}">노출</button>
-                        <button class="btn btn-info rounded-4 fw-bold text-nowrap" th:unless= "${space.is_visible == 'Y'}">숨김</button>
+                     <td>
+                        <span class="badge text-bg-warning fs-6" th:if= "${space.is_visible == 'Y'}">노출</span>
+                        <span class="badge text-bg-info fs-6" th:unless= "${space.is_visible == 'Y'}">숨김</span>
                      </td>
                      <td>[[${space.category.cate_name}]]</td>
                      <td class="text-start">
@@ -193,10 +193,10 @@
       <input type="hidden" name="searchType"     th:value="${pageMaker.cri.searchType}">
       <input type="hidden" name="keyword"        th:value="${pageMaker.cri.keyword}">
       <!-- 날짜 검색 파라미터 -->
-      <input type="hidden" name="start_date"     th:value="${searchItem.start_date}">
-      <input type="hidden" name="end_date"       th:value="${searchItem.end_date}">
+      <input type="hidden" name="start_date"     th:value="${pageMaker.cri.start_date}">
+      <input type="hidden" name="end_date"       th:value="${pageMaker.cri.end_date}">
       <!-- 노출여부 검색 파라미터 -->
-      <input type="hidden" name="visible_status" th:value="${searchItem.visible_status}">
+      <input type="hidden" name="visible_status" th:value="${pageMaker.cri.visible_status}">
       
       <!-- 수정, 삭제 시 공간 코드 -->
       <input type="hidden" name="host_space_id" id="host_space_id">
@@ -209,7 +209,6 @@
       document.addEventListener("DOMContentLoaded", function() {
          console.log([[${spaceList}]]);
          console.log([[${pageMaker}]]);
-         console.log([[${searchItem}]]);
 
          // 체크 박스 기능
          const checkAll = document.getElementById('checkAll'); // 전체 체크박스 요소 가져오기
@@ -247,7 +246,7 @@
             });
 
             fetch('/host/space/selectedDelete', {
-               method: 'post',
+               method: 'POST',
                headers: {
                   'Content-type' : 'application/json'
                },
@@ -260,7 +259,7 @@
             })
             .then(data => {
                // 서버에서 삭제 성공 응답을 받았을 때
-               alert("선택된 상품이 삭제되었습니다."); 
+               alert("선택된 공간이 삭제되었습니다."); 
                location.reload();
             })
             .catch(error => {

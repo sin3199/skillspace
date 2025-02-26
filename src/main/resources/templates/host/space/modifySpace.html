@@ -105,7 +105,7 @@
                             <div class="col-lg-4 col-6">
                                 <div class="card shadow-sm">
                                     <div class="card-body d-flex flex-column align-items-center">
-                                        <h6 class="card-title">이미지 1(대표 이미지)</h6>
+                                        <h6 class="card-title">이미지 1</h6>
                                         <div class="image-preview-container mb-2">
                                             <img id="preview1" src="#" alt="미리보기" class="img-thumbnail rounded" style="display: none; max-width: 100%; height: auto; object-fit: cover; aspect-ratio: 4/3;">
                                         </div>
@@ -210,12 +210,15 @@
                     <button type="reset" class="btn btn-outline-secondary w-25">취소</button>
                 </div>
                 <!-- 페이징과 검색 파라미터 정보 : 현재 목록 상태를 작업(수정, 삭제)을 하고 돌아왔을 때 페이지 유지-->
-                <!-- 4개의 검색 파라미터 -->
-                <input type="hidden" name="page"       id="page"       th:value="${cri.page}">
-                <input type="hidden" name="perPageNum" id="perPageNum" th:value="${cri.perPageNum}">
-                <input type="hidden" name="searchType" id="searchType" th:value="${cri.searchType}">
-                <input type="hidden" name="keyword"    id="keyword"    th:value="${cri.keyword}">
-                <input type="hidden" name="orderBy"    id="orderBy"    th:value="${cri.orderBy}">
+                <!-- 검색 파라미터 -->
+                <input type="hidden" name="page"            id="page"           th:value="${cri.page}">
+                <input type="hidden" name="perPageNum"      id="perPageNum"     th:value="${cri.perPageNum}">
+                <input type="hidden" name="searchType"      id="searchType"     th:value="${cri.searchType}">
+                <input type="hidden" name="keyword"         id="keyword"        th:value="${cri.keyword}">
+                <input type="hidden" name="orderBy"         id="orderBy"        th:value="${cri.orderBy}">
+                <input type="hidden" name="start_date"      id="start_date"     th:value="${cri.start_date}">
+                <input type="hidden" name="end_date"        id="end_date"       th:value="${cri.end_date}">
+                <input type="hidden" name="visible_status"  id="visible_status" th:value="${cri.visible_status}">
 
                 <!-- 수정할 공간 아이디 -->
                  <input type="hidden" name="host_space_id" th:value="${hostSpaceDTO.host_space_id}">
@@ -264,7 +267,6 @@
             // 기존 이미지 출력
             function loadImage() {
                 const images = [[${hostSpaceDTO.images}]];
-                console.log(images);
                 let imageNumber = 1;
                 images.forEach(image => {
                     const loadImage = $('#loadImage' + imageNumber);

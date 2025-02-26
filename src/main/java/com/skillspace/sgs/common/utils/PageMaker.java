@@ -3,8 +3,11 @@ package com.skillspace.sgs.common.utils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import lombok.ToString;
+
 // 	  	  1  2  3  4  5  [next]
 // [prev] 6  7  8  9  10
+@ToString
 public class PageMaker {
 
 	private int 	totalCount;	// 테이블의 총 데이터 개수
@@ -105,24 +108,21 @@ public class PageMaker {
 
 	// 페이징, 검색기능 사용시 필요한 파라미터 생성해 주는 기능.  쿼리스트링 만들어주는 메소드
 	// ?page=2&perPageNum=10&searchType&keyword
+	// 호스트 상품, 공간 목록에서 사용
 	public String makeSearch(int page) {
 		UriComponents uriComponents = 
 				UriComponentsBuilder.newInstance()
-				.queryParam("page", page)
-				.queryParam("perPageNum", cri.getPerPageNum())
-				.queryParam("searchType", ((SearchCriteria)cri).getSearchType())
-				.queryParam("keyword", ((SearchCriteria)cri).getKeyword())
+				.queryParam("page", 			page)
+				.queryParam("perPageNum", 		cri.getPerPageNum())
+				.queryParam("searchType", 		cri.getSearchType())
+				.queryParam("keyword", 			cri.getKeyword())
+				.queryParam("orderBy", 			cri.getOrderBy())
+				.queryParam("start_date", 		cri.getStart_date())
+				.queryParam("end_date", 		cri.getEnd_date())
+				.queryParam("visible_status",	cri.getVisible_status())
 				.build();
 		
 		return uriComponents.toUriString();
 	}
-	
-	@Override
-	public String toString() {
-		return "PageMaker [totalCount=" + totalCount + ", startPage=" + startPage + ", endPage=" + endPage + ", prev="
-				+ prev + ", next=" + next + ", displayPageNum=" + displayPageNum + ", cri=" + cri + "]";
-	}
-	
-	
 	
 }

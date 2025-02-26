@@ -50,13 +50,13 @@ public class HostSpaceService {
 	}
 	
 	// 공간 목록 조회
-	public List<HostSpaceDTO> sapceList(String user_id, SearchCriteria cri, SearchItem searchItem) {
-		return hostSpaceMapper.spaceList(user_id, cri, searchItem);
+	public List<HostSpaceDTO> sapceList(String user_id, SearchCriteria cri) {
+		return hostSpaceMapper.spaceList(user_id, cri);
 	}
 	
 	// 전체 공간 게시물 갯수 조회
-	public int getCountSpaceByUser_id(String user_id) {
-		return hostSpaceMapper.getCountSpaceByUser_id(user_id);
+	public int getCountSpaceByUser_id(String user_id, SearchCriteria cri) {
+		return hostSpaceMapper.getCountSpaceByUser_id(user_id, cri);
 	}
 
 	// 호스트 공간 수정
@@ -75,14 +75,14 @@ public class HostSpaceService {
 		}
 		
 		// 3) 이미지 업로드 및 db 저장
-				if(imageFiles != null && !imageFiles.isEmpty()) {
-					for(MultipartFile imageFile : imageFiles) {
-						if(!imageFile.isEmpty()) {
-							log.info("이미지 이름 : " + imageFile.getOriginalFilename());
-							imagesService.image_upload(null, "host_space", dto.getHost_space_id(), imageFile);
-						}
-					}
+		if(imageFiles != null && !imageFiles.isEmpty()) {
+			for(MultipartFile imageFile : imageFiles) {
+				if(!imageFile.isEmpty()) {
+					log.info("이미지 이름 : " + imageFile.getOriginalFilename());
+					imagesService.image_upload(null, "host_space", dto.getHost_space_id(), imageFile);
 				}
+			}
+		}
 	}
 
 	// 호스트 공간 삭제
@@ -108,6 +108,11 @@ public class HostSpaceService {
 
 	public List<HostSpaceDTO> getHostSpaceByUserId(String user_id) {
 		return hostSpaceMapper.getHostSpaceByUserId(user_id);
+	}
+
+	// 공간의 유저 정보
+	public String getHostSpaceUserIdById(int host_space_id) {
+		return hostSpaceMapper.getHostSpaceUserIdById(host_space_id);
 	}
 
 }

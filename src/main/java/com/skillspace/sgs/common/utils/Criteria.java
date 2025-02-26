@@ -10,7 +10,6 @@ public class Criteria {
 	
 	public Criteria() {
 		this.page = 1;			// 페이지 초기값 1페이지
-		this.perPageNum = 5;
 		this.orderBy = "desc";
 	}
 

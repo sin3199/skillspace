@@ -16,10 +16,14 @@ public interface HostSpaceMapper {
 	HostSpaceDTO getHostSpaceWithCateAndImagesById(Integer host_space_id);
 
 	// 공간 리스트
-	List<HostSpaceDTO> spaceList(@Param("user_id") String user_id, @Param("cri") SearchCriteria cri,@Param("searchItem") SearchItem searchItem);
+	List<HostSpaceDTO> spaceList(
+			@Param("user_id") String user_id, 
+			@Param("cri") SearchCriteria cri);
 	
 	// 공간 리스트 총 갯수
-	int getCountSpaceByUser_id(String user_id);
+	int getCountSpaceByUser_id(
+			@Param("user_id") String user_id, 
+			@Param("cri") SearchCriteria cri);
 
 	// 호스트 공간 수정
 	void modifyHostSpace(HostSpaceDTO dto);
@@ -32,5 +36,8 @@ public interface HostSpaceMapper {
 
 	// 회원 아이디로 공간 목록 조회
 	List<HostSpaceDTO> getHostSpaceByUserId(String user_id);
+
+	// 공간 유저 정보
+	String getHostSpaceUserIdById(int host_space_id);
 
 }

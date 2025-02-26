@@ -5,27 +5,45 @@
 <select id="getCountProductByUser_id" parameterType="String" resultType="int">
 	select
 		count(*)
-	from
-		products
+	from 
+		products p
+	inner join 
+		host_space hs 
+	on 
+		p.host_space_id = hs.host_space_id
 	where
-		user_id = #{user_id}
+		p.user_id = #{user_id}
+		<include refid="search"></include>
+	    <include refid="period"></include>
+	    <include refid="visible_status"></include>
 </select>
 
 <select id="productList" parameterType="Map" resultMap="ProductWithImageMap">
 	select
-		product_id,
-		host_space_id,
-		user_id,
-		name,
-		product_intro,
-		price,
-		created_at,
-		updated_at,
-		is_visible 
+		p.product_id,
+		p.host_space_id,
+		p.user_id,
+		p.name,
+		p.product_intro,
+		p.price,
+		p.created_at,
+		p.updated_at,
+		p.is_visible 
 	from 
-		products
+		products p
+	inner join 
+		host_space hs 
+	on 
+		p.host_space_id = hs.host_space_id
 	where
-		user_id = #{user_id}
+		p.user_id = #{user_id}
+	    <include refid="search"></include>
+	    <include refid="period"></include>
+	    <include refid="visible_status"></include>
+	order by 
+	    p.created_at <if test="cri.orderBy.equals('desc')">desc</if>
+	limit
+	    #{cri.pageStart}, #{cri.perPageNum}
 		
 </select>
 
@@ -49,6 +67,63 @@
 			#{is_visible}
 		)
 </insert>
+
+<select id="getProductWithImagesById" parameterType="Integer" resultMap="ProductWithImageMap">
+	select
+		product_id,
+		host_space_id,
+		user_id,
+		name,
+		product_intro,
+		price,
+		created_at,
+		updated_at,
+		is_visible 
+	from 
+		products
+	where
+		product_id = #{product_id}
+</select>
+
+<update id="modifyHostProduct" parameterType="com.skillspace.sgs.host.product.HostProductDTO">
+	update 
+		products 
+	set 
+		host_space_id = #{host_space_id},
+		name = #{name},
+		product_intro = #{product_intro},
+		price = #{price},
+		updated_at = now(),
+		is_visible = #{is_visible}
+	where
+		product_id = #{product_id}
+</update>
+
+<select id="getProductUserIdById" parameterType="Integer" resultType="String">
+	select 
+		user_id
+	from 
+		products
+	where
+		product_id = #{product_id}
+</select>
+
+<delete id="deleteHostProduct" parameterType="Integer">
+	delete from 
+		products 
+	where
+		product_id = #{product_id} 
+</delete>
+
+<delete id="selectedDelete">
+	delete from 
+		products 
+	where 
+		product_id in 
+	<foreach collection="product_id_arr" item="product_id" open="(" separator="," close=")">
+		#{product_id}
+	</foreach>
+</delete>
 
 <resultMap id="ProductWithImageMap" type="com.skillspace.sgs.host.product.HostProductDTO">
 	<!-- HostProductDTO 기본 정보 -->
@@ -82,6 +157,7 @@
 	    host_space_id,
 		user_id,
 		cate_id,
+		space_name,
 		main_title,
 		sub_title,
 		space_intro,
@@ -117,38 +193,31 @@
 
 <sql id="search">
 	<if test="cri.searchType != null and !cri.searchType.equals('')">
-	   	<if test="cri.searchType == 'main_title'">
-	   		and s.main_title like concat('%', #{cri.keyword}, '%')
+	   	<if test="cri.searchType == 'space_name'">
+	   		and hs.space_name like concat('%', #{cri.keyword}, '%')
 	   	</if>
-	   	<if test="cri.searchType == 'sub_title'">
-	   		and s.sub_title like concat('%', #{cri.keyword}, '%')
-	   	</if>
-	   	<if test="cri.searchType == 'all_title'">
-	   		and (s.main_title like concat('%', #{cri.keyword}, '%')
-	   		or s.sub_title like concat('%', #{cri.keyword}, '%'))
-	   	</if>
-	   	<if test="cri.searchType == 'cate_name'">
-	   		and c.cate_name like concat('%', #{cri.keyword}, '%') 
+	   	<if test="cri.searchType == 'name'">
+	   		and p.name like concat('%', #{cri.keyword}, '%')
 	   	</if>
 	</if>
 </sql>
 
 <sql id="period">
-	<if test="searchItem.start_date != null and !searchItem.start_date.equals('')">
+	<if test="cri.start_date != null and !cri.start_date.equals('')">
 		<![CDATA[
-			and s.created_at >= date(#{searchItem.start_date})
+			and p.created_at >= date(#{cri.start_date})
 			]]>
 	</if>
-	<if test="searchItem.end_date != null and !searchItem.end_date.equals('')">
+	<if test="cri.end_date != null and !cri.end_date.equals('')">
 		<![CDATA[
-			and s.created_at < date(#{searchItem.end_date}) + 1
+			and p.created_at < date(#{cri.end_date}) + 1
 			]]>
 	</if>
 </sql>
 
 <sql id="visible_status">
-	<if test="searchItem.visible_status != null and !searchItem.visible_status.equals('')">
-			and s.is_visible = #{searchItem.visible_status}
+	<if test="cri.visible_status != null and !cri.visible_status.equals('')">
+			and p.is_visible = #{cri.visible_status}
 	</if>
 </sql>
 </mapper>

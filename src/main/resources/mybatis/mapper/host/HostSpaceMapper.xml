@@ -79,7 +79,7 @@
 	on
 		s.cate_id = c.cate_id
 	where 
-	    user_id = #{user_id}
+	    s.user_id = #{user_id}
 	    <include refid="search"></include>
 	    <include refid="period"></include>
 	    <include refid="visible_status"></include>
@@ -90,13 +90,20 @@
 
 </select>
 
-<select id="getCountSpaceByUser_id" parameterType="String" resultType="int">
+<select id="getCountSpaceByUser_id" parameterType="Map" resultType="int">
 	select
 		count(*)
 	from
-		host_space
-	where
-		user_id = #{user_id}
+	    host_space s
+	inner join
+		category c
+	on
+		s.cate_id = c.cate_id
+	where 
+	    s.user_id = #{user_id}
+		<include refid="search"></include>
+	    <include refid="period"></include>
+	    <include refid="visible_status"></include>
 </select>
 
 <update id="modifyHostSpace" parameterType="com.skillspace.sgs.host.space.HostSpaceDTO">
@@ -155,6 +162,15 @@
 		host_space
 	where 
 		user_id = #{user_id}
+</select>
+
+<select id="getHostSpaceUserIdById" parameterType="int" resultType="String">
+	select
+		user_id
+	from
+		host_space
+	where
+		host_space_id = #{host_space_id}
 </select>
 
 <resultMap id="SpaceWithImageMap" type="com.skillspace.sgs.host.space.HostSpaceDTO">
@@ -240,21 +256,21 @@
 </sql>
 
 <sql id="period">
-	<if test="searchItem.start_date != null and !searchItem.start_date.equals('')">
+	<if test="cri.start_date != null and !cri.start_date.equals('')">
 		<![CDATA[
-			and s.created_at >= date(#{searchItem.start_date})
+			and s.created_at >= date(#{cri.start_date})
 			]]>
 	</if>
-	<if test="searchItem.end_date != null and !searchItem.end_date.equals('')">
+	<if test="cri.end_date != null and !cri.end_date.equals('')">
 		<![CDATA[
-			and s.created_at < date(#{searchItem.end_date}) + 1
+			and s.created_at < date(#{cri.end_date}) + 1
 			]]>
 	</if>
 </sql>
 
 <sql id="visible_status">
-	<if test="searchItem.visible_status != null and !searchItem.visible_status.equals('')">
-			and s.is_visible = #{searchItem.visible_status}
+	<if test="cri.visible_status != null and !cri.visible_status.equals('')">
+			and s.is_visible = #{cri.visible_status}
 	</if>
 </sql>
 
