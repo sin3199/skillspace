@@ -7,7 +7,7 @@ import lombok.ToString;
 // 페이징 기능, 검색 기능을 위한 클래스
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 public class SearchCriteria extends Criteria {
 	// 디폴트 생성자 자동 생성.
 

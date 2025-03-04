@@ -72,7 +72,16 @@ public class AdminCategoryService {
 	public void updateCategory(CategoryDTO dto) {
 		adminCategoryMapper.updateCategory(dto);
 	}
-
+	
+	// 계층형으로 모든 카테고리 조회
+	public List<CategoryTreeDTO> getAllCategoryTree() {
+		return adminCategoryMapper.getAllCategoryTree();
+	}
+	
+	// 특정 카테고리 조회
+	public CategoryDTO getCategoryById(int cate_id) {
+		return adminCategoryMapper.getCategoryById(cate_id);
+	}
 	
 
 }

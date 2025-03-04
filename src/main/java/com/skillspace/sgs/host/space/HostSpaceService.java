@@ -9,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.skillspace.sgs.admin.images.ImagesService;
 import com.skillspace.sgs.common.utils.SearchCriteria;
-import com.skillspace.sgs.common.utils.SearchItem;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

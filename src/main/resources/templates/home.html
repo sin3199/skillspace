@@ -91,8 +91,10 @@
 </th:block>
 
 <th:block layout:fragment="scriptBottom">
-	<script>
+	<script th:inline="javascript">
 		$(document).ready(function () {
+
+			console.log("글로벌 카테고리 트리", [[${categoryTreeByMenu}]]);
 
 			loadCategories_first();
 
@@ -263,7 +265,7 @@
 					const cate_id = $(this).data('cate_id');
 
 					// 추가 동작 구현 가능
-					location.href = `/guest/product/pro_list?cate_id=${cate_id}`;
+					location.href = `/guest/space/spaceList?cate_id=${cate_id}`;
 
 				});
 			}

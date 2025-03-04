@@ -49,25 +49,35 @@
 <th:block layout:fragment="content">
 	<h1 th:text="'해당 카테고리의 상품 페이지 ' + ${cate_id}"></h1>
 	<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3">
-		<div class="col">
+		<div class="col" th:each="spaceInfo : ${spaceList}">
 			<div class="card">
 				<div class="position-relative">
-					<img src="https://cdn.pixabay.com/photo/2024/08/24/02/13/ai-generated-8993116_1280.jpg" class="card-img-top" alt="푸토어 프로덕션 스페이스">
+					<img th:if="${!spaceInfo.images.isEmpty()}" 
+                        th:src="@{|/api/image/display/${spaceInfo.images[0]?.image_up_folder}/s_${spaceInfo.images[0]?.image_name}|}"
+                        class="card-img-top" 
+                        alt="공간 대표 이미지">
+					<img th:unless="${!spaceInfo.images.isEmpty()}" 
+                        src="/images/no-image.png"
+                        class="card-img-top" 
+                        alt="이미지 없음">
 					
 				</div>
 				<div class="card-body pb-1">
-					<h5 class="card-title main_title">일이삼사오육칠팔구십일이삼사오육칠팔구</h5>
+					<h5 class="card-title main_title">[[${spaceInfo.main_title}]]</h5>
 					<div class="d-flex justify-content-between card-text">
 						<div class="text-nowrap me-3">
-							<i class="bi bi-geo-alt-fill me-1"></i><span class="space_addr">양재동</span>
+							<i class="bi bi-geo-alt-fill me-1"></i><span class="space_addr">[[${#strings.arraySplit(spaceInfo.space_addr, ' ')[1]}]] </span>
 						</div>
 
-						<span class="text-truncate sub_title">#강남연습실 #개인연습실 #봉천연습실 #서울대입구 #피아노 </span>
+						<span class="text-truncate sub_title">[[${spaceInfo.sub_title}]]</span>
 					</div>
 				</div>
 				<div class="card-footer">
 					<div class="d-flex justify-content-between">
-						<div class="card-text"><span class="price">5,000</span><small>원/시간</small></div>
+						<div class="card-text">
+                            <span class="price" th:text="${spaceInfo?.products != null and not #lists.isEmpty(spaceInfo?.products) and spaceInfo?.products[0]?.price != null} ? ${#numbers.formatInteger(spaceInfo?.products[0]?.price, 1, 'COMMA')} : '0'">0</span>
+                            <small>원/시간</small>
+                        </div>
 						<div class="align-content-center">
 							<span class="info-item"><i class="bi bi-chat-square-fill me-1"></i><span class="reviewCount">163</span></span>
 							<span class="info-item"><i class="bi bi-heart-fill me-1"></i><span class="whishCount">646</span></span>
@@ -79,5 +89,12 @@
 		
 	</div>
 	
+</th:block>
+<th:block layout:fragment="scriptBottom">
+    <script th:inline="javascript">
+        $(document).ready(function() {
+            console.log("공간목록", [[${spaceList}]]);
+        });
+    </script>
 </th:block>
 </html>

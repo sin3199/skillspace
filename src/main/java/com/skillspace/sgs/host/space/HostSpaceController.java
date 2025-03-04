@@ -46,10 +46,10 @@ public class HostSpaceController {
 		
 		// 1) 유저 공간 정보
 		String user_id = ((GuestDTO)session.getAttribute("login_auth")).getUser_id();
-		// 2) 공간 리스트 정보 가져오기(이미지 계층형 데이터로)
 		
-		if (cri.getPerPageNum() == 0) { // perPageNum이 0 인 경우 (초기 요청)
-	        cri.setPerPageNum(5);	// 페이지 관리 상수값
+		// 2) 공간 리스트 정보 가져오기(이미지 계층형 데이터로)
+		if(cri.getPerPageNum() == 0) { // perPageNum이 0 인 경우 (초기 요청)
+			cri.setPerPageNum(5);	// 페이지 관리 상수값
 	    }
 		PageMaker pageMaker = new PageMaker();
 		pageMaker.setDisplayPageNum(2);

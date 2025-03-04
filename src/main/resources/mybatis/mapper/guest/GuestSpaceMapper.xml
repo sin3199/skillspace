@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.skillspace.sgs.guest.space.GuestSpaceMapper">
+
+<select id="getHostSpaceWithCateAndImageByCateId" parameterType="Map" resultMap="SpaceWithCateAndImageMap">
+	select 
+	    s.host_space_id,
+		s.cate_id,
+		s.space_name,
+		s.main_title,
+		s.sub_title,
+		s.space_addr,
+		s.created_at,
+		s.is_visible
+	from
+	    host_space s
+	where
+		s.cate_id = #{cate_id}
+	limit
+	    #{cri.pageStart}, #{cri.perPageNum}
+</select>
+
+<select id="getCountSpaceByCateId" parameterType="Int" resultType="Int">
+	select 
+	    count(*)
+	from
+	    host_space s
+	where
+		s.cate_id = #{cate_id}
+</select>
+
+<resultMap id="SpaceWithCateAndImageMap" type="com.skillspace.sgs.host.space.HostSpaceDTO">
+	<!-- HostSpaceDTO 기본 정보 -->
+    <id property="host_space_id" column="host_space_id"/> <!-- Review PK -->
+    <result property="user_id" column="user_id"/>
+    <result property="cate_id" column="cate_id"/>
+    <result property="space_name" column="space_name"/>
+    <result property="main_title" column="main_title"/>
+    <result property="sub_title" column="sub_title"/>
+    <result property="space_intro" column="space_intro"/>
+    <result property="space_guide" column="space_guide"/>
+    <result property="space_zipcode" column="space_zipcode"/>
+    <result property="space_addr" column="space_addr"/>
+    <result property="space_addrdetail" column="space_addrdetail"/>
+    <result property="created_at" column="created_at"/>
+    <result property="updated_at" column="updated_at"/>
+    <result property="is_visible" column="is_visible"/>
+    
+    <!-- Category 1:1 매핑 
+    <association 
+    	property="category" 
+	    javaType="com.skillspace.sgs.admin.category.CategoryDTO" 
+	    column="cate_id" 
+	    select="selectCategory"/> -->
+    
+     <!-- Images 1:N 매핑 -->
+     <collection 
+     	property="images" 
+     	javaType="java.util.ArrayList" 
+     	ofType="com.skillspace.sgs.admin.images.ImagesDTO" 
+     	column="host_space_id" 
+     	select="selectImages"/>
+
+     <!-- Products 1:N 매핑 -->
+     <collection 
+     	property="products" 
+     	javaType="java.util.ArrayList" 
+     	ofType="com.skillspace.sgs.host.product.HostProductDTO" 
+     	column="host_space_id" 
+     	select="selectProductPrice"/>
+</resultMap>
+
+<!-- Category 정보 조회 
+<select id="selectCategory" resultType="com.skillspace.sgs.admin.category.CategoryDTO">
+    select
+        cate_id,
+        cate_prtcode,
+        cate_name,
+        level,
+        sort_order
+    from
+        category
+    where
+        cate_id = #{cate_id}
+</select> -->
+
+
+<!-- images 목록 조회 -->
+<select id="selectImages" resultType="com.skillspace.sgs.admin.images.ImagesDTO">
+    select
+        image_id,
+        entity_type,
+        entity_id,
+        image_up_folder,
+        image_name,
+        created_at
+    from
+        images
+    where
+        entity_type = 'host_space'
+        and entity_id = #{host_space_id}
+</select>
+
+<select id="selectProductPrice" resultType="com.skillspace.sgs.host.product.HostProductDTO">
+	select 
+		min(price) as price
+	from 
+		products 
+	where 
+		host_space_id = #{host_space_id}
+</select>
+
+</mapper>

@@ -1,0 +1,19 @@
+/* Show it is fixed to the top */
+body {
+  padding-top: 57px;
+  min-width: 320px; /* 모바일 최소 너비 설정 */
+  overflow-x: auto;
+  background-color: #dee2e6;
+}
+
+.public-footer {
+  background: #f8f9fa;
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+  text-align: center;
+  color: #6c757d;
+  width: 100%; 
+}
+.container {
+  flex: 1;
+}

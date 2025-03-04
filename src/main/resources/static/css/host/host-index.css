@@ -176,7 +176,7 @@ body {
    border-radius: 5px;
 }
 
-.admin-footer {
+.public-footer {
    background: #f8f9fa;
    padding: 0.5rem 0;
    border-top: 1px solid #dee2e6;
@@ -189,7 +189,7 @@ body {
 }
 
 /* 사이드바가 접혔을 때 */
-.admin-footer.active {
+.public-footer.active {
    width: 100%;
    margin-left: 0;
 }

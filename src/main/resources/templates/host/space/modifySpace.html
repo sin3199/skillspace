@@ -24,6 +24,11 @@
             height: 100%;
             object-fit: cover;
         }
+
+        .remove-image-button {
+            z-index: 100;
+            padding: 0.1rem 0.25rem !important;
+        }
     </style>
 </th:block>
 <th:block layout:fragment="content">
@@ -103,9 +108,12 @@
                     <div class="col-lg-10">
                         <div class="row mb-3">
                             <div class="col-lg-4 col-6">
-                                <div class="card shadow-sm">
+                                <div class="card shadow-sm mb-2">
                                     <div class="card-body d-flex flex-column align-items-center">
-                                        <h6 class="card-title">이미지 1</h6>
+                                        <h5 class="card-title badge text-bg-secondary">대표 이미지</h5>
+                                        <button type="button" class="btn btn-sm btn-danger remove-image-button position-absolute top-0 end-0 m-1" data-image-number="1" style="display:none;">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
                                         <div class="image-preview-container mb-2">
                                             <img id="preview1" src="#" alt="미리보기" class="img-thumbnail rounded" style="display: none; max-width: 100%; height: auto; object-fit: cover; aspect-ratio: 4/3;">
                                         </div>
@@ -114,14 +122,14 @@
                                         <input type="hidden" id="changeImage1" name="changeImages" value="">
                                     </div>
                                 </div>
-                                <div class="text-center mt-1">
-                                    <span class="badge text-bg-secondary text-center">대표이미지</span>
-                                </div>
                             </div>
                             <div class="col-lg-4 col-6">
-                                <div class="card shadow-sm">
+                                <div class="card shadow-sm mb-2">
                                     <div class="card-body d-flex flex-column align-items-center">
-                                        <h6 class="card-title">이미지 2</h6>
+                                        <h5 class="card-title badge text-bg-secondary">이미지 2</h5>
+                                        <button type="button" class="btn btn-sm btn-danger remove-image-button position-absolute top-0 end-0 m-1" data-image-number="2" style="display:none;">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
                                         <div class="image-preview-container mb-2">
                                             <img id="preview2" src="#" alt="미리보기" class="img-thumbnail rounded" style="display: none; max-width: 100%; height: auto; object-fit: cover; aspect-ratio: 4/3;">
                                         </div>
@@ -133,9 +141,12 @@
                                 </div>
                             </div>
                             <div class="col-lg-4 col-6 mt-2 m-lg-0">
-                                <div class="card shadow-sm">
+                                <div class="card shadow-sm mb-2">
                                     <div class="card-body d-flex flex-column align-items-center">
-                                        <h6 class="card-title">이미지 3</h6>
+                                        <h5 class="card-title badge text-bg-secondary">이미지 3</h5>
+                                        <button type="button" class="btn btn-sm btn-danger remove-image-button position-absolute top-0 end-0 m-1" data-image-number="3" style="display:none;">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
                                         <div class="image-preview-container mb-2">
                                             <img id="preview3" src="#" alt="미리보기" class="img-thumbnail rounded" style="display: none; max-width: 100%; height: auto; object-fit: cover; aspect-ratio: 4/3;">
                                         </div>
@@ -266,36 +277,40 @@
             loadImage();
             // 기존 이미지 출력
             function loadImage() {
-                const images = [[${hostSpaceDTO.images}]];
+                const images = [[${productDTO.images}]];
                 let imageNumber = 1;
                 images.forEach(image => {
                     const loadImage = $('#loadImage' + imageNumber);
                     const changeImage = $('#changeImage' + imageNumber);
                     const preview = $('#preview' + imageNumber);
+                    const removeButton = $('.remove-image-button[data-image-number="' + imageNumber + '"]');
                     preview.attr('src', `/api/image/display/${image.image_up_folder}/s_${image.image_name}`);
                     preview.show();
+                    removeButton.show();
                     loadImage.val(image.image_id);  // 기존 이미지
                     changeImage.val(image.image_id);  // 기존 이미지
                     imageNumber++;
                 });
             }
 
-
             // 이미지 미리보기 함수
             function previewImage(imageNumber) {
                 const fileInput = $('#image' + imageNumber);
-                const preview = $('#preview' + imageNumber);
+                const $preview = $('#preview' + imageNumber);
                 const changeImage = $('#changeImage' + imageNumber);
+                const removeButton = $('.remove-image-button[data-image-number="' + imageNumber + '"]');
                 const file = fileInput[0].files[0];
 
                 if (file) {
                     const reader = new FileReader();
                     reader.onload = function () {
-                        preview.attr('src', reader.result).show();
+                        $preview.attr('src', reader.result).show();
+                        removeButton.show();
                     }
                     reader.readAsDataURL(file);
                 } else {
                     preview.attr('src', '#').hide();
+                    removeButton.hide();
                 }
                 changeImage.val("");  // 기존 이미지 변경
             }
@@ -304,6 +319,26 @@
             $('#image1').on('change', function() { previewImage(1); });
             $('#image2').on('change', function() { previewImage(2); });
             $('#image3').on('change', function() { previewImage(3); });
+
+            // 제거 버튼 이벤트 리스너
+            $('.remove-image-button').on('click', function() {
+                const imageNumber = $(this).data('image-number');
+                removeImage(imageNumber);
+            });
+
+            // 이미지 제거 함수
+            function removeImage(imageNumber) {
+                const $preview = $('#preview' + imageNumber);
+                const loadImage = $('#loadImage' + imageNumber);
+                const changeImage = $('#changeImage' + imageNumber);
+                const fileInput = $('#image' + imageNumber);
+                const removeButton = $('.remove-image-button[data-image-number="' + imageNumber + '"]'); // 제거 버튼
+
+                $preview.attr('src', '#').hide(); // 미리보기 이미지 숨김
+                changeImage.val(""); // changeImages input 에 "delete" 설정 (서버에서 삭제될 이미지 명시)
+                fileInput.val(""); // 파일 input 내용 비움 (파일 선택 초기화)
+                removeButton.hide(); // 제거 버튼 숨김
+            }
 
             // 우편번호 입력 이벤트
             $("#sample2_postcode").on('input', function(e) {

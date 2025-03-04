@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.skillspace.sgs.admin.category.CategoryDTO;
 import com.skillspace.sgs.admin.images.ImagesDTO;
+import com.skillspace.sgs.host.product.HostProductDTO;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -32,5 +33,6 @@ public class HostSpaceDTO {
 	
 	private List<ImagesDTO> images;
 	private CategoryDTO category;
+	private List<HostProductDTO> products;
 	
 }

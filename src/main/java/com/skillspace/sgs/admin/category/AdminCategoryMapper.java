@@ -36,5 +36,8 @@ public interface AdminCategoryMapper {
 	// 카테고리 수정
 	void updateCategory(CategoryDTO dto);
 
+	// 계층형으로 모든 카테고리 조회
+	List<CategoryTreeDTO> getAllCategoryTree();
+
 
 }

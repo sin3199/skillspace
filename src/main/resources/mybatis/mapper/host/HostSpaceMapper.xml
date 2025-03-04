@@ -191,19 +191,19 @@
     <result property="is_visible" column="is_visible"/>
     
     <!-- Category 1:1 매핑 -->
-        <association 
-        	property="category" 
-	        javaType="com.skillspace.sgs.admin.category.CategoryDTO" 
-	        column="cate_id" 
-	        select="selectCategory"/>
+    <association 
+    	property="category" 
+	    javaType="com.skillspace.sgs.admin.category.CategoryDTO" 
+	    column="cate_id" 
+	    select="selectCategory"/>
     
      <!-- Images 1:N 매핑 -->
-        <collection 
-        	property="images" 
-        	javaType="java.util.ArrayList" 
-        	ofType="com.skillspace.sgs.admin.images.ImagesDTO" 
-        	column="host_space_id" 
-        	select="selectImages"/>
+     <collection 
+     	property="images" 
+     	javaType="java.util.ArrayList" 
+     	ofType="com.skillspace.sgs.admin.images.ImagesDTO" 
+     	column="host_space_id" 
+     	select="selectImages"/>
 </resultMap>
 
 <!-- Category 정보 조회 -->

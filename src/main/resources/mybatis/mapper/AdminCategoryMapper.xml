@@ -153,5 +153,46 @@
 		cate_id = #{cate_id}
 </update>
 
+<select id="getAllCategoryTree" resultMap="AllCategoryTreeResultMap">
+	select 
+		cate_id, 
+		cate_prtcode, 
+		cate_name, 
+		level, 
+		sort_order
+	from 
+		category
+	where 
+		cate_prtcode is null	
+</select>
+
+<resultMap id="AllCategoryTreeResultMap" type="com.skillspace.sgs.admin.category.CategoryTreeDTO">
+	<id property="cate_id" column="cate_id"/>
+    <result property="cate_prtcode" column="cate_prtcode"/>
+    <result property="cate_name" column="cate_name"/>
+    <result property="level" column="level"/>
+    <result property="sort_order" column="sort_order"/>
+    
+    <collection 
+    	property="subCategories"
+    	javaType="java.util.ArrayList"
+    	ofType="com.skillspace.sgs.admin.category.CategoryDTO"
+    	column="cate_id"
+    	select="selectSubCategories"/>
+</resultMap>
+
+<select id="selectSubCategories" resultType="com.skillspace.sgs.admin.category.CategoryDTO">
+select
+        cate_id,
+        cate_prtcode,
+        cate_name,
+        level,
+        sort_order
+    from
+        category
+    where
+        cate_prtcode = #{cate_id}
+</select>
+
 
 </mapper>

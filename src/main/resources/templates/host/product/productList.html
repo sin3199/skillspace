@@ -3,6 +3,32 @@
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{host/layouts/host-layout}">
 
+
+<th:block layout:fragment="css">
+   <style>
+      /* 캐러셀 이미지 스타일 */
+      #carousel-inner .carousel-item {
+         height: 300px;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+      }
+   
+      #carousel-inner .carousel-item img {
+         object-fit: cover;
+         width: 100%;
+         height: 100%;
+      }
+   
+      /* 캐러셀 컨트롤 버튼 스타일 */
+      .carousel-control-prev-icon,
+      .carousel-control-next-icon {
+         background-color: rgba(0, 0, 0, 0.5);
+         border-radius: 50%;
+         padding: 10px;
+      }
+   </style>
+</th:block>
 <th:block layout:fragment="content">
    <div class="card mb-3">
       <div class="card-header">
@@ -199,57 +225,62 @@
    </div>   <!-- card end -->
 
    <!-- 상품 상세 정보 Modal -->
-   <div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel" aria-hidden="true">
+   <div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel"
+      aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg">
          <div class="modal-content">
             <div class="modal-header">
-                  <h5 class="modal-title" id="productDetailModalLabel">상품 상세 정보</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               <h5 class="modal-title" id="productDetailModalLabel">상품 상세 정보</h5>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                  <div class="container-fluid">
-                     <div class="row mb-3">
-                        <div class="col-md-6 align-content-center">
-                              <div id="carouse_main" class="carousel slide carousel-fade" data-bs-ride="carousel">
-                                 <div class="carousel-inner" id="carousel-inner">
-                                    <!-- carousel-item 동적 생성 -->
-                                 </div>
-                              
-                                 <button class="carousel-control-prev" type="button" data-bs-target="#carouse_main" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Previous</span>
-                                 </button>
-                                 <button class="carousel-control-next" type="button" data-bs-target="#carouse_main" data-bs-slide="next">
-                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Next</span>
-                                 </button>
-                              </div>
+               <div class="container-fluid">
+                  <div class="row mb-3">
+                     <div class="col-md-6 align-content-center">
+                        <!-- 캐러셀 시작 -->
+                        <div id="carouse_main" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                           <div class="carousel-inner" id="carousel-inner">
+                              <!-- carousel-item 동적 생성 -->
+                           </div>
+   
+                           <!-- 이전/다음 버튼 -->
+                           <button class="carousel-control-prev" type="button" data-bs-target="#carouse_main" data-bs-slide="prev">
+                              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                              <span class="visually-hidden">Previous</span>
+                           </button>
+                           <button class="carousel-control-next" type="button" data-bs-target="#carouse_main" data-bs-slide="next">
+                              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                              <span class="visually-hidden">Next</span>
+                           </button>
                         </div>
-                        <div class="col-md-6">
-                              <h4 id="modalProductName" class="fw-bold"></h4>
-                              <p id="modalSpaceName" class="text-muted"></p>
-                              <hr>
-                              <p><span class="fw-bold">가격:</span> <span id="modalProductPrice"></span>원</p>
-                              <p><span class="fw-bold">노출/숨김:</span> <span id="modalIsVisible"></span></p>
-                              <p><span class="fw-bold">등록일:</span> <span id="modalCreatedAt"></span></p>
-                              <p><span class="fw-bold">수정일:</span> <span id="modalUpdatedAt"></span></p>
-                        </div>
+                        <!-- 캐러셀 끝 -->
                      </div>
-                     <hr>
-                     <div class="row">
-                        <div class="col-12">
-                              <h6 class="fw-bold">상품 소개</h6>
-                              <div id="modalProductIntro"></div>
-                        </div>
+                     <div class="col-md-6">
+                        <h4 id="modalProductName" class="fw-bold"></h4>
+                        <p id="modalSpaceName" class="text-muted"></p>
+                        <hr>
+                        <p><span class="fw-bold">가격:</span> <span id="modalProductPrice"></span>원</p>
+                        <p><span class="fw-bold">노출/숨김:</span> <span id="modalIsVisible"></span></p>
+                        <p><span class="fw-bold">등록일:</span> <span id="modalCreatedAt"></span></p>
+                        <p><span class="fw-bold">수정일:</span> <span id="modalUpdatedAt"></span></p>
                      </div>
                   </div>
+                  <hr>
+                  <div class="row">
+                     <div class="col-12">
+                        <h6 class="fw-bold">상품 소개</h6>
+                        <div id="modalProductIntro"></div>
+                     </div>
+                  </div>
+               </div>
             </div>
             <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
             </div>
          </div>
       </div>
    </div>
+
    <!-- 페이징과 검색 파라미터 정보 : 현재 목록 상태를 작업(수정, 삭제)을 하고 돌아왔을 때 페이지 유지-->
    <form id="criteriaForm" action="" method="get">
       <!-- 4개의 검색 파라미터 -->
@@ -500,13 +531,6 @@
                const carouselInner = document.querySelector('.carousel-inner');
 
                const modalProductImage = document.getElementById('modalProductImage');
-               // if (imageUrl) {
-               //    modalProductImage.setAttribute('src', imageUrl);
-               // } else {
-               //    modalProductImage.setAttribute('src', noImageUrl);
-               // }
-
-
             });
          });
 

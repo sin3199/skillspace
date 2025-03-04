@@ -3,6 +3,31 @@
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{host/layouts/host-layout}">
 
+<th:block layout:fragment="css">
+   <style>
+      /* 캐러셀 이미지 스타일 */
+      #carousel-inner .carousel-item {
+         height: 300px;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+      }
+
+      #carousel-inner .carousel-item img {
+         object-fit: cover;
+         width: 100%;
+         height: 100%;
+      }
+
+      /* 캐러셀 컨트롤 버튼 스타일 */
+      .carousel-control-prev-icon,
+      .carousel-control-next-icon {
+         background-color: rgba(0, 0, 0, 0.5);
+         border-radius: 50%;
+         padding: 10px;
+      }
+   </style>
+</th:block>
 <th:block layout:fragment="content">
    <div class="card mb-3">
       <div class="card-header">
@@ -153,8 +178,21 @@
                      </td>
                      <td><small>[[${#temporals.format(space.created_at, 'yyyy-MM-dd HH:mm:ss')}]]</small></td>
                      <td>
-                        <button class="btn btn-outline-success btn-sm text-nowrap" name="btn_modify" th:data-host_space_id="${space.host_space_id}">수정</button>
-                        <button class="btn btn-outline-danger btn-sm text-nowrap" name="btn_delete" th:data-host_space_id="${space.host_space_id}">삭제</button>
+                        <button class="btn btn-outline-success btn-sm text-nowrap" name="btn_modify" th:data-host_space_id="${space.host_space_id}">수정하기</button>
+                        <button class="btn btn-outline-danger btn-sm text-nowrap" name="btn_delete" th:data-host_space_id="${space.host_space_id}">삭제하기</button>
+                        <button class="btn btn-outline-secondary btn-sm text-nowrap btn-detail-modal"
+                           data-bs-toggle="modal" data-bs-target="#productDetailModal"
+                           th:data-host_space_id="${space.host_space_id}"
+                           th:data-space_name="${space.space_name}"
+                           th:data-main_title="${space.main_title}"
+                           th:data-sub_title="${space.sub_title}"
+                           th:data-cate_name="${space.category.cate_name}"
+                           th:data-is_visible="${space.is_visible}"
+                           th:data-created_at="${#temporals.format(space.created_at, 'yyyy-MM-dd HH:mm:ss')}"
+                           th:data-updated_at="${#temporals.format(space.updated_at, 'yyyy-MM-dd HH:mm:ss')}"
+                           th:data-space_intro="${space.space_intro}"
+                           th:data-space_guide="${space.space_guide}"
+                        >상세보기</button>
                      </td>
                   </tr>
                </tbody>
@@ -184,6 +222,69 @@
          </ul>
       </div>
    </div>   <!-- card end -->
+
+   
+   <!-- 상품 상세 정보 Modal -->
+   <div class="modal fade" id="productDetailModal" tabindex="-1" aria-labelledby="productDetailModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+         <div class="modal-content">
+            <div class="modal-header">
+               <span class="modal-title"><span class="fw-bold fs-3" id="productDetailModalLabel"></span> 공간 상세 정보</span>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+               <div class="container-fluid">
+                  <div class="row mb-3">
+                     <div class="col-md-6 align-content-center">
+                        <!-- 캐러셀 시작 -->
+                        <div id="carouse_main" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                           <div class="carousel-inner" id="carousel-inner">
+                              <!-- carousel-item 동적 생성 -->
+                           </div>
+
+                           <!-- 이전/다음 버튼 -->
+                           <button class="carousel-control-prev" type="button" data-bs-target="#carouse_main" data-bs-slide="prev">
+                              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                              <span class="visually-hidden">Previous</span>
+                           </button>
+                           <button class="carousel-control-next" type="button" data-bs-target="#carouse_main" data-bs-slide="next">
+                              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                              <span class="visually-hidden">Next</span>
+                           </button>
+                        </div>
+                        <!-- 캐러셀 끝 -->
+                     </div>
+                     <div class="col-md-6">
+                        <p><span class="text-muted">제목:</span> <span id="modalMainTitle" class="fw-bold fs-3"></span></p>
+                        <p><span class="text-muted">부제목:</span> <span id="modalSubTitle"></span></p>
+                        <p><span class="text-muted">공간 이름:</span> <span id="modalSpaceName"></span></p>
+                        <p><span class="text-muted">카테고리:</span> <span id="modalCateName"></span></p>
+                        <hr>
+                        <p><span class="fw-bold">노출/숨김:</span> <span id="modalIsVisible"></span></p>
+                        <p><span class="fw-bold">등록일:</span> <span id="modalCreatedAt"></span></p>
+                        <p><span class="fw-bold">수정일:</span> <span id="modalUpdatedAt"></span></p>
+                     </div>
+                  </div>
+                  <hr>
+                  <div class="row">
+                     <div class="col-12">
+                        <h6 class="fw-bold">공간 소개</h6>
+                        <div id="modalSpaceIntro"></div>
+                        <hr>
+                        <h6 class="fw-bold">시설 안내</h6>
+                        <div id="modalSpaceGuide"></div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+         </div>
+      </div>
+   </div>
+
    <!-- 페이징과 검색 파라미터 정보 : 현재 목록 상태를 작업(수정, 삭제)을 하고 돌아왔을 때 페이지 유지-->
    <form id="criteriaForm" action="" method="get">
       <!-- 4개의 검색 파라미터 -->
@@ -365,6 +466,81 @@
             criteriaForm.submit();
          });
 
+         // 상품 상세정보 모달
+         const detailButtons = document.querySelectorAll('.btn-detail-modal');
+
+         detailButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+               const hostSpaceId = this.dataset.host_space_id;
+               const spaceName = this.dataset.space_name;
+               const mainTitle = this.dataset.main_title;
+               const subTitle = this.dataset.sub_title;
+               const cateName = this.dataset.cate_name;
+               const isVisible = this.dataset.is_visible;
+               const createdAt = this.dataset.created_at;
+               const updatedAt = this.dataset.updated_at;
+               const spaceIntro = this.dataset.space_intro;
+               const spaceGuide = this.dataset.space_guide;
+
+               const imageCarousel = document.getElementById('carousel-inner');
+
+               // 캐러셀 초기화
+               imageCarousel.innerHTML = '';
+
+               fetch(`/api/image/host_space/${hostSpaceId}`, {
+                  method: 'GET',
+               })
+                  .then(response => {
+                     if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                     }
+                     return response.json();
+                  })
+                  .then(data => {
+                     if (data.length > 0) {
+                        data.forEach((image, index) => {
+                           addCarouselItem(imageCarousel, `/api/image/display/${image.image_up_folder}/s_${image.image_name}`, index === 0);
+                        });
+                     } else {
+                        addCarouselItem(imageCarousel, '/images/no-image.png', true);
+                     }
+                  })
+                  .catch(error => {
+                     console.error('이미지 목록 요청 실패:', error);
+                     alert('이미지 조회 중 오류가 발생했습니다.');
+                  });
+
+
+               function addCarouselItem(container, imagePath, isActive) {
+                  const carouselItem = document.createElement('div');
+                  carouselItem.classList.add('carousel-item');
+                  if (isActive) carouselItem.classList.add('active');
+
+                  const imgElement = document.createElement('img');
+                  imgElement.src = imagePath;
+                  imgElement.alt = '캐러셀 이미지';
+                  imgElement.classList.add('d-block', 'w-100');
+
+                  carouselItem.appendChild(imgElement);
+                  container.appendChild(carouselItem);
+               }
+
+               document.getElementById('productDetailModalLabel').textContent = spaceName; // 모달 제목 변경
+               document.getElementById('modalMainTitle').textContent = mainTitle;
+               document.getElementById('modalSubTitle').textContent = subTitle;
+               document.getElementById('modalSpaceName').textContent = spaceName;
+               document.getElementById('modalCateName').textContent = cateName;
+               document.getElementById('modalIsVisible').textContent = isVisible === 'Y' ? '노출' : '숨김';
+               document.getElementById('modalCreatedAt').textContent = createdAt;
+               document.getElementById('modalUpdatedAt').textContent = updatedAt;
+               document.getElementById('modalSpaceIntro').innerHTML = spaceIntro;
+               document.getElementById('modalSpaceGuide').innerHTML = spaceGuide;
+
+               const carouselInner = document.querySelector('.carousel-inner');
+
+               const modalProductImage = document.getElementById('modalProductImage');
+            });
+         });
 
 
       });   // event end
