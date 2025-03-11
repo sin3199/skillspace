@@ -39,29 +39,36 @@
 </style>
    <header class="pt-3 bg-body-tertiary">
       <!-- 헤더 상단 -->
-      <div class="container-fluid d-flex flex-wrap justify-content-center justify-content-md-between">
-         <a href="/" class="d-flex align-items-center mb-2 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
-            <span class="fs-4 fw-bold ms-md-2">SkillSpace</span>
-         </a>
-         <form class="col-12 col-md-auto " role="search">
-            <div class="input-group">
-               <input type="text" class="form-control " name="keyword" id="keyword" 
-                  placeholder="검색어 입력">
-               <button class="btn btn-outline-secondary btn-sm" type="submit">
-                  <i class="bi bi-search"></i>
-               </button>
-            </div>
-         </form>
-      </div>
+      <div class="navbar container-fluid px-3">
+         <!-- 상단 영역 -->
+         <div class="d-flex flex-column flex-md-row align-items-center justify-content-between w-100">
+             <!-- 토글 버튼과 a 태그 -->
+             <div class="d-flex align-items-center justify-content-between justify-content-md-start w-100">
+                 <button class="navbar-toggler p-1 custom-toggler me-md-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbarLight" aria-controls="offcanvasNavbarLight" aria-label="Toggle navigation">
+                     <span class="navbar-toggler-icon"></span>
+                 </button>
+                 <a href="/" class="d-flex align-items-center mx-auto mx-md-0 link-body-emphasis text-decoration-none">
+                     <span class="fs-4 fw-bold">SkillSpace</span>
+                 </a>
+             </div>
+     
+             <!-- 검색창 -->
+             <form class="col-12 col-md-auto mt-3 mt-md-0" role="search">
+                 <div class="input-group">
+                     <input type="text" class="form-control" name="keyword" id="keyword" placeholder="검색어 입력">
+                     <button class="btn btn-outline-secondary btn-sm" type="submit">
+                         <i class="bi bi-search"></i>
+                     </button>
+                 </div>
+             </form>
+         </div>
+     </div>
+     
 
       <!-- 헤더 하단 -->
       <nav class="navbar navbar-expand-md py-2 bg-body-tertiary">
          <div class="container-fluid d-flex flex-wrap justify-content-between">
-            <button class="navbar-toggler p-1 custom-toggler" type="button" data-bs-toggle="offcanvas"
-               data-bs-target="#offcanvasNavbarLight" aria-controls="offcanvasNavbarLight"
-               aria-label="Toggle navigation">
-               <span class="navbar-toggler-icon"></span>
-            </button>
+            
 
             <div class="collapse navbar-collapse" id="">
                <ul class="navbar-nav me-auto">
@@ -82,8 +89,16 @@
 
             </div>
             <ul class="nav">
-               <li class="nav-item"><a href="#" class="nav-link link-body-emphasis px-2">로그인</a></li>
-               <li class="nav-item"><a href="#" class="nav-link link-body-emphasis px-2">회원가입</a></li>
+               <th:block th:if="${session.login_auth == null}">
+                  <li class="nav-item"><a href="/guest/login" class="nav-link link-body-emphasis px-2">로그인</a></li>
+                  <li class="nav-item"><a href="/guest/join" class="nav-link link-body-emphasis px-2">회원가입</a></li>
+               </th:block>
+               <th:block th:unless="${session.login_auth == null}">
+                  <li class="nav-item"><a href="/host/space/spaceList" class="nav-link link-body-emphasis px-2">호스트 공간</a></li>
+                  <li class="nav-item"><a href="/guest/mypage" class="nav-link link-body-emphasis px-2">마이페이지</a></li>
+                  <li class="nav-item"><a href="/guest/modify" class="nav-link link-body-emphasis px-2">정보수정</a></li>
+                  <li class="nav-item"><a href="/guest/logout" class="nav-link link-body-emphasis px-2">로그아웃</a></li>
+               </th:block>
             </ul>
          </div>
       </nav>
@@ -121,14 +136,14 @@
 
             <!-- 카테고리 메뉴 -->
             <div class="accordion" id="categoryAccordion">
-               <div class="accordion-item" th:each="firstCategory : ${categoryTreeByMenu}">
-                  <h2 class="accordion-header" id="headingOne">
+               <div class="accordion-item" th:each="firstCategory, number : ${categoryTreeByMenu}">
+                  <h2 class="accordion-header" th:id="'heading' + ${number.index}">
                      <button class="accordion-button collapsed custom-hover" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                        th:data-bs-target="'#collapse' + ${number.index}" aria-expanded="false" th:aria-controls="'collapse' + ${number.index}">
                         [[${firstCategory.cate_name}]]
                      </button>
                   </h2>
-                  <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+                  <div th:id="'collapse' + ${number.index}" class="accordion-collapse collapse" th:aria-labelledby="'heading' + ${number.index}"
                      data-bs-parent="#categoryAccordion">
                      <div class="accordion-body p-1">
                         <div class="list-group list-group-flush">
@@ -142,6 +157,7 @@
                   </div>
                </div>
             </div>
+            
 
 
          </div><!-- offcanvas-body end -->

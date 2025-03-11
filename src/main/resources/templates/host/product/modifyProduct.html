@@ -35,10 +35,11 @@
 <th:block layout:fragment="content">
     <div class="card">
         <div class="card-header bg-secondary text-white">
-            <h5 class="fw-bold my-2">상품 등록</h5>
+            <h5 class="fw-bold my-2">상품 수정</h5>
         </div>
         <div class="card-body ps-lg-4">
             <form class="needs-validation" novalidate id="spaceInfoForm" action="/host/product/modifyProduct" method="post" enctype="multipart/form-data">
+                <!-- 기존 코드 -->
                 <div class="row align-items-center">
                     <label class="col-lg-2 col-form-label">상품 노출</label>
                     <div class="col-lg-10">
@@ -88,6 +89,51 @@
 
                 <hr class="my-4">
 
+                <!-- 추가된 필드 시작 -->
+                <div class="mb-3 row">
+                    <label for="max_headcount" class="col-lg-2 col-form-label">최대 수용 인원</label>
+                    <div class="col-lg-4">
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="max_headcount" name="max_headcount" th:value="${productDTO.max_headcount}" placeholder="예: 10" min="1" max="99" required>
+                            <span class="input-group-text">명</span>
+                            <div class="invalid-feedback">최대 수용 인원을 입력하세요 (1-99 사이)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="time_slot" class="col-lg-2 col-form-label">예약 시간 단위</label>
+                    <div class="col-lg-4">
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="time_slot" name="time_slot" th:value="${productDTO.time_slot}" placeholder="예: 1" min="1" max="24" required>
+                            <span class="input-group-text">시간</span>
+                            <div class="invalid-feedback">예약 시간 단위를 입력하세요 (1-24 사이)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-lg-2 col-form-label">운영 시간</label>
+                    <div class="col-lg-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <select class="form-select time-select" id="open_time" name="open_time" required>
+                                    <option value="" disabled selected>시작 시간 선택</option>
+                                    <!-- 옵션은 JavaScript로 동적 생성 -->
+                                </select>
+                                <div class="invalid-feedback">시작 시간을 선택하세요</div>
+                            </div>
+                            <div class="col-md-6">
+                                <select class="form-select time-select" id="close_time" name="close_time" required>
+                                    <option value="" disabled selected>종료 시간 선택</option>
+                                    <!-- 옵션은 JavaScript로 동적 생성 -->
+                                </select>
+                                <div class="invalid-feedback">종료 시간을 선택하세요</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 추가된 필드 끝 -->
+
+                <!-- 기존 코드 -->
                 <div class="mb-3 row">
                     <label class="col-lg-2 col-form-label">공간 이미지</label>
                     <div class="col-lg-10">
@@ -119,7 +165,6 @@
                                             <img id="preview2" src="#" alt="미리보기" class="img-thumbnail rounded" style="display: none; max-width: 100%; height: auto; object-fit: cover; aspect-ratio: 4/3;">
                                         </div>
                                         <input class="form-control form-control-sm" type="file" id="image2" name="imageFiles" accept="image/*">
-                                        <!-- loadImages와 changeImages를 비교하여 변경된 이미지 확인-->
                                         <input type="hidden" id="loadImage2" name="loadImages" value="">
                                         <input type="hidden" id="changeImage2" name="changeImages" value="">
                                     </div>
@@ -158,7 +203,7 @@
                 <hr class="my-4">  
                 
                 <div class="text-center">
-                    <button type="submit" class="btn btn-primary w-25">등록하기</button>
+                    <button type="submit" class="btn btn-primary w-25">수정하기</button>
                     <button type="reset" class="btn btn-outline-secondary w-25">취소</button>
                 </div>
                 <!-- 페이징과 검색 파라미터 정보 : 현재 목록 상태를 작업(수정, 삭제)을 하고 돌아왔을 때 페이지 유지-->
@@ -187,8 +232,8 @@
             console.log("상품 정보", [[${productDTO}]]);
             console.log("공간 목록", [[${spaceList}]]);
 
-            
             loadImage();
+
             // 기존 이미지 출력
             function loadImage() {
                 const images = [[${productDTO.images}]];
@@ -196,16 +241,17 @@
                 images.forEach(image => {
                     const loadImage = $('#loadImage' + imageNumber);
                     const changeImage = $('#changeImage' + imageNumber);
-                    const preview = $('#preview' + imageNumber);
+                    const $preview = $('#preview' + imageNumber);
                     const removeButton = $('.remove-image-button[data-image-number="' + imageNumber + '"]');
-                    preview.attr('src', `/api/image/display/${image.image_up_folder}/s_${image.image_name}`);
-                    preview.show();
+                    $preview.attr('src', `/api/image/display/${image.image_up_folder}/s_${image.image_name}`);
+                    $preview.show();
                     removeButton.show();
                     loadImage.val(image.image_id);  // 기존 이미지
                     changeImage.val(image.image_id);  // 기존 이미지
                     imageNumber++;
                 });
             }
+
 
             // 이미지 미리보기 함수
             function previewImage(imageNumber) {
@@ -223,19 +269,19 @@
                     }
                     reader.readAsDataURL(file);
                 } else {
-                    preview.attr('src', '#').hide();
+                    $preview.attr('src', '#').hide();
                     removeButton.hide();
                 }
                 changeImage.val("");  // 기존 이미지 변경
             }
 
             // 이벤트 리스너 연결
-            $('#image1').on('change', function() { previewImage(1); });
-            $('#image2').on('change', function() { previewImage(2); });
-            $('#image3').on('change', function() { previewImage(3); });
+            $('#image1').on('change', function () { previewImage(1); });
+            $('#image2').on('change', function () { previewImage(2); });
+            $('#image3').on('change', function () { previewImage(3); });
 
             // 제거 버튼 이벤트 리스너
-            $('.remove-image-button').on('click', function() {
+            $('.remove-image-button').on('click', function () {
                 const imageNumber = $(this).data('image-number');
                 removeImage(imageNumber);
             });
@@ -255,80 +301,143 @@
             }
 
             // 상품가격 숫자만 입력 이벤트
-            $("#price").on('input', function(e) {
-                let input = e.target.value.replace(/[^0-9]/g, ''); // 숫자가 아닌 문자 제거
+            $("#price").on('input', function (e) {
+                let input = e.target.value.replace(/[^0-9]/g, '');
+                e.target.value = input;
+            });
+            // 최대 수용 인원 숫자만 입력 이벤트
+            $("#max_headcount").on('input', function (e) {
+                let input = e.target.value.replace(/[^0-9]/g, '');
+                e.target.value = input;
+            });
+            // 예약 시간 단위 숫자만 입력 이벤트
+            $("#time_slot").on('input', function (e) {
+                let input = e.target.value.replace(/[^0-9]/g, '');
                 e.target.value = input;
             });
 
             // 유효성 검사
-            $("#spaceInfoForm").on("submit", function(event) {
-
-                // **CKEditor 내용 textarea에 강제 동기화 (유효성 검사 전에 실행)**
-                if (typeof CKEDITOR !== 'undefined') { // CKEDITOR가 로드되었는지 확인 (선택적)
+            $("#spaceInfoForm").on("submit", function (event) {
+                // CKEditor 내용 textarea에 강제 동기화
+                if (typeof CKEDITOR !== 'undefined') {
                     for (const instanceName in CKEDITOR.instances) {
                         CKEDITOR.instances[instanceName].updateElement();
                     }
                 }
 
-                let valid = true;   // 커스텀 유효성 검사 변수
+                let valid = true;
                 const product_intro = $("#product_intro");
                 const product_intro_invalid = $("#product_intro_invalid");
                 const select_host_space_id = $("#host_space_id");
                 const selectedOption = select_host_space_id.find("option:selected");
+                const max_headcount = $("#max_headcount");
+                const time_slot = $("#time_slot");
+                const open_time = $("#open_time");
+                const close_time = $("#close_time");
 
-                // 공간소개 유효성 검사
-                if(!product_intro.val()) {
+
+                // 상품소개 유효성 검사
+                if (!product_intro.val()) {
                     product_intro_invalid.show();
                     valid = false;
-                }else {
+                } else {
                     product_intro_invalid.hide();
                 }
 
-                // 1차 카테고리 유효성 검사
-                if (selectedOption.text() === "" || selectedOption.text() === "-- 공간을 선택해주세요 --") {
-                    select_host_space_id.removeClass("is-valid").addClass("is-invalid"); // invalid 스타일 적용
+                // 공간 선택 유효성 검사
+                if (!select_host_space_id.val() || select_host_space_id.val() === "") {
+                    select_host_space_id.addClass("is-invalid");
                     $("#space_invalid").show();
                     valid = false;
                 } else {
-                    select_host_space_id.removeClass("is-invalid").addClass("is-valid"); // valid 스타일 적용
+                    select_host_space_id.removeClass("is-invalid");
                     $("#space_invalid").hide();
                 }
 
-                // 기본 유효성 검사 (required 등) 처리
-                if (!this.checkValidity() || !valid) { 
-                    event.preventDefault();  // 기본 제출 동작 차단
-                    event.stopPropagation(); // 객체로 이벤트 전파 중지
+                // 최대 수용 인원 유효성 검사
+                if (max_headcount.val() < 1 || max_headcount.val() > 99) {
+                    max_headcount.addClass("is-invalid");
+                    valid = false;
+                } else {
+                    max_headcount.removeClass("is-invalid");
                 }
-                // 유효성 검사 결과 스타일 적용
+
+                // 예약 시간 단위 유효성 검사
+                if (time_slot.val() < 1 || time_slot.val() > 24) {
+                    time_slot.addClass("is-invalid");
+                    valid = false;
+                } else {
+                    time_slot.removeClass("is-invalid");
+                }
+
+                // 운영 시간 유효성 검사
+                if (!open_time.val() || !close_time.val()) {
+                    open_time.addClass("is-invalid");
+                    close_time.addClass("is-invalid");
+                    valid = false;
+                } else {
+                    open_time.removeClass("is-invalid");
+                    close_time.removeClass("is-invalid");
+                }
+
+                if (!this.checkValidity() || !valid) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
                 $(this).addClass('was-validated');
             });
 
+            // 운영시간에 동적으로 시간 옵션 생성 및 기존 데이터 설정
+            populateTimeOptions([[${ productDTO.open_time }]], [[${ productDTO.close_time }]]);
 
-        }); // ready evnet end
+            function populateTimeOptions(openTime, closeTime) {
+                $('.time-select').each(function () {
+                    for (let i = 0; i < 24; i++) {
+                        const hour = i.toString().padStart(2, '0');
+                        const option = $('<option>', {
+                            value: `${hour}:00`,
+                            text: `${hour}:00`
+                        });
 
-    </script>
-    <script>
-        // ckeditor 설정
-        const ckeditor_config_intro = {
-            removeButtons : "Image",
-            editorplaceholder: "상품에 대한 자세한 설명을 입력해주세요."
-        }
-        
-        // id="content"인 textarea태그에 ckeditor_config변수가 가지고 있는 설정 정보를 적용하겠다.
-        CKEDITOR.replace('product_intro', ckeditor_config_intro);
+                        // HH:mm:ss 형식에서 HH:mm 추출
+                        const openTimeHHMM = openTime ? openTime.substring(0, 5) : "";
+                        const closeTimeHHMM = closeTime ? closeTime.substring(0, 5) : "";
 
-        if (!CKEDITOR.tools.debounce) {
-            CKEDITOR.tools.debounce = function(func, wait) {
-                var timeout;
-                return function() {
-                    var context = this, args = arguments;
-                    clearTimeout(timeout);
-                    timeout = setTimeout(function() {
-                        func.apply(context, args);
-                    }, wait);
-                };
+                        if (this.id === 'open_time' && `${hour}:00` === openTimeHHMM) {
+                            option.attr('selected', 'selected');
+                        }
+                        if (this.id === 'close_time' && `${hour}:00` === closeTimeHHMM) {
+                            option.attr('selected', 'selected');
+                        }
+                        $(this).append(option);
+                    }
+                });
+            }
+
+
+            //CKEDITOR 설정
+            const ckeditor_config_intro = {
+                removeButtons: "Image",
+                editorplaceholder: "상품에 대한 자세한 설명을 입력해주세요."
             };
-        }
+            CKEDITOR.replace('product_intro', ckeditor_config_intro);
+
+
+            if (!CKEDITOR.tools.debounce) {
+                CKEDITOR.tools.debounce = function (func, wait) {
+                    var timeout;
+                    return function () {
+                        var context = this, args = arguments;
+                        clearTimeout(timeout);
+                        timeout = setTimeout(function () {
+                            func.apply(context, args);
+                        }, wait);
+                    };
+                };
+            }
+
+        });
+
     </script>
 </th:block>
 </html>

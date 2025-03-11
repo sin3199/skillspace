@@ -1,6 +1,5 @@
 /* Show it is fixed to the top */
 body {
-  padding-top: 57px;
   min-width: 320px; /* 모바일 최소 너비 설정 */
   overflow-x: auto;
   background-color: #dee2e6;

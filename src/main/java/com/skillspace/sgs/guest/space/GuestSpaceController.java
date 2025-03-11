@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.skillspace.sgs.admin.category.AdminCategoryService;
+import com.skillspace.sgs.admin.images.ImagesDTO;
 import com.skillspace.sgs.common.utils.PageMaker;
 import com.skillspace.sgs.common.utils.SearchCriteria;
+import com.skillspace.sgs.host.product.HostProductDTO;
 import com.skillspace.sgs.host.space.HostSpaceDTO;
 
 import lombok.RequiredArgsConstructor;
@@ -49,6 +51,7 @@ public class GuestSpaceController {
 		model.addAttribute("cateInfo", adminCategoryService.getCategoryById(cate_id));
 	}
 	
+	// 게스트 공간 목록에 공간 목록 추가
 	@GetMapping("/loadMore")
 	public ResponseEntity<Map<String, Object>> listMore (Integer cate_id,
 			SearchCriteria cri, Integer totalCount, Integer displayPageNum) throws Exception {
@@ -71,17 +74,50 @@ public class GuestSpaceController {
 		return ResponseEntity.ok(map);
 	}
 	
-	// 이미지 경로 구분자를 변경
-	private List<HostSpaceDTO> separatorChange(List<HostSpaceDTO> spaceList) {
-		spaceList.forEach(space_info -> {
-			space_info.getImages().forEach(image_info -> {
-				image_info.setImage_up_folder(image_info.getImage_up_folder().replace("\\", "/"));
-			});
-		});
-		return spaceList;
+	// 게스트 공간 상세 페이지
+	@GetMapping("/spaceDetail")
+	public void detail(Integer host_space_id, Model model) throws Exception {
+		
+		// 1) 공간 상세 정보(이미지 포함)
+		HostSpaceDTO hostSpaceDTO = guestSpaceService.getHostSpaceWithImages(host_space_id);
+		
+		List<ImagesDTO> images = hostSpaceDTO.getImages();
+		if(!images.isEmpty()) {
+			images.forEach(this::changeImageUpFolder);
+			hostSpaceDTO.setImages(images);
+		}
+		
+		// 2) 공간의 상품 목록(이미지 포함)
+		List<HostProductDTO> productList = guestSpaceService.getProductsWithImages(host_space_id);
+		separatorChange(productList);
+		
+		model.addAttribute("spaceInfo", hostSpaceDTO);
+		model.addAttribute("productList", productList);
 	}
 	
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	// 이미지 경로 구분자를 변경
+	private <T> List<T> separatorChange(List<T> dtoList) {
+	    dtoList.forEach(dto -> {
+	        if (dto instanceof HostSpaceDTO) {
+	            ((HostSpaceDTO) dto).getImages().forEach(this::changeImageUpFolder);
+	        } else if (dto instanceof HostProductDTO) {
+	            ((HostProductDTO) dto).getImages().forEach(this::changeImageUpFolder);
+	        }
+	    });
+	    return dtoList;
+	}
+	private void changeImageUpFolder(ImagesDTO imageInfo) {
+	    	imageInfo.setImage_up_folder(imageInfo.getImage_up_folder().replace("\\", "/"));
+	}
+
 }

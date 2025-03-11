@@ -188,6 +188,10 @@
                            th:data-created_at="${#temporals.format(product.created_at, 'yyyy-MM-dd HH:mm:ss')}"
                            th:data-updated_at="${#temporals.format(product.updated_at, 'yyyy-MM-dd HH:mm:ss')}"
                            th:data-product_intro="${product.product_intro}"
+                           th:data-max_headcount="${product.max_headcount}"  
+                           th:data-time_slot="${product.time_slot}"
+                           th:data-open_time="${product.open_time}"
+                           th:data-close_time="${product.close_time}"
                         >상세보기</button>
                      </td>
                   </tr>
@@ -263,6 +267,10 @@
                         <p><span class="fw-bold">노출/숨김:</span> <span id="modalIsVisible"></span></p>
                         <p><span class="fw-bold">등록일:</span> <span id="modalCreatedAt"></span></p>
                         <p><span class="fw-bold">수정일:</span> <span id="modalUpdatedAt"></span></p>
+                        <p><span class="fw-bold">최대 수용 인원:</span> <span id="modalMaxHeadcount"></span>명</p>
+                        <p><span class="fw-bold">예약 시간 단위:</span> <span id="modalTimeSlot"></span>시간</p>
+                        <p><span class="fw-bold">운영 시작 시간:</span> <span id="modalOpenTime"></span></p>
+                        <p><span class="fw-bold">운영 종료 시간:</span> <span id="modalCloseTime"></span></p>
                      </div>
                   </div>
                   <hr>
@@ -476,6 +484,11 @@
                const createdAt = this.dataset.created_at;
                const updatedAt = this.dataset.updated_at;
                const productIntro = this.dataset.product_intro;
+               const maxHeadcount = this.dataset.max_headcount;
+               const timeSlot = this.dataset.time_slot;
+               const openTime = this.dataset.open_time;
+               const closeTime = this.dataset.close_time;
+
 
                const imageCarousel = document.getElementById('carousel-inner');
 
@@ -527,6 +540,11 @@
                document.getElementById('modalCreatedAt').textContent = createdAt;
                document.getElementById('modalUpdatedAt').textContent = updatedAt;
                document.getElementById('modalProductIntro').innerHTML = productIntro;
+               document.getElementById('modalMaxHeadcount').textContent = maxHeadcount;
+               document.getElementById('modalTimeSlot').textContent = timeSlot;
+               document.getElementById('modalOpenTime').textContent = openTime;
+               document.getElementById('modalCloseTime').textContent = closeTime;
+
 
                const carouselInner = document.querySelector('.carousel-inner');
 

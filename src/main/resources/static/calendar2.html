@@ -211,15 +211,15 @@
 
     <main class="container">
         <style>
-            /* 전체 컨테이너 */
+            /* 예약 컨테이너 스타일 */
             .reservation-container {
-                font-family: 'Noto Sans KR', sans-serif;
-                width: 95%; /* 기본적으로 화면 너비의 95%를 차지하게 합니다. */
-                margin: auto;
-                background-color: #f9f9f9;
-                border-radius: 15px;
+                max-width: 100%;
+                width: 100%;
+                margin: 0;
+                border-radius: 0;
+                padding: 10px;
                 box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-                padding: 20px;
+                background-color: transparent;
             }
         
             /* 날짜 선택 섹션 */
@@ -255,39 +255,56 @@
                 font-weight: bold;
                 color: #333;
             }
-        
-            /* 캘린더 테이블 */
-            .calendar {
+
+            .week {
+                display: flex;
+                flex-wrap: wrap;    /* 한 줄에 7개의 셀을 배치하고 줄 바꿈 */
+                margin-top: 10px;
                 width: 100%;
-                border-collapse: collapse;
+            }
+
+            .week .dayOfWeek {
+                flex: 0 0 calc(100% / 7);   /* 7일(일주일)을 기준으로 너비 설정 */
+                aspect-ratio: 2 / 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: 1px solid #ddd;
+                box-sizing: border-box;
+                color: #999999;
+                font-size: 1rem;
+                font-weight: bold;
+            }
+        
+            /* 달력 스타일 (Flexbox 사용) */
+            .calendar {
+                display: flex;
+                flex-wrap: wrap;    /* 한 줄에 7개의 셀을 배치하고 줄 바꿈 */
+                width: 100%;
                 margin-top: 10px;
             }
         
-            .calendar th {
-                text-align: center;
-                padding-bottom: 10px;
-                color: #999999;
-                font-size: 14px;
-            }
-        
-            .calendar td {
-                text-align: center;
-                /* padding: 15px;  고정 패딩 제거 */
-                padding: 2.5vw; /* vw 단위를 사용하여 뷰포트 너비에 따라 동적으로 조절되도록 설정 */
-                border-radius: 50%;
+            .calendar .day {
+                flex: 0 0 calc(100% / 7);   /* 7일(일주일)을 기준으로 너비 설정 */
+                aspect-ratio: 1 / 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: 1px solid #ddd;
+                box-sizing: border-box;
                 cursor: pointer;
                 transition: all 0.2s;
-                font-size: 1rem; /* 기본 글꼴 크기 */
+                font-size: 1rem;
             }
-             /* 작은 화면에서 글꼴 크기 조정 */
-             @media (max-width: 360px) {
-                .calendar td {
-                    font-size: 0.8rem; /* 글꼴 크기 축소 */
-                }
-             }
         
-            .calendar td:hover {
-                background-color: #f3f1ff; /* hover 효과 */
+            /* 작은 화면에서 폰트 크기 조정 */
+            @media (max-width: 360px) {
+                .calendar .day {
+                    font-size: 0.7rem !important;
+                }
+                .week .dayOfWeek {
+                    font-size: 0.7rem !important;
+                }
             }
         
             /* 상태별 스타일 */
@@ -307,34 +324,13 @@
                 color: white !important;
             }
         
-            .legend span {
-                display: inline-block;
-                width: 20px;
-                height: 20px;
-                margin-right: 10px;
-                border-radius: 3px;
-            }
-        
-            /* 텍스트 스타일 */
-            .legend {
-                display: flex;
-                align-items: center;
-            }
-        
-            .legend span+span {
-                margin-left: 15px;
-                /* 각 아이콘 사이 간격 */
-            }
-        
             /* 요일별 색상 */
             .sat {
                 color: #4a90e2 !important;
-                /* 파란색 */
             }
         
             .sun {
                 color: #e94e77 !important;
-                /* 빨간색 */
             }
         
             /* 선택된 날짜 표시 */
@@ -342,6 +338,19 @@
                 color: #704de4;
                 font-size: 14px;
                 font-weight: bold;
+            }
+        
+            /* 범례 스타일 */
+            .legend {
+                font-size: 14px;
+                margin-top: 10px;
+            }
+        
+            .legend span {
+                display: inline-block;
+                width: 10px;
+                height: 10px;
+                margin-right: 5px;
             }
         
             /* 시간 선택 섹션 */
@@ -370,217 +379,209 @@
         
         
 
+        <div class="card">
 
-    <div class="reservation-container card mt-3">
-        <div class="date-selection">
-            <div class="d-flex justify-content-between">
-                <h5 class="fw-bold">날짜 선택</h5>
-                <div class="selectedDate" id="selectedDate"></div>
-            </div>
-            <div class="calendar-header">
-                <button id="prev-month">&lt;</button>
-                <span class="fw-bold" id="current-month">2025.03</span>
-                <button id="next-month">&gt;</button>
-            </div>
-            <table class="calendar">
-                <thead>
-                    <tr>
-                        <th>SUN</th>
-                        <th>MON</th>
-                        <th>TUE</th>
-                        <th>WED</th>
-                        <th>THU</th>
-                        <th>FRI</th>
-                        <th>SAT</th>
-                    </tr>
-                </thead>
-                <tbody id="calendar-body"></tbody>
-            </table>
-            <div class="legend">
-                <span class="unavailable p-2"></span>예약불가
-                <span class="today p-2"></span>오늘
-                <span class="selected p-2"></span>선택
+            <div class="reservation-container card mt-3">
+                <div class="date-selection">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="fw-bold">날짜 선택</h5>
+                        <div class="selectedDate" id="selectedDate"></div>
+                    </div>
+                    <div class="calendar-header">
+                        <button id="prev-month">&lt;</button>
+                        <span class="fw-bold" id="current-month">2025.03</span>
+                        <button id="next-month">&gt;</button>
+                    </div>
+                    <div>
+                        <div></div>
+                    </div>
+                    <div class="week">
+                        <div class="dayOfWeek">SUN</div>
+                        <div class="dayOfWeek">MON</div>
+                        <div class="dayOfWeek">TUE</div>
+                        <div class="dayOfWeek">WED</div>
+                        <div class="dayOfWeek">THU</div>
+                        <div class="dayOfWeek">FRI</div>
+                        <div class="dayOfWeek">SAT</div>
+                    </div>
+                    <div class="calendar">
+                        <!-- 날짜 셀은 JavaScript로 동적으로 생성됩니다 -->
+                    </div>
+                    <div class="legend">
+                        <span class="unavailable"></span>예약불가
+                        <span class="today"></span>오늘
+                        <span class="selected"></span>선택
+                    </div>
+                </div>
+            
+                <div class="time-selection">
+                    <h2>시간 선택</h2>
+                    <div id="time-slots"></div>
+                </div>
             </div>
         </div>
-    
-        <div class="time-selection">
-            <h2>시간 선택</h2>
-            <div id="time-slots"></div>
-        </div>
-    </div>
 
   <script>
     $(document).ready(function () {
-        // 달력과 시간 슬롯을 표시할 주요 DOM 요소를 선택합니다.
-        const $calendarBody = $("#calendar-body"); // 달력의 날짜 부분
-        const $currentMonth = $("#current-month"); // 현재 월 표시
-        const today = new Date(); // 오늘 날짜를 가져옵니다.
-        today.setHours(0, 0, 0, 0); // 시간, 분, 초, 밀리초를 0으로 설정
-        let selectedDate = null; // 선택된 날짜를 저장할 변수
-        let currentYear = today.getFullYear();
-        let currentMonth = today.getMonth();
+        const $calendar = $(".calendar");
+    const $currentMonth = $("#current-month");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    let selectedDate = null;
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth();
 
-        /**
-         * 달력을 렌더링하는 함수
-         * @param {number} year - 렌더링할 연도의 값
-         * @param {number} month - 렌더링할 월의 값 (0부터 시작)
-         */
-        function renderCalendar(year, month) {
-            const firstDay = new Date(year, month, 1).getDay(); // 해당 월의 첫 번째 날의 요일 (0: 일요일 ~ 6: 토요일)
-            const lastDate = new Date(year, month + 1, 0).getDate(); // 해당 월의 마지막 날짜
-            const prevMonthLastDate = new Date(year, month, 0).getDate(); // 이전 달의 마지막 날짜
+    /**
+     * 달력을 렌더링하는 함수
+     * @param {number} year - 렌더링할 연도의 값
+     * @param {number} month - 렌더링할 월의 값 (0부터 시작)
+     */
+    function renderCalendar(year, month) {
+        const firstDay = new Date(year, month, 1).getDay(); // 해당 월의 첫 번째 날의 요일 (0: 일요일 ~ 6: 토요일)
+        const lastDate = new Date(year, month + 1, 0).getDate(); // 해당 월의 마지막 날짜
+        const prevMonthLastDate = new Date(year, month, 0).getDate(); // 이전 달의 마지막 날짜
 
-            $calendarBody.empty(); // 이전 달력 데이터를 초기화합니다.
-            $currentMonth.text(`${year}.${String(month + 1).padStart(2, "0")}`); // 현재 월을 표시합니다.
+        $calendar.empty(); // 이전 달력 데이터를 초기화
+        $currentMonth.text(`${year}.${String(month + 1).padStart(2, "0")}`); // 현재 월 표시
 
-            let date = 1; // 날짜 시작 값
-            let prevMonthDate = prevMonthLastDate - firstDay + 1; // 이전 달 날짜 시작 값
-            let nextMonthDate = 1; // 다음 달 날짜 시작 값
+        // 달력에 표시될 날짜 수 (이전 달 + 현재 달 + 다음 달)
+        const totalCells = 42; // 6주 * 7일
 
-            for (let i = 0; i < 6; i++) { // 최대 주 수는 보통 한 달에 약 6주
-                const $row = $("<tr></tr>"); // 새로운 행을 만듭니다.
-
-                for (let j = 0; j < 7; j++) { // 한 주는 항상 7일로 구성됩니다.
-                    const $cell = $("<td></td>"); // 새로운 셀을 만듭니다.
-
-                    let cellDate; // 날짜 객체를 저장할 변수 선언
-
-                    if (i === 0 && j < firstDay) {
-                        // 첫 번째 행에서 첫날 이전은 이전 달의 마지막 주 날짜로 채웁니다.
-                        $cell.text(prevMonthDate);
-
-                        cellDate = new Date(year, month - 1, prevMonthDate); // 이전 달의 날짜 객체 생성
-                        prevMonthDate++;
-                    } else if (date > lastDate) {
-                        // 마지막 날짜 이후는 다음 달의 날짜로 채웁니다.
-                        $cell.text(nextMonthDate);
-
-                        cellDate = new Date(year, month + 1, nextMonthDate); // 다음 달의 날짜 객체 생성
-                        nextMonthDate++;
-                    } else {
-                        $cell.text(date); // 셀에 날짜를 설정합니다.
-
-                        cellDate = new Date(year, month, date); // 이번 달의 날짜 객체 생성
-
-                        if (cellDate.toDateString() === today.toDateString()) {
-                            $cell.addClass("today"); // 오늘 날짜에 특별한 스타일을 추가합니다.
-                        }
-
-                        date++; // 다음 날짜로 이동합니다.
-                    }
-
-                    if(j === 0){
-                        $cell.addClass("sun");
-                    }else if(j === 6){
-                        $cell.addClass("sat");
-                    }
-
-                    // 날짜 비활성화 처리
-                    if (cellDate < today) {
-                        $cell.addClass("unavailable");
-                    } else {
-                        // 이전달, 이번달, 다음달 모두 클릭이벤트 추가
-                        $cell.on("click", function () {
-                            selectDate(cellDate, $(this)); // 클릭 이벤트로 날짜를 선택합니다.
-                        });
-                    }
-
-                    $row.append($cell); // 행에 셀을 추가합니다.
-                }
-
-                $calendarBody.append($row); // 달력 본문에 행을 추가합니다.
-            }
-
-            renderTimeSlots(); // 시간 슬롯을 렌더링합니다.
+        // 이전 달 날짜 채우기
+        for (let i = firstDay - 1; i >= 0; i--) {
+            const prevDate = prevMonthLastDate - i;
+            const $cell = createDayCell(prevDate, year, month - 1);
+            $calendar.append($cell);
         }
 
-        /**
-         * 날짜 선택 함수
-         * @param {Date} date - 선택된 날짜 객체
-         * @param {jQuery} $cell - 선택된 셀 요소
-         */
-        function selectDate(date, $cell) {
-            if ($cell.hasClass("unavailable")) {
-                return; // 선택할 수 없는 날짜인 경우 함수를 종료합니다.
-            }
-            if (selectedDate) selectedDate.removeClass("selected"); // 이전 선택된 셀에서 스타일 제거
-
-            selectedDate = $cell; // 현재 선택된 셀 저장
-            selectedDate.addClass("selected"); // 선택 스타일 추가
-
-            $("#selectedDate").text(formatDate(date)); // 선택된 날짜를 지정된 형식으로 표시
-
-            renderTimeSlots(); // 시간 슬롯을 다시 렌더링합니다.
+        // 현재 달 날짜 채우기
+        for (let date = 1; date <= lastDate; date++) {
+            const $cell = createDayCell(date, year, month);
+            $calendar.append($cell);
         }
 
-        /**
-         * 날짜를 "년.월.일 (요일)" 형식으로 변환하는 함수
-         * @param {Date} date - 날짜 객체
-         * @returns {string} - 포맷된 날짜 문자열
-         */
-            function formatDate(date) {
-            const year = date.getFullYear();
-            const month = date.getMonth() + 1; // getMonth()는 0부터 시작하므로 1을 더합니다.
-            const day = date.getDate();
-            const dayOfWeek = date.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
+        // 다음 달 날짜 채우기
+        const remainingCells = totalCells - (firstDay + lastDate);
+        for (let date = 1; date <= remainingCells; date++) {
+            const $cell = createDayCell(date, year, month + 1);
+            $calendar.append($cell);
+        }
+        renderTimeSlots();
+    }
 
-            const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"]; // 요일 문자열 배열
-            const dayOfWeekString = daysOfWeek[dayOfWeek]; // 해당 요일에 맞는 문자열 가져오기
+    /**
+     * 날짜 셀을 생성하는 함수
+     * @param {number} date - 날짜
+     * @param {number} year - 연도
+     * @param {number} month - 월 (0부터 시작)
+     * @returns {jQuery} - 생성된 날짜 셀 jQuery 객체
+     */
+    function createDayCell(date, year, month) {
+        const $cell = $("<div class='day'></div>").text(date);
+        const cellDate = new Date(year, month, date);
 
-            return `${year}.${month}.${day} (${dayOfWeekString})`; // 원하는 형식으로 조합하여 반환
+        // 요일에 따른 클래스 추가
+        const dayOfWeek = cellDate.getDay();
+        if (dayOfWeek === 0) $cell.addClass("sun");
+        else if (dayOfWeek === 6) $cell.addClass("sat");
+
+        // 오늘 날짜 처리
+        if (cellDate.toDateString() === today.toDateString()) {
+            $cell.addClass("today");
         }
 
-        /**
-         * 시간 슬롯 렌더링 함수
-         */
-        function renderTimeSlots() {
-            const $timeSlotsContainer = $("#time-slots"); // 시간 슬롯 컨테이너 선택
-            $timeSlotsContainer.empty(); // 기존 시간 슬롯 초기화
-
-            for (let hour = 9; hour <= 15; hour++) { // 예약 가능한 시간 범위 설정 (9시 ~ 15시)
-                const $slot = $("<button></button>")
-                    .text(`${hour}:00`) // 버튼 텍스트 설정
-                    .addClass("time-slot"); // 버튼 스타일 클래스 추가
-
-                $slot.on("click", function () {
-                    alert(`${hour}:00 예약 완료!`); // 클릭 시 알림 메시지 표시
-                });
-
-                $timeSlotsContainer.append($slot); // 컨테이너에 버튼 추가
-            }
+        // 날짜 비활성화 처리 (오늘 이전 날짜는 선택 불가)
+        if (cellDate < today) {
+            $cell.addClass("unavailable");
+        } else {
+            $cell.on("click", function () {
+                selectDate(cellDate, $(this));
+            });
         }
 
-        /**
-         * 이전/다음 월 이동 버튼 이벤트 처리
-         */
-        $("#prev-month").on("click", function () {
-            if(currentYear === today.getFullYear() && currentMonth === today.getMonth()){
-                return;
-            }
-            currentMonth--;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
-            renderCalendar(currentYear, currentMonth); // 달력을 다시 렌더링
-        });
+        return $cell;
+    }
 
-        $("#next-month").on("click", function () {
-            if(currentYear === today.getFullYear() && currentMonth === today.getMonth()+1){
-                return;
-            }
-            currentMonth++;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-            renderCalendar(currentYear, currentMonth); // 달력을 다시 렌더링
-        });
+    /**
+     * 날짜 선택 함수
+     * @param {Date} date - 선택된 날짜 객체
+     * @param {jQuery} $cell - 선택된 셀 요소
+     */
+    function selectDate(date, $cell) {
+        if ($cell.hasClass("unavailable")) return;
+        if (selectedDate) selectedDate.removeClass("selected");
+        selectedDate = $cell;
+        selectedDate.addClass("selected");
+        $("#selectedDate").text(formatDate(date));
+        renderTimeSlots();
+    }
 
-        /**
-         * 초기 렌더링 실행
-         */
+    /**
+     * 날짜를 "년.월.일 (요일)" 형식으로 변환하는 함수
+     * @param {Date} date - 날짜 객체
+     * @returns {string} - 포맷된 날짜 문자열
+     */
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const dayOfWeek = date.getDay();
+        const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
+        const dayOfWeekString = daysOfWeek[dayOfWeek];
+        return `${year}.${month}.${day} (${dayOfWeekString})`;
+    }
+
+    /**
+     * 이전/다음 월 이동 버튼 이벤트 처리
+     */
+    $("#prev-month").on("click", function () {
+        if (currentYear === today.getFullYear() && currentMonth === today.getMonth()) {
+            return; // 오늘 이전으로는 이동 불가
+        }
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
         renderCalendar(currentYear, currentMonth);
+    });
+
+    $("#next-month").on("click", function () {
+        if(currentYear === today.getFullYear() && currentMonth === today.getMonth()+1){
+                return;
+            }
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar(currentYear, currentMonth);
+    });
+
+    /**
+     * 초기 렌더링 실행
+     */
+    renderCalendar(currentYear, currentMonth);
+
+    /**
+     * 시간 슬롯 렌더링 함수
+     */
+        function renderTimeSlots() {
+        const $timeSlotsContainer = $("#time-slots"); // 시간 슬롯 컨테이너 선택
+        $timeSlotsContainer.empty(); // 기존 시간 슬롯 초기화
+
+        for (let hour = 9; hour <= 15; hour++) { // 예약 가능한 시간 범위 설정 (9시 ~ 15시)
+            const $slot = $("<button></button>")
+                .text(`${hour}:00`) // 버튼 텍스트 설정
+                .addClass("time-slot"); // 버튼 스타일 클래스 추가
+
+            $slot.on("click", function () {
+                alert(`${hour}:00 예약 완료!`); // 클릭 시 알림 메시지 표시
+            });
+
+            $timeSlotsContainer.append($slot); // 컨테이너에 버튼 추가
+        }
+    }
     });
 
 

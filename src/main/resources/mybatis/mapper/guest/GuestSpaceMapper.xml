@@ -29,6 +29,49 @@
 		s.cate_id = #{cate_id}
 </select>
 
+<select id="getHostSpaceWithImages" parameterType="Int" resultMap="SpaceWithImageMap">
+	select 
+		host_space_id,
+		user_id,
+		cate_id,
+		space_name,
+		main_title,
+		sub_title,
+		space_intro,
+		space_guide,
+		space_zipcode,
+		space_addr,
+		space_addrdetail,
+		created_at,
+		updated_at,
+		is_visible
+	from
+		host_space
+	where 
+		host_space_id = #{host_space_id}
+</select>
+
+<select id="getProductsWithImages" parameterType="Int" resultMap="ProductWithImageMap">
+	select
+		product_id,
+		host_space_id,
+		name,
+		product_intro,
+		price,
+		max_headcount,
+		created_at,
+		updated_at,
+		is_visible,
+		created_at,
+		updated_at,
+		is_visible
+	from 
+		products
+	where
+		host_space_id = #{host_space_id}
+	limit 0, 4
+</select>
+
 <resultMap id="SpaceWithCateAndImageMap" type="com.skillspace.sgs.host.space.HostSpaceDTO">
 	<!-- HostSpaceDTO 기본 정보 -->
     <id property="host_space_id" column="host_space_id"/> <!-- Review PK -->
@@ -46,13 +89,6 @@
     <result property="updated_at" column="updated_at"/>
     <result property="is_visible" column="is_visible"/>
     
-    <!-- Category 1:1 매핑 
-    <association 
-    	property="category" 
-	    javaType="com.skillspace.sgs.admin.category.CategoryDTO" 
-	    column="cate_id" 
-	    select="selectCategory"/> -->
-    
      <!-- Images 1:N 매핑 -->
      <collection 
      	property="images" 
@@ -69,21 +105,6 @@
      	column="host_space_id" 
      	select="selectProductPrice"/>
 </resultMap>
-
-<!-- Category 정보 조회 
-<select id="selectCategory" resultType="com.skillspace.sgs.admin.category.CategoryDTO">
-    select
-        cate_id,
-        cate_prtcode,
-        cate_name,
-        level,
-        sort_order
-    from
-        category
-    where
-        cate_id = #{cate_id}
-</select> -->
-
 
 <!-- images 목록 조회 -->
 <select id="selectImages" resultType="com.skillspace.sgs.admin.images.ImagesDTO">
@@ -109,5 +130,55 @@
 	where 
 		host_space_id = #{host_space_id}
 </select>
+
+<resultMap id="SpaceWithImageMap" type="com.skillspace.sgs.host.space.HostSpaceDTO">
+	<!-- HostSpaceDTO 기본 정보 -->
+    <id property="host_space_id" column="host_space_id"/> <!-- Review PK -->
+    <result property="user_id" column="user_id"/>
+    <result property="cate_id" column="cate_id"/>
+    <result property="space_name" column="space_name"/>
+    <result property="main_title" column="main_title"/>
+    <result property="sub_title" column="sub_title"/>
+    <result property="space_intro" column="space_intro"/>
+    <result property="space_guide" column="space_guide"/>
+    <result property="space_zipcode" column="space_zipcode"/>
+    <result property="space_addr" column="space_addr"/>
+    <result property="space_addrdetail" column="space_addrdetail"/>
+    <result property="created_at" column="created_at"/>
+    <result property="updated_at" column="updated_at"/>
+    <result property="is_visible" column="is_visible"/>
+    
+     <!-- Images 1:N 매핑 -->
+     <collection 
+     	property="images" 
+     	javaType="java.util.ArrayList" 
+     	ofType="com.skillspace.sgs.admin.images.ImagesDTO" 
+     	column="host_space_id" 
+     	select="selectImages"/>
+</resultMap>
+
+<resultMap id="ProductWithImageMap" type="com.skillspace.sgs.host.product.HostProductDTO">
+	<!-- HostProductDTO 기본 정보 -->
+    <id property="product_id" column="product_id"/> <!-- Review PK -->
+    <result property="host_space_id" column="host_space_id"/>
+    <result property="name" column="name"/>
+    <result property="product_intro" column="product_intro"/>
+    <result property="price" column="price"/>
+    <result property="max_headcount" column="max_headcount"/>
+    <result property="created_at" column="created_at"/>
+    <result property="updated_at" column="updated_at"/>
+    <result property="is_visible" column="is_visible"/>
+    <result property="time_slot" column="time_slot"/>
+    <result property="open_time" column="open_time"/>
+    <result property="close_time" column="close_time"/>
+    
+     <!-- Images 1:N 매핑 -->
+        <collection 
+        	property="images" 
+        	javaType="java.util.ArrayList" 
+        	ofType="com.skillspace.sgs.admin.images.ImagesDTO" 
+        	column="product_id" 
+        	select="selectImages"/>
+</resultMap>
 
 </mapper>

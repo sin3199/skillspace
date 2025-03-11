@@ -96,7 +96,7 @@
         <div class="row" id="spaceCardList">
             <div class="col-md-4 col-sm-6" th:each="spaceInfo : ${spaceList}">
                 <div class="card product-card">
-                    <a class="stretched-link" th:href="@{/guest/space/detail(host_space_id=${spaceInfo.host_space_id})}"></a>
+                    <a class="stretched-link" th:href="@{/guest/space/spaceDetail(host_space_id=${spaceInfo.host_space_id})}"></a>
                     <img th:if="${!spaceInfo.images.isEmpty()}" 
                             th:src="@{|/api/image/display/${spaceInfo.images[0]?.image_up_folder}/s_${spaceInfo.images[0]?.image_name}|}"
                             class="card-img-top product-image" 
@@ -203,7 +203,7 @@
                                 const html = `
                                     <div class="col-md-4 col-sm-6">
                                         <div class="card product-card">
-                                            <a class="stretched-link" href="/guest/space/detail?host_space_id=${spaceInfo.host_space_id}"></a>
+                                            <a class="stretched-link" href="/guest/space/spaceDetail?host_space_id=${spaceInfo.host_space_id}"></a>
                                             <img src="${imageUrl}" class="card-img-top product-image" alt="${image ? '공간 대표 이미지' : '이미지 없음'}">
                                             <div class="card-body">
                                                 <h5 class="product-title">${spaceInfo.main_title}</h5>

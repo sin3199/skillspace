@@ -26,9 +26,13 @@
 		p.name,
 		p.product_intro,
 		p.price,
+		p.max_headcount,
 		p.created_at,
 		p.updated_at,
-		p.is_visible 
+		p.is_visible,
+		p.time_slot,
+		p.open_time,
+		p.close_time
 	from 
 		products p
 	inner join 
@@ -56,7 +60,11 @@
 			name,
 			product_intro,
 			price,
-			is_visible 
+			max_headcount,
+			is_visible,
+			time_slot,
+			open_time,
+			close_time
 		)
 		values(
 			#{host_space_id},
@@ -64,7 +72,11 @@
 			#{name},
 			#{product_intro},
 			#{price},
-			#{is_visible}
+			#{max_headcount},
+			#{is_visible},
+			#{time_slot},
+			#{open_time},
+			#{close_time}
 		)
 </insert>
 
@@ -76,9 +88,13 @@
 		name,
 		product_intro,
 		price,
+		max_headcount,
 		created_at,
 		updated_at,
-		is_visible 
+		is_visible,
+		time_slot,
+		open_time,
+		close_time
 	from 
 		products
 	where
@@ -93,8 +109,13 @@
 		name = #{name},
 		product_intro = #{product_intro},
 		price = #{price},
+		max_headcount = #{max_headcount},
 		updated_at = now(),
-		is_visible = #{is_visible}
+		is_visible = #{is_visible},
+		time_slot = #{time_slot},
+		open_time = #{open_time},
+		close_time = #{close_time}
+		
 	where
 		product_id = #{product_id}
 </update>
@@ -132,8 +153,13 @@
     <result property="name" column="name"/>
     <result property="product_intro" column="product_intro"/>
     <result property="price" column="price"/>
+    <result property="max_headcount" column="max_headcount"/>
     <result property="created_at" column="created_at"/>
     <result property="updated_at" column="updated_at"/>
+    <result property="is_visible" column="is_visible"/>
+    <result property="time_slot" column="time_slot"/>
+    <result property="open_time" column="open_time"/>
+    <result property="close_time" column="close_time"/>
     
     <!-- HostSpace 1:1 매핑 -->
         <association 

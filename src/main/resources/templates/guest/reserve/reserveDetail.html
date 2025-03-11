@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout1}">
+	  
+<th:block layout:fragment="content">
+	<h1 th:text="'예약 상세페이지'">인덱스 홈</h1>
+	
+</th:block>
+
+<th:block layout:fragment="scriptBottom">
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			console.log("넘어온 예약 정보", [[${reservDetailDTO}]]);
+		});	// ready event end
+	</script>
+
+</th:block>
+</html>

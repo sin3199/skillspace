@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout1}">
+	  
+<th:block layout:fragment="css">
+	<style>
+		/* lg 사이즈 이상일 때 적용되는 스타일 */
+		@media (min-width: 992px) {
+			.custom-grid {
+				display: grid !important;
+				align-items: start;
+				grid-template-columns: repeat(12, 1fr);
+				grid-template-rows: min-content 1fr; /* 1행: 콘텐츠 높이만큼, 2행: 남은 공간 차지 */
+				width: 100%;
+			}
+			
+			/* 왼쪽 영역 스타일 */
+			#left {
+				grid-column: 1 /  9; /* 8열 차지 */
+				grid-row: 1; /* 1번 행 */
+				height: min-content;
+			}
+			
+			/* 오른쪽 영역 스타일 */
+			#right {
+				top: 57px;  /* 상단 네비게이션바 높이만큼 여백 */
+				border: 2px solid #dee2e6;  /* 구분선 추가 */
+				padding: 10px;  /* 여백 추가 */
+				background-color: #f8f9fa;  /* 배경색 추가 */
+				box-shadow: -3px 0 5px -5px rgba(0,0,0,0.2);  /* 왼쪽 그림자 효과 */
+				border-radius: 8px;  /* 모서리 둥글게 */
+				grid-column: 9 /  13; /* 4열 차지 */
+				grid-row: 1 /  3; /* 1-2행 차지 */
+				height: min-content; /* 오른쪽 영역 전체 높이 채우기 */
+				overflow-y: auto; /* 내용이 넘칠 경우 스크롤 생성 */
+			}
+	
+			#bottom {
+				grid-column: 1 /  9;
+				grid-row: 2;
+			}
+		}
+	
+		/* 모바일 환경에서 결제 버튼 고정 스타일 */
+		@media (max-width: 992px) {
+			.btn-payment {
+				position: fixed;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				background-color: #fff;
+				padding: 10px;
+				box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+				z-index: 1030;
+			}
+			/* 버튼 위로 컨텐츠가 가려지지 않도록 하단 여백 추가 */
+			#main-row {
+				padding-bottom: 100px;
+			}
+	
+			/* 버튼 스타일 */
+			.btn-payment .btn {
+				border-radius: 4px;
+				margin: 0 10px;
+			}
+		}
+	
+	</style>
+	<style>
+        /* 캐러셀 이미지 설정*/
+        /* 캐러셀 이미지의 고정 높이 설정 */
+        .carousel-image {
+            height: 400px; /* 원하는 고정 높이 */
+            object-fit: cover; /* 이미지 비율을 유지하며 영역 채우기 */
+        }
+
+        /* 반응형 디자인: 작은 화면에서는 높이 축소 */
+        @media (max-width: 768px) {
+            .carousel-image {
+                height: 250px; /* 모바일 화면에서 이미지 높이 조정 */
+            }
+        }
+    </style>
+	<style>
+		/* 스크롤스파이 네비게이션 스타일 */
+		.nav-justified .nav-link {
+			color: #666;
+			border: none;
+			background-color: #fff;
+		}
+	
+		.nav-justified .nav-link.active {
+			color: #6c5ce7;
+			border-bottom: 2px solid #6c5ce7;
+			background: none;
+			font-weight: bold;
+		}
+	
+		
+	</style>
+	<!-- 달력 -->
+	<style>
+		/* 예약 컨테이너 스타일 */
+		.reservation-container {
+			max-width: 100%;
+			width: 100%;
+			margin: 0;
+			border-radius: 0;
+			padding: 10px;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+			background-color: transparent;
+		}
+	
+		/* 날짜 선택 섹션 */
+		.date-selection {
+		}
+	
+		.calendar-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-top: 10px;
+		}
+	
+		.calendar-header button {
+			background-color: #704de4;
+			color: white;
+			border: none;
+			font-size: 16px;
+			padding: 5px 10px;
+			border-radius: 5px;
+			cursor: pointer;
+			transition: background-color 0.3s ease-in-out;
+		}
+	
+		.calendar-header button:hover {
+			background-color: #563bb7;
+		}
+	
+		.current-month {
+			font-size: 16px;
+			font-weight: bold;
+			color: #333;
+		}
+
+		.week {
+			display: flex;
+			margin-top: 10px;
+			width: 100%;
+		}
+
+		.week .dayOfWeek {
+			flex: 0 0 calc(100% / 7);   /* 7일(일주일)을 기준으로 너비 설정 */
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			border: 1px solid #ddd;
+			box-sizing: border-box;
+			color: #999999;
+			font-size: 0.8rem;
+			font-weight: bold;
+			min-width: 0;
+		}
+	
+		/* 달력 스타일 (Flexbox 사용) */
+		.calendar {
+			display: flex;
+			flex-wrap: wrap;    /* 한 줄에 7개의 셀을 배치하고 줄 바꿈 */
+			width: 100%;
+			margin-top: 10px;
+		}
+	
+		.calendar .day {
+			flex: 0 0 calc(100% / 7);   /* 7일(일주일)을 기준으로 너비 설정 */
+			aspect-ratio: 1 / 1;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			border: 1px solid #ddd;
+			box-sizing: border-box;
+			cursor: pointer;
+			transition: all 0.2s;
+			font-size: 1rem;
+		}
+	
+		/* 작은 화면에서 폰트 크기 조정 */
+		@media (max-width: 360px) {
+			.calendar .day {
+				font-size: 0.7rem !important;
+			}
+			.week .dayOfWeek {
+				font-size: 0.7rem !important;
+			}
+		}
+	
+		/* 상태별 스타일 */
+		.unavailable {
+			background-color: #e6e6e6 !important;
+			color: #b2b2b2 !important;
+			pointer-events: none;
+		}
+	
+		.today {
+			background-color: #ffe066 !important;
+			color: black !important;
+		}
+	
+		.selected {
+			background-color: #704de4 !important;
+			color: white !important;
+		}
+	
+		/* 요일별 색상 */
+		.sat {
+			color: #4a90e2 !important;
+		}
+	
+		.sun {
+			color: #e94e77 !important;
+		}
+	
+		/* 선택된 날짜 표시 */
+		.selectedDate {
+			color: #704de4;
+			font-size: 14px;
+			font-weight: bold;
+		}
+	
+		/* 범례 스타일 */
+		.legend {
+			font-size: 14px;
+			margin-top: 10px;
+		}
+	
+		.legend span {
+			display: inline-block;
+			width: 10px;
+			height: 10px;
+			margin-right: 5px;
+		}
+	
+		/* 시간 선택 섹션 */
+
+		.time-selection {
+			
+		}
+	
+		#time-slots button {
+			background-color: white;
+			border: solid 1px #704de4;
+			padding: 4px;
+			margin-bottom: 5px;
+			cursor: pointer;
+	
+			transition: all ease-in-out .3s;
+		}
+	
+		#time-slots button:hover {
+			background: #ddd;
+		}
+	</style>
+</th:block>
+<th:block layout:fragment="content">
+	<div class="row my-4 shadow-lg border-0" id="main-row">
+		<div class="col-12">
+			<!-- 상단 네비게이션 -->
+			<div class="my-3">
+				<h2>[[${spaceInfo.main_title}]]</h2>
+			</div>
+		</div>
+		<div class="col-12">
+			<div class="row custom-grid">
+				<div class="col-12 mb-3" id="left">
+					<div class="card p-md-2">
+						<div id="carouse_main" class="carousel slide carousel-fade" data-bs-ride="carousel">
+							<div class="carousel-inner">
+								<div th:if="${not #lists.isEmpty(spaceInfo.images)}">
+									<div class="carousel-item" th:each="image, iterStat : ${spaceInfo.images}" th:classappend="${iterStat.index == 0 ? 'active' : ''}">
+										<img th:src="@{|/api/image/display/${image.image_up_folder}/${image.image_name}|}" 
+											class="d-block w-100 carousel-image" th:alt="${'Slide' + (iterStat.index + 1)}">
+									</div>
+								</div>
+								<div class="carousel-item active" th:if="${#lists.isEmpty(spaceInfo.images)}">
+									<img src="/images/no-image.png"
+										class="d-block w-100 carousel-image" alt="No Image Available">
+								</div>
+								
+								
+							</div>
+						
+							<button class="carousel-control-prev" type="button" data-bs-target="#carouse_main"
+								data-bs-slide="prev">
+								<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+								<span class="visually-hidden">Previous</span>
+							</button>
+							<button class="carousel-control-next" type="button" data-bs-target="#carouse_main"
+								data-bs-slide="next">
+								<span class="carousel-control-next-icon" aria-hidden="true"></span>
+								<span class="visually-hidden">Next</span>
+							</button>
+						</div>
+						<div class="card-body">
+							<h5 class="card-title">[[${spaceInfo.sub_title}]]</h5>
+						</div>
+					</div>
+					
+				</div>
+
+				
+				<!-- 오른쪽 세부공간 선택 영역 -->
+				<div class="col-12 mb-3" id="right">
+					<div class="card">
+						<div class="card-body">
+							<div class="d-flex justify-content-between align-items-center mb-3">
+								<h4 class="card-title mb-0 text-primary fw-bold">세부공간 선택</h4>
+								<div>
+									<button class="btn btn-link"><i class="bi bi-heart"></i></button>
+								</div>
+							</div>
+
+							<div class="alert alert-info" role="alert">
+								<h6 class="mb-1 fw-bold">결제 후 바로 예약확정</h6>
+								<small>빠르고 확실한 예약을 위해 온라인 결제를 진행하세요 </small>
+							</div>
+					
+							<div class="detailRoom-group mb-3" role="group">
+								<!-- 1번방 -->
+								<div class="" th:each="productInfo, iterStat : ${productList}">
+									<div class="d-flex align-items-center border p-2">
+										<div class="form-check">
+											<input type="radio" 
+												   class="form-check-input" 
+												   name="detailRoom" 
+												   th:id="|room${iterStat.count}|" 
+												   autocomplete="off" 
+												   data-bs-toggle="collapse" 
+												   th:data-bs-target="|#room${iterStat.count}-detail|" 
+												   aria-expanded="false" 
+												   th:aria-controls="|room${iterStat.count}-detail|"
+												   th:checked="${iterStat.count == 1}">
+										</div>
+										<label class="form-check-label d-flex justify-content-between align-items-center flex-grow-1" th:for="|room${iterStat.count}|">
+											<span>[[${productInfo.name}]]</span>
+											<span class="text-nowrap">[[${'₩' + #numbers.formatInteger(productInfo.price, 1, 'COMMA')}]] / 시간</span>
+										</label>
+									</div>
+									<div th:id="|room${iterStat.count}-detail|" class="collapse" th:aria-labelledby="|room${iterStat.count}|">
+										<div class="card">
+											<div th:id="|carouse_product${iterStat.count}|" class="carousel slide carousel-fade" data-bs-ride="carousel">
+												<div class="carousel-inner">
+													<div th:if="${not #lists.isEmpty(productInfo.images)}">
+														<div class="carousel-item" th:each="image, pro_iterStat : ${productInfo.images}" th:classappend="${pro_iterStat.index == 0 ? 'active' : ''}">
+															<img th:src="@{|/api/image/display/${image.image_up_folder}/${image.image_name}|}" 
+																class="d-block w-100 carousel-image" th:alt="${'Slide' + (pro_iterStat.count)}">
+														</div>
+													</div>
+													<div class="carousel-item active" th:if="${#lists.isEmpty(productInfo.images)}">
+														<img src="/images/no-image.png"
+															class="d-block w-100 carousel-image" alt="No Image Available">
+													</div>
+												</div>
+
+											
+												<button class="carousel-control-prev" type="button" th:data-bs-target="|#carouse_product${iterStat.count}|"
+													data-bs-slide="prev">
+													<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+													<span class="visually-hidden">Previous</span>
+												</button>
+												<button class="carousel-control-next" type="button" th:data-bs-target="|#carouse_product${iterStat.count}|"
+													data-bs-slide="next">
+													<span class="carousel-control-next-icon" aria-hidden="true"></span>
+													<span class="visually-hidden">Next</span>
+												</button>
+											</div>
+											<div class="card-body">
+												<p class="card-text mb-1">
+													<h4 class="fw-bold">상세공간 설명 구역</h4>
+													[[${productInfo.product_intro}]]
+												</p>
+												<hr class="my-2 text-danger">
+												<ul class="list-group list-group-flush">
+													<li class="list-group-item">
+														<i class="bi bi-house-door me-2"></i>공간유형: <span class="">연습실 보컬연습실 댄스연습실</span>
+													</li>
+													<li class="list-group-item">
+														<i class="bi bi-rulers me-2"></i>공간면적: <span class="">20㎡</span>
+													</li>
+													<li class="list-group-item">
+														<i class="bi bi-clock me-2"></i>예약시간: <span class="">최소 1시간 부터</span>
+													</li>
+													<li class="list-group-item">
+														<i class="bi bi-people me-2"></i>수용인원: <span class="">최대 [[${productInfo.max_headcount}]]명</span>
+													</li>
+												</ul>
+												
+												<hr class="my-2 text-danger">
+												<!-- 예약선택 -->
+												<h5 class="mt-4">예약선택</h5>
+												<div class="d-flex flex-column mt-2">
+													<div class="form-check">
+														<input class="form-check-input" 
+																type="radio" 
+																name="reserveSelect"
+																th:id="|reserveSelect${iterStat.count}|"
+																th:data-product_id="${productInfo.product_id}">
+														<label class="form-check-label" th:for="|reserveSelect${iterStat.count}|">
+															시간 단위 예약하기 (최소 1시간 부터)
+														</label>
+													</div>
+													
+												</div>
+											</div>	<!-- caard-body end -->
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- 예약 달력 UI -->
+							<div class="reservation-container card" style="display: none;">
+								<div class="date-selection mb-3">
+									<div class="d-flex justify-content-between">
+										<h5 class="fw-bold">날짜 선택</h5>
+										<div class="selectedDate" id="selectedDate"></div>
+									</div>
+									<div class="calendar-header">
+										<button id="prev-month">&lt;</button>
+										<span class="fw-bold" id="current-month">2025.02</span>
+										<button id="next-month">&gt;</button>
+									</div>
+									<div class="week">
+										<div class="dayOfWeek">SUN</div>
+										<div class="dayOfWeek">MON</div>
+										<div class="dayOfWeek">TUE</div>
+										<div class="dayOfWeek">WED</div>
+										<div class="dayOfWeek">THU</div>
+										<div class="dayOfWeek">FRI</div>
+										<div class="dayOfWeek">SAT</div>
+									</div>
+									<div class="calendar">
+										<!-- 날짜 셀은 JavaScript로 동적으로 생성됩니다 -->
+									</div>
+									<div class="legend">
+										<span class="unavailable"></span>예약불가
+										<span class="today"></span>오늘
+										<span class="selected"></span>선택
+									</div>
+								</div>
+							
+								<div class="time-selection">
+									<div class="d-flex justify-content-between">
+										<h5 class="fw-bold">시간 선택</h5>
+										<div class="selectedDate" id="selectedTime"></div>
+									</div>
+									<div id="time-slots"></div>
+								</div>
+							</div>
+						
+							
+							<div class="d-grid btn-payment">
+								<button type="button" class="btn btn-secondary" id="btn_payment">결제 버튼</button>
+								<form id="reserveForm" method="get" action="/guest/reserve/reserveDetail">
+									<input type="hidden" id="reserveDate" name="reserveDate">
+									<input type="hidden" id="reserveTime" name="reserveTime">
+									<input type="hidden" id="product_id" name="product_id">
+								</form>
+							</div>
+						</div>
+					</div>
+				</div><!-- 세부공간 end-->
+
+				<!-- 네비게이션 탭 -->
+				<div class="col-12 mb-3" id="bottom">
+					<div class="card">
+						<div class="card-body">
+							<nav class="nav nav-pills nav-justified sticky-top mb-2" id="scrollspy_nav">
+								<a class="nav-link" href="#space_info">공간 소개</a>
+								<a class="nav-link" href="#space_facility">시설 안내</a>
+								<a class="nav-link" href="#space_qa">Q&A</a>
+								<a class="nav-link" href="#space_review">이용 후기</a>
+							</nav>
+	
+							<div id="scrollspy_content" data-bs-spy="scroll" data-bs-target="#scrollspy_nav" data-bs-offset="70">
+								<div class="mb-5">
+									<h4 id="space_info" class="fw-bold mb-3">공간 소개</h4>
+									<p>[[${spaceInfo.space_intro}]]</p>
+								</div>
+								<div class="mb-5">
+									<h4 id="space_facility" class="fw-bold mb-3">시설 안내</h4>
+									<p>[[${spaceInfo.space_guide}]]</p>
+								</div>
+								<div class="mb-5">
+									<h4 id="space_qa" class="fw-bold mb-3">Q&A</h4>
+									<p>...</p>
+									<div style="height: 300px;"></div>
+								</div>
+								<div class="mb-5">
+									<h4 id="space_review" class="fw-bold mb-3">이용 후기</h4>
+									<p>...</p>
+									<div style="height: 300px;"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="card mt-3">
+						<div class="card-header">
+							<h4 class="fw-bold">[[${spaceInfo.main_title}]]</h4>
+							<span class="text-muted">[[${spaceInfo.space_addr}]] [[${spaceInfo.space_addrdetail}]]</span>
+						</div>
+						<div id="map" style="width:100%;height:450px;"></div>
+						
+						
+					</div>
+				</div>
+
+			</div> <!-- row end -->
+		</div>
+	</div> <!-- shodow row end -->
+	
+</th:block>
+
+<th:block layout:fragment="scriptBottom">
+    <script th:inline="javascript">
+        $(document).ready(function() {
+			console.log("공간정보", [[${spaceInfo}]]);
+			console.log("상품목록", [[${productList}]]);
+
+			$("#btn_payment").on("click", function() {
+				const $form = $("#reserveForm");
+				const $reserveDate = $("#reserveDate").val();
+				const $reserveTime = $("#reserveTime").val();
+				const $product_id = $("#product_id").val();
+				if (!$reserveDate) {
+					alert("예약 날짜를 선택해주세요.");
+					return;
+				}
+
+				if (!$reserveTime) {
+					alert("예약 시간을 선택해주세요.");
+					return;
+				}
+
+				if (!$product_id) {
+					alert("세부 공간을 선택해주세요.");
+					return;
+				}
+
+				$form.submit();
+			});
+
+			$("input[name='detailRoom']").on("click", function() {
+				// 다른 collapse 닫고 선택된 collapse 만 활성화
+				let targetId = $(this).attr("data-bs-target") || $(this).attr("for");
+				$(".detailRoom-group .collapse").collapse("hide");
+				$(targetId).collapse("show");
+
+				// 예약관련 초기화
+				$("#reserveDate").val("");
+				$("#reserveTime").val("");
+				$("#product_id").val("");
+				$("#selectedDate").text("");
+				$("#selectedTime").text("");
+
+				// 달력 조건 초기화
+				selectedDate = null;
+				currentYear = today.getFullYear();
+				currentMonth = today.getMonth();
+
+				$timeSlotsContainer.empty();
+				$reservationcontainer.hide();
+			});
+
+		
+			/** 달력 **/
+			$("input[name='reserveSelect']").on("click", function() {
+				renderCalendar(currentYear, currentMonth);
+				$("#product_id").val($(this).data("product_id"));
+				$reservationcontainer.show();
+			});
+
+			const $calendar = $(".calendar");
+			const $currentMonth = $("#current-month");
+			const $reservationcontainer = $(".reservation-container");
+			const $timeSlotsContainer = $("#time-slots");
+
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+			let selectedDate = null;
+			let currentYear = today.getFullYear();
+			let currentMonth = today.getMonth();
+
+			/**
+			 * 달력을 렌더링하는 함수
+			 * @param {number} year - 렌더링할 연도의 값
+			 * @param {number} month - 렌더링할 월의 값 (0부터 시작)
+			 */
+			function renderCalendar(year, month) {
+				const firstDay = new Date(year, month, 1).getDay(); // 해당 월의 첫 번째 날의 요일 (0: 일요일 ~ 6: 토요일)
+				const lastDate = new Date(year, month + 1, 0).getDate(); // 해당 월의 마지막 날짜
+				const prevMonthLastDate = new Date(year, month, 0).getDate(); // 이전 달의 마지막 날짜
+
+				$calendar.empty(); // 이전 달력 데이터를 초기화
+				$currentMonth.text(`${year}.${String(month + 1).padStart(2, "0")}`); // 현재 월 표시
+
+				// 달력에 표시될 날짜 수 (이전 달 + 현재 달 + 다음 달)
+				const totalCells = 42; // 6주 * 7일
+
+				// 이전 달 날짜 채우기
+				for (let i = firstDay - 1; i >= 0; i--) {
+					const prevDate = prevMonthLastDate - i;
+					const $cell = createDayCell(prevDate, year, month - 1);
+					$calendar.append($cell);
+				}
+
+				// 현재 달 날짜 채우기
+				for (let date = 1; date <= lastDate; date++) {
+					const $cell = createDayCell(date, year, month);
+					$calendar.append($cell);
+				}
+
+				// 다음 달 날짜 채우기
+				const remainingCells = totalCells - (firstDay + lastDate);
+				for (let date = 1; date <= remainingCells; date++) {
+					const $cell = createDayCell(date, year, month + 1);
+					$calendar.append($cell);
+				}
+			}
+
+			/**
+			 * 날짜 셀을 생성하는 함수
+			 * @param {number} date - 날짜
+			 * @param {number} year - 연도
+			 * @param {number} month - 월 (0부터 시작)
+			 * @returns {jQuery} - 생성된 날짜 셀 jQuery 객체
+			 */
+			function createDayCell(date, year, month) {
+				const $cell = $("<div class='day'></div>").text(date);
+				const cellDate = new Date(year, month, date);
+
+				// 요일에 따른 클래스 추가
+				const dayOfWeek = cellDate.getDay();
+				if (dayOfWeek === 0) $cell.addClass("sun");
+				else if (dayOfWeek === 6) $cell.addClass("sat");
+
+				// 오늘 날짜 처리
+				if (cellDate.toDateString() === today.toDateString()) {
+					$cell.addClass("today");
+				}
+
+				// 날짜 비활성화 처리 (오늘 이전 날짜는 선택 불가)
+				if (cellDate < today) {
+					$cell.addClass("unavailable");
+				} else {
+					$cell.on("click", function () {
+						selectDate(cellDate, $(this));
+					});
+				}
+
+				return $cell;
+			}
+
+			/**
+			 * 날짜 선택 함수
+			 * @param {Date} date - 선택된 날짜 객체
+			 * @param {jQuery} $cell - 선택된 셀 요소
+			 */
+			function selectDate(date, $cell) {
+				if ($cell.hasClass("unavailable")) return;
+				if (selectedDate) selectedDate.removeClass("selected");
+				selectedDate = $cell;
+				selectedDate.addClass("selected");
+				$("#selectedDate").text(formatDate(date));
+				$("#reserveDate").val(formatDate(date));
+				renderTimeSlots();
+			}
+
+			/**
+			 * 날짜를 "년.월.일 (요일)" 형식으로 변환하는 함수
+			 * @param {Date} date - 날짜 객체
+			 * @returns {string} - 포맷된 날짜 문자열
+			 */
+			function formatDate(date) {
+				const year = date.getFullYear();
+				const month = date.getMonth() + 1;
+				const day = date.getDate();
+				const dayOfWeek = date.getDay();
+				const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
+				const dayOfWeekString = daysOfWeek[dayOfWeek];
+				return `${year}.${month}.${day} (${dayOfWeekString})`;
+			}
+
+			/**
+			 * 이전/다음 월 이동 버튼 이벤트 처리
+			 */
+			$("#prev-month").on("click", function () {
+				if (currentYear === today.getFullYear() && currentMonth === today.getMonth()) {
+					return; // 오늘 이전으로는 이동 불가
+				}
+				currentMonth--;
+				if (currentMonth < 0) {
+					currentMonth = 11;
+					currentYear--;
+				}
+				renderCalendar(currentYear, currentMonth);
+			});
+
+			$("#next-month").on("click", function () {
+				if (currentYear === today.getFullYear() && currentMonth === today.getMonth() + 1) {
+					return;
+				}
+				currentMonth++;
+				if (currentMonth > 11) {
+					currentMonth = 0;
+					currentYear++;
+				}
+				renderCalendar(currentYear, currentMonth);
+			});
+
+			/**
+			 * 시간 슬롯 렌더링 함수
+			 */
+			function renderTimeSlots() {
+				$timeSlotsContainer.empty(); // 기존 시간 슬롯 초기화
+				$("#reserveTime").val(""); // 시간 선택 초기화
+
+
+
+				let startTime = null; // 시작 시간 저장 변수
+				let endTime = null;   // 종료 시간 저장 변수
+
+				// 서버에서 예약 가능 여부 데이터를 가져왔다고 가정 (예시 데이터)
+				const availableTimes = ["09:00", "10:00", "12:00", "13:00", "14:00", "15:00"]; // 예약 가능한 시간
+
+				for (let hour = 9; hour <= 15; hour++) { // 예약 가능한 시간 범위 설정 (9시 ~ 15시)
+					const time = `${String(hour).padStart(2, "0")}:00`; // 시간 형식 (09:00)
+					const $slot = $("<button></button>")
+						.text(time) // 버튼 텍스트 설정
+						.addClass("time-slot"); // 버튼 스타일 클래스 추가
+
+					// 예약 불가 시간에 .unavailable 클래스 추가
+					if (!availableTimes.includes(time)) {
+						$slot.addClass("unavailable");
+					} else {
+						// 클릭 이벤트 추가
+						$slot.on("click", function () {
+							if (endTime !== null) {
+								// 세 번째 클릭: 초기화
+								$timeSlotsContainer.find(".time-slot").removeClass("selected");
+								startTime = null;
+								endTime = null;
+							}
+
+							if (startTime === null) {
+								// 첫 번째 클릭: 시작 시간 설정
+								startTime = time;
+								$slot.addClass("selected");
+								$("#selectedTime").text(formatTime(startTime));
+								$("#reserveTime").val(formatTime(startTime));
+							} else {
+								// 두 번째 클릭: 종료 시간 설정 및 범위 선택
+								endTime = time;
+								selectTimeRange(startTime, endTime);
+							}
+						});
+					}
+
+					$timeSlotsContainer.append($slot); // 컨테이너에 버튼 추가
+				}
+
+				// 시간 범위 선택 및 유효성 검사 함수
+				function selectTimeRange(start, end) {
+					const slots = $timeSlotsContainer.find(".time-slot");
+					let inRange = false;
+					let hasUnavailable = false;
+					let selectedTimes = [];
+
+					if (start > end) {
+						let imsi = start;
+						start = end;
+						end = imsi;
+					}
+
+					// 시작 시간부터 종료 시간까지 슬롯 순회
+					slots.each(function () {
+						const slotTime = $(this).text();
+						if (slotTime === start) inRange = true;
+						if (inRange) {
+							if ($(this).hasClass("unavailable")) {
+								hasUnavailable = true;
+							} else {
+								$(this).addClass("selected");
+								selectedTimes.push(slotTime);
+							}
+						}
+						if (slotTime === end) inRange = false;
+					});
+
+					// 예약 불가 시간 포함 여부 확인
+					if (hasUnavailable) {
+						alert("예약 시간이 겹칩니다.");
+						slots.removeClass("selected");
+						startTime = null;
+						endTime = null;
+						$("#reserveTime").val("");
+					} else {
+						const reserveTime = formatTime(start, end);
+						$("#reserveTime").val(reserveTime);
+						$("#selectedTime").text(reserveTime);
+					}
+				}
+
+				// 시간 포멧 함수
+				function formatTime(start, end) {
+					const endHour = end == null ? parseInt(start.split(":")[0]) + 1 : parseInt(end.split(":")[0]) + 1;  // "09:00" → 9 +1 = 10
+					const endTime = `${String(endHour).padStart(2, "0")}:00`; // "10:00"
+					return `${start}-${endTime}`; // "09:00-10:00"
+
+				}
+			}
+
+		});	// ready event end
+
+
+	</script>
+	
+	<!-- 카카오 맵 -->
+	<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9430b0cc6da5caec16502788079444c4&libraries=services"></script>
+	<script th:inline="javascript">
+		var mapContainer = document.getElementById('map'), // 지도를 표시할 div
+			mapOption = {
+				center: new daum.maps.LatLng(37.537187, 127.005476), // 지도의 중심좌표
+				level: 3 // 지도의 확대 레벨
+			};
+	
+		//지도를 미리 생성
+		var map = new daum.maps.Map(mapContainer, mapOption);
+		//주소-좌표 변환 객체를 생성
+		var geocoder = new daum.maps.services.Geocoder();
+		
+		var address = [[${spaceInfo.space_addr}]]; // 여기에 원하는 주소를 입력하세요
+
+		geocoder.addressSearch(address, function(result, status) {
+			if (status === kakao.maps.services.Status.OK) {
+				var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+				// 결과값으로 받은 위치를 마커로 표시합니다
+				var marker = new kakao.maps.Marker({
+					map: map,
+					position: coords
+				});
+
+				// 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
+				map.setCenter(coords);
+			}
+		});
+	</script>
+	
+
+	
+</th:block>
+</html>
