@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.skillspace.sgs.mail.EmailDTO;
 import com.skillspace.sgs.mail.EmailService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -89,11 +90,31 @@ public class GuestController {
 	
 	// 로그인 폼
 	@GetMapping("/login")
-	public void login() {}
+	public void login(HttpServletRequest request, Model model) {
+		// 이전 페이지 URL 가져오기 방식 1
+		/* 
+		String uri 	 = request.getRequestURI();		// /userinfo/modify
+		String query = request.getQueryString();	// ?(물음표) 뒤의 문자열   ?userid=user01
+		
+		if(query == null || query.equals("null")) {
+			query = "";
+		}else {
+			query = "?" + query;
+		}
+		
+		String previousPage = uri + query;
+		*/
+
+		// 이전 페이지 URL 가져오기 방식 2
+		// Referer 헤더 가져오기
+		String previousPage = request.getHeader("Referer");
+
+		model.addAttribute("previousPage", previousPage);
+	}
 	
 	// 로그인 처리
 	@PostMapping("/login")
-	public String loginProcess(LoginDTO dto, HttpSession session, RedirectAttributes rttr) throws Exception {
+	public String loginProcess(LoginDTO dto, String previousPage, HttpSession session, RedirectAttributes rttr) throws Exception {
 		
 		String url = "";
 		String status = "";
@@ -102,7 +123,7 @@ public class GuestController {
 		if(guestDTO != null) {	// 아이디가 일치하면
 			if(passwordEncoder.matches(dto.getUser_pw(), guestDTO.getUser_pw())) {	// 비밀번호 일치하면
 				session.setAttribute("login_auth", guestDTO);
-				url = "/";
+				url = previousPage;
 			}else {	// 비밀번호가 틀릴 경우
 				url = "/guest/login";
 				status = "pwFail";

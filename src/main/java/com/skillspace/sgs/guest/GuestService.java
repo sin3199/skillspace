@@ -50,7 +50,11 @@ public class GuestService {
 		guestMapper.modify_save(vo);
 	}
 
-	
+	// 전화번호와 이메일 조회 
+	public GuestDTO getPhoneAndEmailById(String user_id) {
+		return guestMapper.getPhoneAndEmailById(user_id);
+	}
+
 	
 
 }

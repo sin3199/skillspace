@@ -230,8 +230,8 @@
                             if(!result.pageMaker.next) $('#btn_more').remove();
 
                             // 가격에 콤마
-                            function numberWithCommas(x) {
-                                return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                            function numberWithCommas(number) {
+                                return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                             }
                         }
                     }

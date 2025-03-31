@@ -140,6 +140,16 @@
 		user_id = #{user_id}
 </update>
 
+<select id="getPhoneAndEmailById" parameterType="String" resultType="com.skillspace.sgs.guest.GuestDTO">
+	select
+		user_email,
+		user_phone
+	from
+		userinfo
+	where
+		user_id = #{user_id}
+</select>
+
 
 
 </mapper>

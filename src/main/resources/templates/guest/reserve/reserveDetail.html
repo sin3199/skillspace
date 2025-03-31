@@ -3,8 +3,301 @@
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{layouts/layout1}">
 	  
+<th:block layout:fragment="css">
+	<style>
+		/* 카드 스타일 */
+		.card-custom {
+			backdrop-filter: blur(10px);
+			background-color: rgba(255, 255, 255, 0.1); /* 반투명 효과 */
+			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+			padding: 24px;
+			border-top: #704de4 solid 4px;
+		}
+
+		/* 캐러셀 이미지 */
+		.carousel-item img {
+			width: 100%;
+			height: 400px;
+			border-radius: 16px;
+			object-fit: cover;
+		}
+
+		.payment-text {
+			color: #704de4;
+			font-weight: bold;
+			font-size: 20px;
+		}
+
+		.time-text {
+			color: #949494; /* 밝은 회색 */
+			font-size: 14px;
+			font-weight: 800;
+		}
+
+		.header-custom {
+			font-weight: bold;
+		}
+
+		/* 리스트 아이템 스타일 */
+		.list-group-item {
+			background-color: rgba(255, 255, 255, 0.05);
+			margin-bottom: 8px;
+			padding: 12px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.list-group-item strong{
+			width: 110px;
+			display: inline-block;
+			flex-shrink: 0;
+		}
+
+		.input-wrapper {
+			width: 100%;
+		}
+
+		.list-group-item input[type="text"], input[type="email"] {
+			border-radius: 0;
+			border: 1px solid #c7c4c4;
+			padding: 6px;
+			height: 34px;
+			font-size: 14px;
+		}
+
+		.form-select-sm {
+			border-radius: 0;
+			border: 1px solid #c7c4c4;
+			height: 34px;
+			padding: 6px;
+		}
+
+		.transfer-group {
+			display: none;
+		}
+
+		.btn-custom {
+			background-color: #704de4;
+			color: #fff;
+			border: none;
+			border-radius: 5px;
+			width: 100%;
+			height: 40px;
+		}
+
+		.btn-custom:hover {
+			background-color: #563bb7;
+			color: #fff;
+		}
+
+		.hr-custom {
+			border: none;
+			border-top: 3px solid #704de4;
+			opacity: 1;
+		}
+
+		#payment_amount {
+			color: #704de4;
+			font-weight: bold;
+			font-size: 25px;
+		}
+
+		.toast-container {
+			z-index: 1050; 
+			width: 100%;
+		}
+
+		#errorToast {
+			background-color: #704de4;
+			font-weight: bold;
+			font-size: 1.2rem;
+			color: white;
+			height: 60px;
+			width: 100%;
+		}
+
+	</style>
+</th:block>
 <th:block layout:fragment="content">
-	<h1 th:text="'예약 상세페이지'">인덱스 홈</h1>
+	<h2 class="mt-3 fw-bold text-center">예약하기</h2>
+	<div class="row my-4 justify-content-center">
+		<div class="col-12 col-lg-8 mt-3">
+			<div class="d-flex justify-content-between align-items-center mb-1">
+				<span class="header-custom">예약공간</span>
+				<div>
+					<span class="payment-text">[[${'￦' + #numbers.formatInteger(productDTO.price, 1, 'COMMA')}]]</span>
+					<span class="time-text">/시간</span>
+				</div>
+			</div>
+			<!-- 카드 시작 -->
+			<div class="card card-custom">
+				<h4 class="fw-bold">[[${productDTO.hostSpace.main_title}]]</h4>
+				<span class="text-muted">[[${productDTO.name}]]</span>
+				<hr>
+				<!-- 캐러셀 시작 -->
+				<div id="carouse_main" class="carousel slide carousel-fade" data-bs-ride="carousel">
+					<div class="carousel-inner" id="carousel-inner">
+						<div th:if="${not #lists.isEmpty(productDTO.images)}">
+							<div class="carousel-item" th:each="image, iterStat : ${productDTO.images}" th:classappend="${iterStat.index == 0 ? 'active' : ''}">
+								<img th:src="@{|/api/image/display/${image.image_up_folder}/${image.image_name}|}" 
+									class="d-block w-100 carousel-image" th:alt="${'Slide' + (iterStat.index + 1)}">
+							</div>
+						</div>
+						<div class="carousel-item active" th:if="${#lists.isEmpty(productDTO.images)}">
+							<img src="/images/no-image.png"
+								class="d-block w-100 carousel-image" alt="No Image Available">
+						</div>
+					</div>
+					<!-- 이전/다음 버튼 -->
+					<button class="carousel-control-prev" type="button" data-bs-target="#carouse_main" data-bs-slide="prev">
+						<span class="carousel-control-prev-icon"></span>
+						<span class="visually-hidden">Previous</span>
+					</button>
+					<button class="carousel-control-next" type="button" data-bs-target="#carouse_main" data-bs-slide="next">
+						<span class="carousel-control-next-icon"></span>
+						<span class="visually-hidden">Next</span>
+					</button>
+				</div>
+				<!-- 캐러셀 끝 -->
+				<hr>
+				<!-- 상품 소개 -->
+				<h6>상품 소개</h6>
+				<p>[[${productDTO.product_intro}]]</p>
+
+				<!-- 리스트 그룹 -->
+				<ul class="list-group">
+					<li class="list-group-item"><strong>최대 수용 인원</strong> <span id="modalMaxHeadcount">[[${productDTO.max_headcount}]]명</span></li>
+					<li class="list-group-item"><strong>예약 시간 단위</strong> <span id="modalTimeSlot">[[${productDTO.time_slot}]]시간</span></li>
+					<li class="list-group-item">
+						<strong>운영 시간</strong> 
+						<span><span id="modalOpenTime">[[${productDTO.open_time}]]</span> ~ <span id="modalCloseTime">[[${productDTO.close_time}]]</span></span>
+					</li>
+				</ul>
+			</div>
+			<!-- 카드 끝 -->
+		</div>
+	</div>
+
+	<form id="reservation_form" action="/guest/reserve/reservation" method="post">
+		<div class="row my-4 justify-content-center">
+			<div class="col-12 col-lg-8 mt-3">
+				<div class="d-flex justify-content-between align-items-center mb-1">
+					<span class="header-custom">예약자 정보</span>
+					<span class="text-danger">*필수입력 항목*</span>
+				</div>
+				<!-- 카드 시작 -->
+				<div class="card card-custom">
+					<!-- 리스트 그룹 -->
+					<ul class="list-group">
+						<li class="list-group-item">
+							<strong><label for="reservation_name"  class="">예약자</label></strong> 
+							<input class="form-control" type="text" id="reservation_name" name="reservation_name">
+						</li>
+						<li class="list-group-item">
+							<strong><label for="reservation_phone" class="">연락처</label></strong> 
+							<div class="input-wrapper d-flex gap-1 align-items-center">
+								<input class="form-control phoneNumber" type="text" id="start_phoneNumber"  th:value="${phoneAndEmail.user_phone.substring(0, 3)}" placeholder="010"  maxlength="3">-
+								<input class="form-control phoneNumber" type="text" id="middle_phoneNumber" th:value="${phoneAndEmail.user_phone.substring(3, 7)}" placeholder="1234" maxlength="4">-
+								<input class="form-control phoneNumber" type="text" id="end_phoneNumber"    th:value="${phoneAndEmail.user_phone.substring(7)}"    placeholder="5678" maxlength="4">
+							</div>
+						</li>
+						<li class="list-group-item">
+							<strong><label for="reservation_email" class="">이메일</label></strong> 
+							<input class="form-control" type="email" id="reservation_email" name="reservation_email" th:value="${phoneAndEmail.user_email}">
+						</li>
+					</ul>
+				</div>
+				<!-- 카드 끝 -->
+			</div>
+		</div>
+
+		<div class="row my-4 justify-content-center">
+			<div class="col-12 col-lg-8 mt-3">
+				<div class="d-flex justify-content-between align-items-center mb-1">
+					<span class="header-custom">예약 정보</span>
+					
+				</div>
+				<!-- 카드 시작 -->
+				<div class="card card-custom">
+					<!-- 리스트 그룹 -->
+					<ul class="list-group">
+						<li class="list-group-item"><strong>예약날짜</strong> <span id="reserveDate">[[${reservDetailDTO.reserveDate}]]</span></li>
+						<li class="list-group-item"><strong>예약시간</strong> <span id="reserveTime">[[${reservDetailDTO.reserveTime}]]</span></li>
+						<li class="list-group-item"><strong>예약인원</strong> <span id="headcount">[[${reservDetailDTO.headcount}]]명</span></li>
+						<hr class="hr-custom">
+						<li class="list-group-item m-0"><strong>결제금액</strong> <span id="payment_amount">[[${'₩ ' + #numbers.formatInteger(reservDetailDTO.total_payment, 1, 'COMMA')}]]</span></li>
+					</ul>
+				</div>
+				<!-- 카드 끝 -->
+			</div>
+		</div>
+
+		<div class="row my-4 justify-content-center">
+			<div class="col-12 col-lg-8 mt-3">
+				<div class="d-flex justify-content-between align-items-center mb-1">
+					<span class="header-custom">결제수단 선택</span>
+				</div>
+				<!-- 카드 시작 -->
+				<div class="card card-custom">
+					<!-- 리스트 그룹 -->
+					<ul class="list-group">
+						<li class="list-group-item payment-group justify-content-start">
+							<strong><label>결제방식</label></strong> 
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="payment_method" id="payment_kakao" value="카카오페이" checked>
+								<label class="form-check-label" for="payment_kakao">카카오페이</label>
+							</div>
+							<div class="form-check form-check-inline">
+								<input class="form-check-input" type="radio" name="payment_method" id="payment_transfer" value="계좌이체">
+								<label class="form-check-label" for="payment_transfer">계좌이체</label>
+							</div>
+						</li>
+						<div class="transfer-group">
+							<li class="list-group-item">
+								<strong><label class="">입금계좌</label></strong> 
+								<div class="input-wrapper d-flex gap-1">
+									<select class="form-select-sm w-50" name="account_transfer">
+										<option value="" selected disabled>입금 은행을 선택하세요.</option>
+										<option value="KEB하나은행(123-123-123)">KEB하나은행(123-123-123)</option>
+										<option value="신한은행(456-789-123)">신한은행(456-789-123)</option>
+										<option value="국민은행(789-456-123)">국민은행(789-456-123)</option>
+										<option value="sc제일은행(123-789-456)">sc제일은행(123-789-456)</option>
+									</select>
+									<input class="form-control w-50" type="text" name="sender" placeholder="보내는 사람">
+								</div>
+							</li>
+						</div>
+						
+					</ul>
+				</div>
+				<!-- 카드 끝 -->
+			</div>
+		</div>
+		<div class="row justify-content-center mb-3">
+			<div class="col-12 col-lg-8 mt-3">
+				<button type="button" class="btn-custom" id="btn_reservation">예약하기</button>
+			</div>
+		</div>
+
+		<input type="hidden" id="product_id" 		name="product_id" 		th:value="${reservDetailDTO.product_id}">
+		<input type="hidden" id="total_payment" 	name="total_payment" 	th:value="${reservDetailDTO.total_payment}">
+		<input type="hidden" id="reservation_date" 	name="reservation_date" th:value="${#strings.replace(reservDetailDTO.reserveDate.substring(0, 10), '.', '-')}">
+		<input type="hidden" id="start_time" 		name="start_time" 		th:value="${#strings.arraySplit(reservDetailDTO.reserveTime, '-')[0]}">
+		<input type="hidden" id="end_time" 			name="end_time" 		th:value="${#strings.arraySplit(reservDetailDTO.reserveTime, '-')[1]}">
+		<input type="hidden" id="headcount" 		name="headcount" 		th:value="${reservDetailDTO.headcount}">
+		<input type="hidden" id="reservation_phone" name="reservation_phone">
+
+
+	</form>
+
+	<div class="toast-container position-fixed top-0 start-50 translate-middle-x">
+		<div id="errorToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+		  <div class="toast-body d-flex justify-content-center align-items-center">
+			<!-- 메시지가 여기에 들어갑니다 -->
+		  </div>
+		</div>
+	  </div>
 	
 </th:block>
 
@@ -12,6 +305,115 @@
 	<script th:inline="javascript">
 		$(document).ready(function() {
 			console.log("넘어온 예약 정보", [[${reservDetailDTO}]]);
+			console.log("전화번호 이메일", [[${phoneAndEmail}]]);
+			console.log("productDTO", [[${productDTO}]]);
+
+			// 결제방식 클릭이벤트. name="payment_method"
+			$("input[name='payment_method']").on("click", function() {
+				let pay_method = $("input[name='payment_method']:checked").val(); // "계좌이체", or "카카오페이"
+
+				if(pay_method == "계좌이체") {
+				$(".transfer-group").show();
+				}else if(pay_method == "카카오페이") {
+				$(".transfer-group").hide();
+				}
+            });
+
+			// 예약하기 버튼 클릭 이벤트
+			$("#btn_reservation").on("click", function() {
+				let pay_method = $("input[name='payment_method']:checked").val(); // "계좌이체", or "카카오페이"
+
+				// 전화번호 합치기, 유효성
+				function validateAndCombinePhoneNumber() {
+					const start = $("#start_phoneNumber").val();
+					const middle = $("#middle_phoneNumber").val();
+					const end = $("#end_phoneNumber").val();
+					if (!start || !middle || !end) return false; 
+					if (start.length !== 3 || middle.length !== 4 || end.length !== 4) return false;
+					$("#reservation_phone").val(start + middle + end);
+					console.log(start + middle + end);
+					return true;
+				}
+				
+
+				// 유효성 검사
+				if(!$("#reservation_name").val()) {
+					showErrorToast("예약자 이름을 입력해주세요.");
+					$("#reservation_name").focus();
+					return;
+				}
+
+				if(!validateAndCombinePhoneNumber()) {
+					showErrorToast("올바른 핸드폰번호를 입력해주세요.");
+					$("#start_phoneNumber").focus();
+					return;
+				}
+
+				const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+				if(!$("#reservation_email").val() || !emailRegex.test($("#reservation_email").val())) {
+					showErrorToast("올바른 이메일을 입력해주세요.");
+					$("#reservation_email").focus();
+					return;
+				}
+
+				if(pay_method == "계좌이체") {	// 계좌이체 선택
+					// 유효성 검사
+					if(!$("select[name='account_transfer']").val()) {
+						showErrorToast("입금 은행을 선택해주세요.");
+						$("select[name='account_transfer']").focus();
+						return;
+					}
+					if(!$("input[name='sender']").val()) {
+						showErrorToast("보내는 사람을 입력해주세요.");
+						$("input[name='sender']").focus();
+						return;
+					}
+
+					$("#reservation_form").submit();
+				}else if(pay_method == "kakaopay1") {	// 카카오페이 선택
+					$.ajax({
+						url : "/kakao/kakaoPay",
+						type : "post",
+						data : {
+								ord_name         : $("#ord_name_2").val(),
+								ord_addr_zipcode : $("#sample2_postcode").val(),
+								ord_addr_basic   : $("#sample2_address").val(),
+								ord_addr_detail  : $("#sample2_detailAddress").val(),
+								ord_tel          : $("#ord_tel_2").val(),
+								ord_mail         : $("#ord_mail_2").val(),
+								ord_price        : [[${order_total_price}]]
+						},
+						success : function(response) {
+							// 카카오페이 API서버에게 결제준비(ready)요청을 통한 응답받은 URL을 이용하여 리다이렉트 작업.
+							// location.href = "카카오페이 API서버로부터 응답받은 URL";
+							location.href = response.next_redirect_pc_url;  // QR코드 페이지로 이동
+						}
+					});
+				}
+			});
+
+			// 토스트 표시 함수
+			function showErrorToast(message) {
+				const toastElement = $("#errorToast");
+				const toastBody = toastElement.find(".toast-body");
+				toastBody.text(message);
+				const toast = new bootstrap.Toast(toastElement, {
+					delay: 2000 // 3초 후 자동으로 사라짐
+				});
+				toast.show();
+			}
+
+			// 전화번호 숫자만 입력 이벤트
+			$(".phoneNumber").on("input", function(event) {
+				const input = $(this);
+				const value = input.val();
+				const numericValue = value.replace(/[^0-9]/g, ''); // 숫자 이외의 문자 제거
+				input.val(numericValue);
+			});
+
+
+
+
 		});	// ready event end
 	</script>
 

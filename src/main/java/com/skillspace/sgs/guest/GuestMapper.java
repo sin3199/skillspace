@@ -34,4 +34,7 @@ public interface GuestMapper {
 
 	String emailCheck(String user_email);
 
+	// 전화번호와 이메일 조회
+	GuestDTO getPhoneAndEmailById(String user_id);
+
 }

@@ -2,4 +2,70 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.skillspace.sgs.guest.reserve.GuestReserveMapper">
 
+<insert id="reservation_create" parameterType="com.skillspace.sgs.guest.reserve.ReservationDTO" 
+	useGeneratedKeys="true" keyProperty="reservation_id">
+	insert into reservations (
+		user_id, 
+		product_id, 
+		total_payment, 
+		status, 
+		reservation_date, 
+		start_time, 
+		end_time, 
+		headcount, 
+		reservation_name, 
+		reservation_phone, 
+		reservation_email
+	) 
+	values (
+		#{user_id}, 
+		#{product_id}, 
+		#{total_payment}, 
+		#{status}, 
+		#{reservation_date}, 
+		#{start_time}, 
+		#{end_time}, 
+		#{headcount}, 
+		#{reservation_name}, 
+		#{reservation_phone}, 
+		#{reservation_email}
+	)
+</insert>
+
+<select id="getReservationResultByReservationId" parameterType="Integer" resultType="Map">
+	select
+		r.status as reservation_status,
+		r.reservation_date,
+		r.start_time,
+		r.end_time,
+		r.headcount,
+		r.reservation_name,
+		r.reservation_phone,
+		r.reservation_email,
+		pay.payment_method,
+		pay.amount,
+		pay.status as payment_status,
+		pro.name as product_name,
+		hs.main_title
+	from
+		reservations r
+	inner join
+		products pro
+	on
+		r.product_id = pro.product_id
+	inner join
+		payments pay
+	on 
+		r.reservation_id = pay.reservation_id
+	inner join 
+		host_space hs 
+	on 
+		hs.host_space_id = pro.host_space_id 
+	where
+		r.reservation_id = #{reservation_id}
+</select>
+
+
+
+
 </mapper>

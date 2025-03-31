@@ -259,6 +259,36 @@
 		#time-slots button:hover {
 			background: #ddd;
 		}
+
+		/* Hr */
+		hr {
+			opacity: 1 !important;
+		}
+        .hr-primary {
+            border: none;
+            border-top: 2px solid #704de4;
+            margin: 1rem 0;
+        }
+        .hr-dashed {
+            border: none;
+            border-top: 2px dashed #aaa;
+            margin: 0.5rem 0;
+        }
+        .hr-secondary {
+            border: none;
+            border-top: 2px solid #aaa;
+            margin: 0.5rem 0;
+        }
+
+		.form-check-input:checked {
+			border-color: #704de4;
+			background-color: #704de4;
+		}
+
+		.form-check-input:checked + label {
+			font-weight: bold;
+			color: #704de4;
+		}
 	</style>
 </th:block>
 <th:block layout:fragment="content">
@@ -327,7 +357,7 @@
 							<div class="detailRoom-group mb-3" role="group">
 								<!-- 1번방 -->
 								<div class="" th:each="productInfo, iterStat : ${productList}">
-									<div class="d-flex align-items-center border p-2">
+									<div class="border p-2">
 										<div class="form-check">
 											<input type="radio" 
 												   class="form-check-input" 
@@ -338,12 +368,12 @@
 												   th:data-bs-target="|#room${iterStat.count}-detail|" 
 												   aria-expanded="false" 
 												   th:aria-controls="|room${iterStat.count}-detail|"
-												   th:checked="${iterStat.count == 1}">
+												   >
+											<label class="form-check-label d-flex justify-content-between align-items-center flex-grow-1" th:for="|room${iterStat.count}|">
+												<span>[[${productInfo.name}]]</span>
+												<span class="text-nowrap">[[${'₩' + #numbers.formatInteger(productInfo.price, 1, 'COMMA')}]] / 시간</span>
+											</label>
 										</div>
-										<label class="form-check-label d-flex justify-content-between align-items-center flex-grow-1" th:for="|room${iterStat.count}|">
-											<span>[[${productInfo.name}]]</span>
-											<span class="text-nowrap">[[${'₩' + #numbers.formatInteger(productInfo.price, 1, 'COMMA')}]] / 시간</span>
-										</label>
 									</div>
 									<div th:id="|room${iterStat.count}-detail|" class="collapse" th:aria-labelledby="|room${iterStat.count}|">
 										<div class="card">
@@ -378,7 +408,7 @@
 													<h4 class="fw-bold">상세공간 설명 구역</h4>
 													[[${productInfo.product_intro}]]
 												</p>
-												<hr class="my-2 text-danger">
+												<hr class="my-2 hr-dashed">
 												<ul class="list-group list-group-flush">
 													<li class="list-group-item">
 														<i class="bi bi-house-door me-2"></i>공간유형: <span class="">연습실 보컬연습실 댄스연습실</span>
@@ -387,14 +417,14 @@
 														<i class="bi bi-rulers me-2"></i>공간면적: <span class="">20㎡</span>
 													</li>
 													<li class="list-group-item">
-														<i class="bi bi-clock me-2"></i>예약시간: <span class="">최소 1시간 부터</span>
+														<i class="bi bi-clock me-2"></i>예약시간: <span class="">최소 [[${productInfo.time_slot}]]시간 부터</span>
 													</li>
 													<li class="list-group-item">
 														<i class="bi bi-people me-2"></i>수용인원: <span class="">최대 [[${productInfo.max_headcount}]]명</span>
 													</li>
 												</ul>
 												
-												<hr class="my-2 text-danger">
+												<hr class="my-2 hr-dashed">
 												<!-- 예약선택 -->
 												<h5 class="mt-4">예약선택</h5>
 												<div class="d-flex flex-column mt-2">
@@ -403,7 +433,10 @@
 																type="radio" 
 																name="reserveSelect"
 																th:id="|reserveSelect${iterStat.count}|"
-																th:data-product_id="${productInfo.product_id}">
+																th:data-product_id="${productInfo.product_id}"
+																th:data-max_headcount="${productInfo.max_headcount}"
+																th:data-price="${productInfo.price}"
+																>
 														<label class="form-check-label" th:for="|reserveSelect${iterStat.count}|">
 															시간 단위 예약하기 (최소 1시간 부터)
 														</label>
@@ -423,6 +456,7 @@
 										<h5 class="fw-bold">날짜 선택</h5>
 										<div class="selectedDate" id="selectedDate"></div>
 									</div>
+									<hr class="hr-primary">
 									<div class="calendar-header">
 										<button id="prev-month">&lt;</button>
 										<span class="fw-bold" id="current-month">2025.02</span>
@@ -452,7 +486,25 @@
 										<h5 class="fw-bold">시간 선택</h5>
 										<div class="selectedDate" id="selectedTime"></div>
 									</div>
+									<hr class="hr-primary">
 									<div id="time-slots"></div>
+								</div>
+
+								<div class="headcount-selection mt-3">
+									<div class="d-flex justify-content-between">
+										<h5 class="fw-bold">총 예약 인원</h5>
+									</div>
+									<hr class="hr-primary">
+									<div class="input-group headcount-input">
+										<button class="input-group-text fs-3" id="headcount_minus"><i class="bi bi-dash-lg"></i></button>	
+										<input type="number" id="totalHeadcount" class="form-control text-center fs-3" min="1" value="1">
+										<button class="input-group-text fs-3" id="headcount_plus"><i class="bi bi-plus-lg"></i></button>	
+									</div>
+									<div class="d-flex justify-content-between mt-3">
+										<h5 class="fw-bold">결제 금액</h5>
+										<div class="selectedDate" id="selectPayment"></div>
+									</div>
+									<hr class="hr-secondary">
 								</div>
 							</div>
 						
@@ -460,9 +512,11 @@
 							<div class="d-grid btn-payment">
 								<button type="button" class="btn btn-secondary" id="btn_payment">결제 버튼</button>
 								<form id="reserveForm" method="get" action="/guest/reserve/reserveDetail">
-									<input type="hidden" id="reserveDate" name="reserveDate">
-									<input type="hidden" id="reserveTime" name="reserveTime">
-									<input type="hidden" id="product_id" name="product_id">
+									<input type="hidden" id="reserveDate" 	name="reserveDate">
+									<input type="hidden" id="reserveTime" 	name="reserveTime">
+									<input type="hidden" id="product_id" 	name="product_id">
+									<input type="hidden" id="headcount" 	name="headcount">
+									<input type="hidden" id="total_payment" name="total_payment">
 								</form>
 							</div>
 						</div>
@@ -549,18 +603,75 @@
 				$form.submit();
 			});
 
+			function renderHeadCount() {
+				const $totalHeadcount = $("#totalHeadcount");	// input type="number"
+				const $reserveSelect = $("input[name='reserveSelect']:checked");	// 체크된 예약 라디오
+				
+				// 최소값 설정
+				$totalHeadcount.attr("min", 1);
+				const $minValue = parseInt($totalHeadcount.attr("min"));	// 최소값
+				$totalHeadcount.val($minValue);	// 초기값 설정
+				
+				// 최대값 가져오기
+				const $maxHeadcount = parseInt($reserveSelect.data("max_headcount"));	// 최대값
+				$totalHeadcount.attr("max", $maxHeadcount);
+
+				$("#headcount").val($minValue);		// hidden 필드 인원수 초기화
+				
+				// 입력값에 따른 결제가격 이벤트
+				$totalHeadcount.on("input change", function() {
+					$("#headcount").val($(this).val());
+				});
+
+				$("#headcount_minus").on("click", function () {
+					let currentValue = parseInt($totalHeadcount.val());
+					if (currentValue > $minValue) {
+						$totalHeadcount.val(currentValue - 1);
+						$totalHeadcount.trigger("input"); // 강제 이벤트 발생
+					}
+				});
+
+				$("#headcount_plus").on("click", function () {
+					let currentValue = parseInt($totalHeadcount.val());
+					if (currentValue < $maxHeadcount) {
+						$totalHeadcount.val(currentValue + 1);
+						$totalHeadcount.trigger("input"); // 강제 이벤트 발생
+					}
+				});
+			}
+
+			// 가격에 콤마
+			function numberWithCommas(number) {
+				return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+			}
+
 			$("input[name='detailRoom']").on("click", function() {
 				// 다른 collapse 닫고 선택된 collapse 만 활성화
 				let targetId = $(this).attr("data-bs-target") || $(this).attr("for");
 				$(".detailRoom-group .collapse").collapse("hide");
 				$(targetId).collapse("show");
+				
+				// 예약 선택 라디오 버튼 checked 해제
+				$("input[name='reserveSelect']").prop("checked", false);
 
-				// 예약관련 초기화
+				reservReset();	// 예약 초기화
+			});
+
+			// 예약 정보 초기화
+			function reservReset() {
+				// hidden 필드 초기화
 				$("#reserveDate").val("");
 				$("#reserveTime").val("");
 				$("#product_id").val("");
+				$("#headcount").val("");
+				$("#total_payment").val("");
+
+				// 선택한 날짜 출력 초기화
 				$("#selectedDate").text("");
 				$("#selectedTime").text("");
+
+				// 결제 금액 초기화
+				$("#selectPayment").text("");
 
 				// 달력 조건 초기화
 				selectedDate = null;
@@ -569,14 +680,16 @@
 
 				$timeSlotsContainer.empty();
 				$reservationcontainer.hide();
-			});
+			}
 
 		
 			/** 달력 **/
+			// 예약 선택 라디오 클릭 시
 			$("input[name='reserveSelect']").on("click", function() {
 				renderCalendar(currentYear, currentMonth);
 				$("#product_id").val($(this).data("product_id"));
 				$reservationcontainer.show();
+				renderHeadCount();	// 예약인원 설정
 			});
 
 			const $calendar = $(".calendar");
@@ -687,7 +800,7 @@
 				const dayOfWeek = date.getDay();
 				const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
 				const dayOfWeekString = daysOfWeek[dayOfWeek];
-				return `${year}.${month}.${day} (${dayOfWeekString})`;
+				return `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(2, "0")} (${dayOfWeekString})`;
 			}
 
 			/**
@@ -723,6 +836,12 @@
 			function renderTimeSlots() {
 				$timeSlotsContainer.empty(); // 기존 시간 슬롯 초기화
 				$("#reserveTime").val(""); // 시간 선택 초기화
+
+				const $reserveSelect = $("input[name='reserveSelect']:checked");	// 체크된 예약 라디오
+				const $price = $reserveSelect.data("price");	// 가격
+				// 결제 가격 초기화
+				$("#total_payment").val("");	
+				$("#selectPayment").text("₩0");
 
 
 
@@ -762,6 +881,13 @@
 								endTime = time;
 								selectTimeRange(startTime, endTime);
 							}
+
+							// 선택된 .time-slot 갯수를 구하여 가격 계산하기							
+							const selectedCount = $timeSlotsContainer.find(".time-slot.selected").length;
+							const totalPayment = $price * selectedCount;
+							$("#total_payment").val(totalPayment);
+							$("#selectPayment").text("₩" + numberWithCommas(totalPayment));
+
 						});
 					}
 
@@ -803,6 +929,7 @@
 						startTime = null;
 						endTime = null;
 						$("#reserveTime").val("");
+						$("#selectedTime").text("");
 					} else {
 						const reserveTime = formatTime(start, end);
 						$("#reserveTime").val(reserveTime);

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/layout1}">
+	  
+<th:block layout:fragment="css">
+	<style>
+		/* 카드 스타일 */
+		.card-custom {
+			backdrop-filter: blur(10px);
+			background-color: rgba(255, 255, 255, 0.1); /* 반투명 효과 */
+			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+			padding: 24px;
+			border-top: #704de4 solid 4px;
+		}
+
+		/* 리스트 아이템 스타일 */
+		.list-group-item {
+			background-color: rgba(255, 255, 255, 0.05);
+			margin-bottom: 8px;
+			padding: 12px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.list-group-item strong{
+			width: 110px;
+			display: inline-block;
+			flex-shrink: 0;
+		}
+
+		.btn-custom {
+			background-color: #704de4;
+			color: #fff;
+			border: none;
+			border-radius: 5px;
+			width: 40%;
+			height: 40px;
+		}
+
+		.btn-custom:hover {
+			background-color: #704de4;
+			color: #fff;
+			opacity: 0.9;
+		}
+
+		.hr-custom {
+			border: none;
+			border-top: 3px solid #704de4;
+			opacity: 1;
+		}
+
+		#payment_amount {
+			color: #704de4;
+			font-weight: bold;
+			font-size: 25px;
+		}
+	</style>
+</th:block>
+<th:block layout:fragment="content">
+	<h2 class="mt-3 fw-bold text-center">예약확인</h2>
+            <div class="row mb-4 justify-content-center">
+                <div class="col-12 col-lg-8 mt-3">
+                    <!-- 카드 시작 -->
+                    <div class="card card-custom">
+                        <!-- 리스트 그룹 -->
+                        <ul class="list-group">
+                            <h4 id="space_main_title" class="fw-bold">[[${reservationResult.main_title}]]</h4>
+                            <span id="product_name" class="text-muted">[[${reservationResult.product_name}]]</span>
+                            <hr class="hr-custom">
+                            <li class="list-group-item"><strong>예약날짜</strong> <span id="reserveDate">[[${#dates.format(reservationResult.reservation_date, 'yyyy.MM.dd (EEE)')}]]</span></li>
+                            <li class="list-group-item"><strong>예약시간</strong> <span id="reserveTime">[[${#dates.format(reservationResult.start_time, 'HH:mm') + '-' + #dates.format(reservationResult.end_time, 'HH:mm')}]]</span></li>
+                            <li class="list-group-item"><strong>예약인원</strong> <span id="headcount">[[${reservationResult.headcount}]]명</span></li>
+                            <li class="list-group-item"><strong>결제방식</strong> <span id="payment_method">[[${reservationResult.payment_method}]]</span></li>
+                            <li class="list-group-item"><strong>예약자</strong> <span id="reservation_name">[[${reservationResult.reservation_name}]]</span></li>
+                            <li class="list-group-item">
+								<strong>연락처</strong>
+								<span id="reservation_phone" th:text="${reservationResult.reservation_phone.substring(0,3) + '-' + reservationResult.reservation_phone.substring(3,7) + '-' + reservationResult.reservation_phone.substring(7)}"></span>
+							</li>
+                            <li class="list-group-item"><strong>이메일</strong> <span id="reservation_email">[[${reservationResult.reservation_email}]]</span></li>
+                            <hr class="hr-custom">
+                            <li class="list-group-item m-0">
+								<strong>결제금액</strong>
+								<span id="payment_amount" th:text="${'￦' + #numbers.formatDecimal(reservationResult.amount, 0, 'COMMA', 0, 'POINT')}"></span>
+							</li>
+                        </ul>
+                    </div>
+                    <!-- 카드 끝 -->
+                </div>
+                <div class="col-12 col-lg-8 mt-3">
+                    <div class="d-flex justify-content-center gap-3">
+                        <a class="btn btn-custom" href="#">예약목록</a>
+                        <a class="btn btn-custom" href="/">홈으로</a>
+                    </div>
+                </div>
+            </div>
+	
+</th:block>
+
+<th:block layout:fragment="scriptBottom">
+	<script th:inline="javascript">
+		$(document).ready(function() {
+			console.log("예약 결과 : ", [[${reservationResult}]]);
+		});
+	</script>
+</th:block>
+</html>

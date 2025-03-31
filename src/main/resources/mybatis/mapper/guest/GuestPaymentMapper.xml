@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.skillspace.sgs.guest.payment.GuestPaymentMapper">
+
+<insert id="payment_create" parameterType="com.skillspace.sgs.guest.payment.PaymentDTO">
+	insert into 
+		payments(
+			reservation_id,
+			payment_method,
+			amount,
+			status
+		)
+		values(
+		#{reservation_id},
+		#{payment_method},
+		#{amounts},
+		#{status}
+		)
+</insert>
+
+
+
+</mapper>

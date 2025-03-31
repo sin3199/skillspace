@@ -483,6 +483,44 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="headcount-selection mt-3">
+                                        <div class="d-flex justify-content-between">
+                                            <h5 class="fw-bold">총 예약 인원</h5>
+                                            <div class="selectedHeadcount" id="selectedHeadcount"></div>
+                                        </div>
+                                        <hr>
+                                        <div class="input-group headcount-input">
+                                            
+                                        </div>
+                                    </div>
+
+                                    <script>
+                                        $(document).ready(function() {
+                                            renderHeadCount();
+                                            function renderHeadCount() {
+                                                const container = $(".headcount-input"); // 클릭한 요소의
+                                                let innerHtml = `<button class="input-group-text fs-3" id="headcount_minus"><i class="bi bi-dash-lg"></i></button>	
+                                                <input type="number" id="totalHeadcount" class="form-control text-center fs-3" min="1" value="1">
+                                                <button class="input-group-text fs-3" id="headcount_plus"><i class="bi bi-plus-lg"></i></button>	`
+                                                container.html(innerHtml);
+                                                
+                                                $(container).on("click", "#headcount_minus", function() {
+                                                    let currentValue = parseInt($("#totalHeadcount").val());
+                                                    let minValue = parseInt($("#totalHeadcount").attr("min"));
+                                                    if(currentValue > minValue) {
+                                                        $("#totalHeadcount").val(currentValue - 1);
+                                                    }
+                                                });
+                                    
+                                                $(container).on("click", "#headcount_plus", function() {
+                                                    let currentValue = parseInt($("#totalHeadcount").val());
+                                                    $("#totalHeadcount").val(currentValue + 1);
+                                                });
+                                            }
+                                        });
+                                    </script>
+                                    
                                     
                                 </div>
                             

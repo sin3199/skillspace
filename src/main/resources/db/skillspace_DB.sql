@@ -154,11 +154,15 @@ CREATE TABLE `Reservations` (
 	`reservation_id`	int 			NOT NULL,
 	`user_id`			varchar(30)		NOT NULL	COMMENT '게스트 회원 아이디',
 	`product_id`		int 			NOT NULL,
-	`total_price`		decimal(10, 2)	NOT NULL,
+	`total_payment`		decimal(10, 2)	NOT NULL,
 	`status`			varchar(15)		NOT NULL	COMMENT 'Pending, Completed, Cancelled',
-	`start_time`		datetime		NOT NULL,
-	`end_time`			datetime		NOT NULL,
+	`reservation_date`  DATE            NOT NULL 	COMMENT '예약 날짜',
+    `start_time`        TIME            NOT NULL 	COMMENT '예약 시작 시간',
+    `end_time`          TIME            NOT NULL 	COMMENT '예약 종료 시간',
 	`headcount`			tinyint			NOT NULL,
+	`reservation_name`	varchar(30)		NOT NULL,
+	`reservation_phone`	varchar(13)		NOT NULL,
+	`reservation_email`	varchar(100)	NOT NULL,
 	`is_review`			char(1)			NOT NULL	DEFAULT 'N'	COMMENT '리뷰 1개만 가능 하게',
 	`created_at`		datetime		NOT NULL	DEFAULT now(),
 	`updated_at`		datetime		NOT NULL	DEFAULT now()
@@ -181,15 +185,13 @@ REFERENCES `UserInfo` (`user_id`);
 
 -- 결제 테이블
 CREATE TABLE `Payments` (
-	`payment_id`	int 	NOT NULL,
-	`reservation_id`	int	NOT NULL,
-	`payment_method`	varchar(30)	NOT NULL	COMMENT '카드, 계좌이체, pay 등',
-	`amount`	decimal(10, 2)	NOT NULL,
-	`status`	varchar(15)	NOT NULL	COMMENT 'Pending, Completed , Failed, Refunded',
-	`transaction_id`	varchar(100)	NOT NULL,
-	`payment_date`	datetime	NOT NULL	DEFAULT now(),
-	`created_at`	datetime	NOT NULL	DEFAULT now(),
-	`updated_at`	datetime	NOT NULL	DEFAULT now()
+	`payment_id`		int 			NOT NULL,
+	`reservation_id`	int				NOT NULL,
+	`payment_method`	varchar(100)	NOT NULL	COMMENT '카드, 계좌이체, pay 등',
+	`amount`			decimal(10, 2)	NOT NULL,
+	`status`			varchar(15)		NOT NULL	COMMENT 'Pending, Completed , Failed, Refunded',
+	`created_at`		datetime		NOT NULL	DEFAULT now(),
+	`updated_at`		datetime		NOT NULL	DEFAULT now()
 );
 
 ALTER TABLE `Payments`
@@ -308,4 +310,3 @@ CREATE TABLE `loginlog` (
 ALTER TABLE `loginlog`
 MODIFY `log_id` INT NOT NULL AUTO_INCREMENT,
 ADD PRIMARY KEY (`log_id`);
-
