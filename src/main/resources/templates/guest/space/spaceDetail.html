@@ -96,6 +96,11 @@
 			background: none;
 			font-weight: bold;
 		}
+
+		#scrollspy_content > div {
+			padding-top: 70px; /* 헤더 높이에 맞춤 */
+			margin-top: -70px;
+		}
 	
 		
 	</style>
@@ -424,9 +429,9 @@
 													</li>
 												</ul>
 												
-												<hr class="my-2 hr-dashed">
+												<hr class="mt-4 hr-primary border-4">
 												<!-- 예약선택 -->
-												<h5 class="mt-4">예약선택</h5>
+												<h5 class="fw-bold">예약선택</h5>
 												<div class="d-flex flex-column mt-2">
 													<div class="form-check">
 														<input class="form-check-input" 
@@ -534,14 +539,16 @@
 								<a class="nav-link" href="#space_review">이용 후기</a>
 							</nav>
 	
-							<div id="scrollspy_content" data-bs-spy="scroll" data-bs-target="#scrollspy_nav" data-bs-offset="70">
+							<div id="scrollspy_content" data-bs-target="#scrollspy_nav" data-bs-spy="scroll">
 								<div class="mb-5">
 									<h4 id="space_info" class="fw-bold mb-3">공간 소개</h4>
 									<p>[[${spaceInfo.space_intro}]]</p>
+									<div style="height: 300px;"></div>
 								</div>
 								<div class="mb-5">
 									<h4 id="space_facility" class="fw-bold mb-3">시설 안내</h4>
 									<p>[[${spaceInfo.space_guide}]]</p>
+									<div style="height: 300px;"></div>
 								</div>
 								<div class="mb-5">
 									<h4 id="space_qa" class="fw-bold mb-3">Q&A</h4>
@@ -575,10 +582,30 @@
 </th:block>
 
 <th:block layout:fragment="scriptBottom">
+	<script>
+		// document.addEventListener('DOMContentLoaded', function () {
+		// 	var scrollSpy = new bootstrap.ScrollSpy(document.body, {
+		// 		target: '#scrollspy_nav'
+		// 	});
+		// });
+	</script>
     <script th:inline="javascript">
         $(document).ready(function() {
 			console.log("공간정보", [[${spaceInfo}]]);
 			console.log("상품목록", [[${productList}]]);
+
+			// 네비게이션 링크 클릭 이벤트
+            $('#bottom .nav-link').on('click', function (event) {
+                event.preventDefault(); // 기본 동작 방지
+
+                // 이동할 대상의 ID 가져오기
+                var target = $(this).attr('href');
+
+                // 스크롤 애니메이션 실행 (100px 오프셋 적용)
+                $('html, body').animate({
+                    scrollTop: $(target).offset().top - 50
+                }, 100); // 800ms 동안 부드럽게 이동
+            });
 
 			$("#btn_payment").on("click", function() {
 				const $form = $("#reserveForm");

@@ -62,7 +62,7 @@ public class GuestReserveController {
 		log.info("예약 dto : " + dto);
 		log.info("payment_method : " + payment_method);
 
-		rttr.addFlashAttribute("reservation_id", dto.getReservation_id());
+		rttr.addAttribute("reservation_id", dto.getReservation_id());
 		
 
 		return "redirect:/guest/reserve/reserve_result";
@@ -71,6 +71,7 @@ public class GuestReserveController {
 	@GetMapping("reserve_result")
 	public void reserve_result(Integer reservation_id, Model model) throws Exception {
 		
+		log.info("예약결과에서 reservation_id : {}", reservation_id);
 		// 예약정보 조회
 		Map<String, Object> reservationResult = guestReserveService.getReservationResultByReservationId(reservation_id);
 		model.addAttribute("reservationResult", reservationResult);

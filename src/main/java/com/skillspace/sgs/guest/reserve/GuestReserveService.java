@@ -23,7 +23,13 @@ public class GuestReserveService {
     public void reservation_process(ReservationDTO dto, String payment_method) {
 
         // 1) Reverations DB 저장
-		dto.setStatus("대기");
+
+        if(payment_method.contains("계좌이체")) {
+            dto.setStatus("예약대기");
+        }else {
+            dto.setStatus("예약완료");
+        }
+        
         guestReserveMapper.reservation_create(dto);
 
         // 2) payments DB 저장
