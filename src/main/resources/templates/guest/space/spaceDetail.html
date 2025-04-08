@@ -84,22 +84,22 @@
     </style>
 	<style>
 		/* 스크롤스파이 네비게이션 스타일 */
-		.nav-justified .nav-link {
+		.nav-pills .nav-link {
 			color: #666;
+			border-radius: 0;
 			border: none;
 			background-color: #fff;
 		}
 	
-		.nav-justified .nav-link.active {
+		.nav-pills .nav-link.active {
 			color: #6c5ce7;
 			border-bottom: 2px solid #6c5ce7;
-			background: none;
+			background: #fff;
 			font-weight: bold;
 		}
-
-		#scrollspy_content > div {
-			padding-top: 70px; /* 헤더 높이에 맞춤 */
-			margin-top: -70px;
+	
+		#scrollspy_content h4[id] { /* ID가 있는 모든 h4 태그를 대상으로 */
+		scroll-margin-top: 50px; /* sticky 네비게이션 높이(40px) + 약간의 여유 공간 */
 		}
 	
 		
@@ -293,6 +293,67 @@
 		.form-check-input:checked + label {
 			font-weight: bold;
 			color: #704de4;
+		}
+	</style>
+
+	<!-- 리뷰 and Q&A -->
+	<style>
+		.review-text {
+			font-size: 15px;
+		}
+		
+		.text-purple {
+			color: #6c5ce7;
+		}
+		.text-bg-purple {
+			background-color: #6c5ce7;
+		}
+
+		.border-bottom-purple {
+			border-bottom: #6c5ce7 solid 1px;
+		}
+
+		#review-list-container hr {
+			border-bottom: #6c5ce7 solid 2px;
+		}
+
+		.active>.page-link, .page-link.active {
+			background-color: #6c5ce7;
+			border-color: #6c5ce7;
+			z-index: 3;
+		}
+
+		.btn-purple {
+			background-color: #704de4;
+			color: #fff;
+			border: none;
+			border-radius: 5px;
+			height: 30px;
+			font-size: 14px;
+		}
+
+		.btn-purple:hover {
+			background-color: #563bb7;
+			color: #fff;
+		}
+
+		.modal-header {
+			background-color: #6c5ce7;
+			color: #fff;
+		}
+		
+		textarea {
+			resize: none;
+		}
+
+		#questionModal .btn-primary {
+			background-color: #6c5ce7;
+			border-color: #6c5ce7;
+		}
+
+		#questionModal .btn-primary:hover {
+			background-color: #5b46fd;
+			border-color: #5b46fd;
 		}
 	</style>
 </th:block>
@@ -539,7 +600,7 @@
 								<a class="nav-link" href="#space_review">이용 후기</a>
 							</nav>
 	
-							<div id="scrollspy_content" data-bs-target="#scrollspy_nav" data-bs-spy="scroll">
+							<div id="scrollspy_content" data-bs-target="#scrollspy_nav" data-bs-spy="scroll" data-bs-offset="50">
 								<div class="mb-5">
 									<h4 id="space_info" class="fw-bold mb-3">공간 소개</h4>
 									<p>[[${spaceInfo.space_intro}]]</p>
@@ -551,15 +612,300 @@
 									<div style="height: 300px;"></div>
 								</div>
 								<div class="mb-5">
-									<h4 id="space_qa" class="fw-bold mb-3">Q&A</h4>
-									<p>...</p>
-									<div style="height: 300px;"></div>
+									<div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h4 id="space_qa" class="fw-bold">Q&A</h4>
+                                        <!-- '질문_작성하기' 문구에 어울리는 아이콘과 함께 버튼 -->
+                                        <button type="button" class="btn-purple" data-bs-toggle="modal" data-bs-target="#questionModal">
+											<i class="bi bi-pencil-square"></i>_질문작성하기
+										</button>
+										<!-- 질문 작성하기 모달 -->
+										<div class="modal fade" id="questionModal" tabindex="-1" aria-labelledby="questionModalLabel" aria-hidden="true">
+											<div class="modal-dialog modal-dialog-centered">
+												<div class="modal-content">
+													<div class="modal-header">
+														<h5 class="modal-title fw-bold" id="questionModalLabel">질문 작성하기</h5>
+														<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+													</div>
+													<div class="modal-body">
+														<form id="questionForm">
+															<div class="mb-3">
+																<div class="d-flex justify-content-between align-content-center">
+																	<label for="questionContent" class="form-label fw-bold">질문</label>
+																	<span><span id="textCount">0</span> / 200</span>
+																</div>
+																<textarea class="form-control" id="questionContent" name="questionContent" rows="5" placeholder="질문 내용을 자세히 작성해주세요" maxlength="200" required></textarea>
+																<div class="text-end mt-1">
+																	
+																</div>
+															</div>
+														</form>
+														<div class="d-flex justify-content-center align-content-center gap-2">
+															<button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">취소</button>
+															<button type="button" class="btn btn-primary w-50" id="submitQuestion">질문 등록</button>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+                                    </div>
+									<!-- 페이지네이션이 포함된 Q&A 목록 -->
+                                    <div id="review-list-section" class="card">
+
+                                        <!-- Q&A 목록 컨테이너 -->
+                                        <div id="review-list-container" class="card-body">
+											<th:block th:if="${not #lists.isEmpty(questionList)}" th:each="questionDTO : ${questionList}">
+                                                <!-- 예시 Q&A 항목 1 -->
+                                                <div class="review-item mb-3 d-flex flex-column border p-2">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2 border-bottom-purple">
+                                                        <div>
+                                                            <strong>[[${questionDTO.user_nick}]]</strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="review-text">[[${questionDTO.question_content}]]</div>
+                                                    <small class="text-muted" th:text="${#temporals.format(questionDTO.created_at, 'yyyy.MM.dd')}"></small>
+                                                </div>
+                                                <!-- 답변 -->
+                                                <div class="review-item mb-3 d-flex border p-2" th:if="${questionDTO.answer != null}">
+                                                    <div class="me-3">
+                                                        <span class="badge text-bg-purple">답변</span>
+                                                    </div>
+                                                    <div>
+                                                        <div class="review-text">
+                                                            [[${questionDTO.answer.answer_content}]]
+                                                        </div>
+                                                        <small class="text-muted">[[${#temporals.format(questionDTO.answer.created_at, 'yyyy.MM.dd')}]]</small>
+                                                    </div>
+                                                </div>
+                                                <hr class="my-3"> <!-- 리뷰 구분선 -->
+											</th:block>
+											<th:block th:if="${#lists.isEmpty(questionList)}">
+                                                <div class="text-center text-muted py-5">
+                                                    <p><i class="bi bi-chat-square-dots fs-1"></i></p>
+                                                    <p>아직 작성된 질문이 없습니다.</p>
+                                                </div>
+											</th:block>
+
+                                                <!-- 예시 Q&A 항목 2 -->
+                                                <div class="review-item mb-3 d-flex flex-column border p-2">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2 border-bottom-purple">
+                                                        <div>
+                                                            <strong class="">박*영</strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="review-text">
+                                                        위치도 찾기 쉽고, 필요한 장비들이 잘 갖춰져 있어서 만족스러웠습니다. 예약 시스템도 간편해서 좋네요.
+                                                    </div>
+                                                    <small class="text-muted">2024.05.18</small>
+                                                </div>
+                                                <!-- 답변 -->
+                                                <div class="review-item mb-3 d-flex border p-2">
+                                                    <div class="me-3">
+                                                        <span class="badge text-bg-purple">답변</span>
+                                                    </div>
+                                                    <div>
+                                                        <div class="review-text">
+                                                            어쩌구 저쩌구 답변을 달았다
+                                                        </div>
+                                                        <small class="text-muted">2024.05.20</small>
+                                                    </div>
+                                                </div>
+                                                <hr class="my-3"> <!-- Q&A 구분선 -->
+                                        
+                                                <!-- 예시 Q&A 항목 2 -->
+                                                <div class="review-item mb-3 d-flex flex-column border p-2">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2 border-bottom-purple">
+                                                        <div>
+                                                            <strong class="">박*영</strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="review-text">
+                                                        위치도 찾기 쉽고, 필요한 장비들이 잘 갖춰져 있어서 만족스러웠습니다. 예약 시스템도 간편해서 좋네요.
+                                                    </div>
+                                                    <small class="text-muted">2024.05.18</small>
+                                                </div>
+                                                <!-- 답변 -->
+                                                <div class="review-item mb-3 d-flex border p-2">
+                                                    <div class="me-3">
+                                                        <span class="badge text-bg-purple">답변</span>
+                                                    </div>
+                                                    <div>
+                                                        <div class="review-text">
+                                                            어쩌구 저쩌구 답변을 달았다
+                                                        </div>
+                                                        <small class="text-muted">2024.05.20</small>
+                                                    </div>
+                                                </div>
+                                                <hr class="my-3"> <!-- Q&A 구분선 -->
+                                        
+                                        
+                                                 <!-- 리뷰가 없을 경우 표시 (주석 처리됨 - 필요시 활성화) -->
+                                                 <!--
+                                                 <div class="text-center text-muted py-5">
+                                                     <p><i class="bi bi-chat-square-dots fs-1"></i></p>
+                                                     <p>아직 작성된 이용 후기가 없습니다.</p>
+                                                 </div>
+                                                  -->
+                                        
+                                        
+                                        
+                                            <!-- 페이지네이션 -->
+                                            <nav aria-label="Review page navigation" class="mt-0">
+                                                <ul class="pagination pagination-sm justify-content-center">
+                                                    <li class="page-item disabled">
+                                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                                                    </li>
+                                                    <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="#">&raquo;</a>
+                                                    </li>
+                                                </ul>
+                                            </nav>
+                                        </div><!-- // #review-list-container 끝 -->
+                                    </div>
 								</div>
 								<div class="mb-5">
 									<h4 id="space_review" class="fw-bold mb-3">이용 후기</h4>
-									<p>...</p>
-									<div style="height: 300px;"></div>
+									<!-- 페이지네이션이 포함된 리뷰 목록 -->
+                                    <div id="review-list-section" class="mt-4">
+
+                                        <!-- 리뷰 목록 컨테이너 -->
+                                        <div id="review-list-container" class="card">
+                                            <div class="card-body">
+                                                <!-- 예시 리뷰 항목 1 -->
+                                                <div class="review-item mb-3 d-flex flex-column border p-2">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2 border-bottom-purple">
+                                                        <div>
+                                                            <strong class="">김*현</strong>
+                                                        </div>
+                                                        <span class="text-purple"> <!-- 별점 아이콘 (Bootstrap Icons 필요) -->
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-half"></i>
+                                                        </span>
+                                                    </div>
+                                                    <div class="review-text">
+                                                        시설이 정말 깨끗하고 관리가 잘 되어 있어서 좋았습니다. 특히 방음이 잘 돼서 연습에 집중하기 편했어요. 다음에 또 이용할 생각입니다!
+                                                    </div>
+                                                    <img src="https://cdn.pixabay.com/photo/2015/12/04/22/20/gear-1077550_640.png" class="my-2" style="height: 300px; width: 300px;">
+                                                    <small class="text-muted">2024.05.20</small>
+                                                </div>
+                                                <!-- 답변 -->
+                                                <div class="review-item mb-3 d-flex border p-2">
+                                                    <div class="me-3">
+                                                        <span class="badge text-bg-purple">답변</span>
+                                                    </div>
+                                                    <div>
+                                                        <div class="review-text">
+                                                            어쩌구 저쩌구 답변을 달았다
+                                                        </div>
+                                                        <small class="text-muted">2024.05.20</small>
+                                                    </div>
+                                                </div>
+                                                <hr class="my-3"> <!-- 리뷰 구분선 -->
+                                        
+                                                <!-- 예시 리뷰 항목 2 -->
+                                                <div class="review-item mb-3 d-flex flex-column border p-2">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2 border-bottom-purple">
+                                                        <div>
+                                                            <strong class="">김*현</strong>
+                                                        </div>
+                                                        <span class="text-purple"> <!-- 별점 아이콘 (Bootstrap Icons 필요) -->
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-half"></i>
+                                                        </span>
+                                                    </div>
+                                                    <div class="review-text">
+                                                        시설이 정말 깨끗하고 관리가 잘 되어 있어서 좋았습니다. 특히 방음이 잘 돼서 연습에 집중하기 편했어요. 다음에 또 이용할 생각입니다!
+                                                    </div>
+                                                    <img src="https://cdn.pixabay.com/photo/2015/12/04/22/20/gear-1077550_640.png" class="my-2" style="height: 300px; width: 300px;">
+                                                    <small class="text-muted">2024.05.20</small>
+                                                </div>
+                                                <!-- 답변 -->
+                                                <div class="review-item mb-3 d-flex border p-2">
+                                                    <div class="me-3">
+                                                        <span class="badge text-bg-purple">답변</span>
+                                                    </div>
+                                                    <div>
+                                                        <div class="review-text">
+                                                            어쩌구 저쩌구 답변을 달았다
+                                                        </div>
+                                                        <small class="text-muted">2024.05.20</small>
+                                                    </div>
+                                                </div>
+                                                <hr class="my-3"> <!-- 리뷰 구분선 -->
+                                        
+                                                <!-- 예시 리뷰 항목 3 -->
+                                                <div class="review-item mb-3 d-flex flex-column border p-2">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2 border-bottom-purple">
+                                                        <div>
+                                                            <strong class="">김*현</strong>
+                                                        </div>
+                                                        <span class="text-purple"> <!-- 별점 아이콘 (Bootstrap Icons 필요) -->
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-fill"></i>
+                                                            <i class="bi bi-star-half"></i>
+                                                        </span>
+                                                    </div>
+                                                    <div class="review-text">
+                                                        시설이 정말 깨끗하고 관리가 잘 되어 있어서 좋았습니다. 특히 방음이 잘 돼서 연습에 집중하기 편했어요. 다음에 또 이용할 생각입니다!
+                                                    </div>
+                                                    <img src="https://cdn.pixabay.com/photo/2015/12/04/22/20/gear-1077550_640.png" class="my-2" style="height: 300px; width: 300px;">
+                                                    <small class="text-muted">2024.05.20</small>
+                                                </div>
+                                                <!-- 답변 -->
+                                                <div class="review-item mb-3 d-flex border p-2">
+                                                    <div class="me-3">
+                                                        <span class="badge text-bg-purple">답변</span>
+                                                    </div>
+                                                    <div>
+                                                        <div class="review-text">
+                                                            어쩌구 저쩌구 답변을 달았다
+                                                        </div>
+                                                        <small class="text-muted">2024.05.20</small>
+                                                    </div>
+                                                </div>
+                                                <hr class="my-3"> <!-- 리뷰 구분선 -->
+                                        
+                                                
+                                        
+                                                 <!-- 리뷰가 없을 경우 표시 (주석 처리됨 - 필요시 활성화) -->
+                                                 <!--
+                                                 <div class="text-center text-muted py-5">
+                                                     <p><i class="bi bi-chat-square-dots fs-1"></i></p>
+                                                     <p>아직 작성된 이용 후기가 없습니다.</p>
+                                                 </div>
+                                                  -->
+                                        
+                                            </div><!-- // #review-list-container 끝 -->
+                                        
+                                        
+                                            <!-- 페이지네이션 -->
+                                            <nav aria-label="Review page navigation" class="mt-0">
+                                                <ul class="pagination pagination-sm justify-content-center">
+                                                    <li class="page-item disabled">
+                                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                                                    </li>
+                                                    <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="#">&raquo;</a>
+                                                    </li>
+                                                </ul>
+                                            </nav>
+                                        </div>
+                                    </div>
 								</div>
+
 							</div>
 						</div>
 					</div>
@@ -582,30 +928,71 @@
 </th:block>
 
 <th:block layout:fragment="scriptBottom">
-	<script>
-		// document.addEventListener('DOMContentLoaded', function () {
-		// 	var scrollSpy = new bootstrap.ScrollSpy(document.body, {
-		// 		target: '#scrollspy_nav'
-		// 	});
-		// });
-	</script>
     <script th:inline="javascript">
         $(document).ready(function() {
 			console.log("공간정보", [[${spaceInfo}]]);
 			console.log("상품목록", [[${productList}]]);
+			console.log("질문목록", [[${questionList}]]);
+			
+			const login_auth = [[${session.login_auth ?: 'null'}]];
+			// 질문작성하기 모달 이벤트			
+			$("#questionModal").on("show.bs.modal", function() {
+				// 로그인 여부 확인
+				if (login_auth === 'null') {
+					alert("로그인이 필요한 서비스입니다.");
+					return false;
+				}
+			});
+			
+			// 모달에서 질문 등록 버튼 클릭 시
+			$("#submitQuestion").on("click", function() {
+				const questionContent = $("#questionContent").val();
 
-			// 네비게이션 링크 클릭 이벤트
-            $('#bottom .nav-link').on('click', function (event) {
-                event.preventDefault(); // 기본 동작 방지
+				if (!questionContent) {
+					alert("질문 내용을 입력해주세요.");
+					$("#questionContent").focus();
+					return;
+				}
 
-                // 이동할 대상의 ID 가져오기
-                var target = $(this).attr('href');
+				const host_space_id = [[${spaceInfo.host_space_id}]];
+				const user_id = login_auth.user_id;
+				const user_nick = login_auth.user_nick;
 
-                // 스크롤 애니메이션 실행 (100px 오프셋 적용)
-                $('html, body').animate({
-                    scrollTop: $(target).offset().top - 50
-                }, 100); // 800ms 동안 부드럽게 이동
-            });
+				$.ajax({
+					type: "POST",
+					url: "/guest/question/create",
+					data: {
+						host_space_id : host_space_id,
+						question_content : $("#questionContent").val(),
+						user_id : user_id,
+						user_nick : user_nick
+					},
+					success: function(response) {
+
+					},
+					error: function(error) {
+						alert("질문 등록에 실패했습니다.");
+					}
+			
+				});
+
+
+
+				// 질문 등록 후 모달 닫기
+				$("#questionModal").modal("hide");
+			});
+
+			// 모달이 닫힐 때 폼 초기화
+			$('#questionModal').on('hidden.bs.modal', function () {
+				$("#questionForm")[0].reset();
+				$("#textCount").text(0);
+			});
+
+			// 글자 수 제한 및 이벤트
+			$("#questionContent").on("input", function() {
+				const textLength = $(this).val().length;
+				$("#textCount").text(textLength);
+			});
 
 			$("#btn_payment").on("click", function() {
 				const $form = $("#reserveForm");

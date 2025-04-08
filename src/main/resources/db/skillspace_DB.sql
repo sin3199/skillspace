@@ -242,6 +242,42 @@ ADD CONSTRAINT `FK_Reviews_TO_Reply_1`
 FOREIGN KEY (`review_id`)
 REFERENCES `Reviews` (`review_id`);
 
+-- 질문 테이블
+CREATE TABLE `Questions` (
+	`question_id`		int 			NOT NULL,
+	`host_space_id`		int				NOT NULL,
+	`user_id`			varchar(30)		NOT NULL,
+	`question_content`	varchar(200)	NOT NULL,
+	`created_at`		datetime		NOT NULL	DEFAULT now()
+);
+
+ALTER TABLE `Questions`
+MODIFY `question_id` INT NOT NULL AUTO_INCREMENT,
+ADD PRIMARY KEY (`question_id`);
+
+ALTER TABLE `Questions` 
+ADD CONSTRAINT `FK_Host_space_TO_Questions_1` 
+FOREIGN KEY (`host_space_id`)
+REFERENCES `Host_space` (`host_space_id`);
+
+
+-- 답변 테이블
+CREATE TABLE `Answer` (
+	`answer_id`			int 			NOT NULL,
+	`question_id`		int				NOT NULL,
+	`answer_content`	varchar(200)	NOT NULL,
+	`created_at`		datetime		NOT NULL	DEFAULT now()
+);
+
+ALTER TABLE `Answer`
+MODIFY `answer_id` INT NOT NULL AUTO_INCREMENT,
+ADD PRIMARY KEY (`answer_id`);
+
+ALTER TABLE `Answer` 
+ADD CONSTRAINT `FK_Question_TO_Answer_1` 
+FOREIGN KEY (`question_id`)
+REFERENCES `Question` (`question_id`);
+
 
 -- 찜 목록
 CREATE TABLE `Wishlist` (

@@ -8,13 +8,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.skillspace.sgs.admin.category.AdminCategoryService;
 import com.skillspace.sgs.admin.images.ImagesDTO;
 import com.skillspace.sgs.common.utils.PageMaker;
 import com.skillspace.sgs.common.utils.SearchCriteria;
+import com.skillspace.sgs.guest.question.GuestQuestionService;
+import com.skillspace.sgs.guest.question.QuestionDTO;
 import com.skillspace.sgs.host.product.HostProductDTO;
 import com.skillspace.sgs.host.space.HostSpaceDTO;
 
@@ -29,6 +30,7 @@ public class GuestSpaceController {
 	
 	private final GuestSpaceService guestSpaceService;
 	private final AdminCategoryService adminCategoryService;
+	private final GuestQuestionService guestQuestionService;
 	
 	// 게스트 공간 목록 페이지
 	@GetMapping("/spaceList")
@@ -90,9 +92,14 @@ public class GuestSpaceController {
 		// 2) 공간의 상품 목록(이미지 포함)
 		List<HostProductDTO> productList = guestSpaceService.getProductsWithImages(host_space_id);
 		separatorChange(productList);
+
+		// 3) 질문 목록
+		List<QuestionDTO> questionList = guestQuestionService.getQuestionWithAnswerBySpaceId(host_space_id);
+
 		
 		model.addAttribute("spaceInfo", hostSpaceDTO);
 		model.addAttribute("productList", productList);
+		model.addAttribute("questionList", questionList);
 	}
 	
 	
