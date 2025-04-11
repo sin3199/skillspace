@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="mypageTab-css">
+    <style>
+        .category-title {
+            color: #333;
+                font-size: 2.5rem;
+                font-weight: 700;
+                margin-bottom: 1rem;
+                position: relative;
+                display: inline-block;
+                padding-bottom: 10px;
+        }
+    
+        .category-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 3px;
+            background-color: #007bff;
+        }
+    
+        .category-card {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            text-align: center;
+        }
+    
+        /* 활성 탭 강조 (선택 사항) */
+        .nav-pills .nav-link.active {
+            font-weight: bold;
+            background-color: #6c5ce7;
+            border-color: #6c5ce7;
+        }
+    
+        .nav-pills .nav-link:hover {
+            background-color: #b4acf0;
+            color: #fff;
+        }
+    </style>
+</th:block>
+<th:block th:fragment="mypageTab">
+    <div class="card mt-3 mb-5 category-card">
+		<h2 class="category-title">마이페이지</h2>
+		<!-- 탭 네비게이션 -->
+		<ul class="nav nav-pills nav-fill" id="myPageTab" role="tablist">
+			<li class="nav-item">
+				<a class="nav-link" th:classappend="${currentUri == '/guest/mypage/modify'} ? 'active' : ''" id="info-tab" href="/guest/mypage/modify">정보수정</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" th:classappend="${currentUri == '/guest/mypage'} ? 'active' : ''" id="reservations-tab" href="/reservations">예약내역</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" th:classappend="${currentUri == '/guest/mypage/question'} ? 'active' : ''" id="qa-tab" href="/guest/mypage/question">Q&A</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" th:classappend="${currentUri == '/guest/mypage'} ? 'active' : ''" id="reviews-tab" href="/reviews">이용후기</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" th:classappend="${currentUri == '/guest/mypage'} ? 'active' : ''" id="wishlist-tab" href="/wishlist">찜목록</a>
+			</li>
+		</ul>
+	</div>
+</th:block>
+</html>

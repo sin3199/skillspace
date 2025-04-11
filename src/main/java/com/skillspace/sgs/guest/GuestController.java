@@ -146,22 +146,7 @@ public class GuestController {
 		return "redirect:/";
 	}
 	
-	// 회원 정보 수정 폼
-	@GetMapping("/modify")
-	public void modify(Model model, HttpSession session) {
-		
-		GuestDTO dto = guestService.modify(((GuestDTO)session.getAttribute("login_auth")).getUser_id());
-		model.addAttribute("guestDTO", dto);
-	}
 	
-	// 회원 정보 수정 처리
-	@PostMapping("/modify")
-	public String modify_save(GuestDTO dto) throws Exception {
-		
-		guestService.modify_save(dto);
-		
-		return "redirect:/guest/modify";
-	}
 	
 	// 아이디 찾기 폼
 	@GetMapping("/idsearch")
@@ -230,37 +215,7 @@ public class GuestController {
 		
 	}
 	
-	@GetMapping("/pwchange")
-	public void pwchange() {
-		
-	}
 	
-	@PostMapping("/pwchange")
-	public ResponseEntity<String> pwchange(@RequestParam("cur_pw") String user_pw, 
-											String new_pw, HttpSession session) {
-		
-		log.info("user_pw : " + user_pw + " new_pw : " + new_pw); 
-		ResponseEntity<String> entity = null;
-		String result = "";
-		GuestDTO db_dto = (GuestDTO)session.getAttribute("login_auth");
-		
-		if(passwordEncoder.matches(user_pw, db_dto.getUser_pw())) {
-			// 신규 비밀번호 60바이트 암호화.
-			String encoding_new_pw = passwordEncoder.encode(new_pw);
-			
-			// 암호화 된 비밀번호 db 변경
-			guestService.pwchange(db_dto.getUser_id(), encoding_new_pw);
-			
-			db_dto.setUser_pw(encoding_new_pw);
-			session.setAttribute("login_auth", db_dto);
-			
-			result = "success";
-		}else result = "fail";
-		
-		entity = new ResponseEntity<String>(result, HttpStatus.OK);
-		
-		return entity;
-	}
 	
 	
 }

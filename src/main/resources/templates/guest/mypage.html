@@ -3,11 +3,117 @@
 	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	  layout:decorate="~{layouts/layout1}">
 	  
+<th:block layout:fragment="css">
+	<style>
+	.category-title {
+        color: #333;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+    }
+
+    .category-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        height: 3px;
+        background-color: #007bff;
+    }
+
+    .category-card {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        text-align: center;
+    }
+
+    /* 활성 탭 강조 (선택 사항) */
+    .nav-pills .nav-link.active {
+        font-weight: bold;
+        background-color: #6c5ce7;
+        border-color: #6c5ce7;
+    }
+
+    .nav-pills .nav-link:hover {
+        background-color: #b4acf0;
+        color: #fff;
+    }
+	</style>
+</th:block>
 <th:block layout:fragment="content">
 	<h1>마이페이지</h1>
 
-	<a href="/guest/modify" class="text-muted text-decoration-none">정보수정</a>
-	<a href="/guest/pwchange" class="text-muted text-decoration-none">비밀번호 수정</a>
+	<a href="/guest/mypage/modify" class="text-muted text-decoration-none">정보수정</a>
+	<a href="/guest/mypage/pwchange" class="text-muted text-decoration-none">비밀번호 수정</a>
+
+	<th:block th:replace="~{guest/mypage/mypageTab :: mypageTab}"></th:block>
+
+
+
+	<!-- 탭 컨텐츠 영역 -->
+	<div class="card" id="myPageTabContent">
+		<!-- 정보수정 탭 -->
+		<div class="card-body" id="info-content">
+			<h4>회원 정보 수정</h4>
+			<p class="text-muted">회원님의 개인 정보(비밀번호, 연락처, 주소 등)를 안전하게 관리하세요.</p>
+			<!-- 실제 폼 구현 필요 -->
+			<form>
+				<div class="mb-3 row">
+					<label for="staticEmail" class="col-sm-2 col-form-label">아이디(이메일)</label>
+					<div class="col-sm-10">
+						<input type="text" readonly class="form-control-plaintext" id="staticEmail" value="user@example.com">
+					</div>
+				</div>
+				<div class="mb-3 row">
+					<label for="inputPassword" class="col-sm-2 col-form-label">새 비밀번호</label>
+					<div class="col-sm-10">
+						<input type="password" class="form-control" id="inputPassword" placeholder="새 비밀번호 (8자 이상)">
+					</div>
+				</div>
+				<div class="mb-3 row">
+					<label for="inputPasswordConfirm" class="col-sm-2 col-form-label">비밀번호 확인</label>
+					<div class="col-sm-10">
+						<input type="password" class="form-control" id="inputPasswordConfirm" placeholder="새 비밀번호 확인">
+					</div>
+				</div>
+				<div class="mb-3 row">
+					<label for="inputName" class="col-sm-2 col-form-label">이름</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="inputName" value="홍길동">
+					</div>
+				</div>
+				<div class="mb-3 row">
+					<label for="inputPhone" class="col-sm-2 col-form-label">연락처</label>
+					<div class="col-sm-10">
+						<input type="tel" class="form-control" id="inputPhone" value="010-1234-5678">
+					</div>
+				</div>
+				<!-- 주소 필드 추가 (우편번호 찾기 API 연동 필요) -->
+				<div class="mb-3 row">
+					<label class="col-sm-2 col-form-label">주소</label>
+					<div class="col-sm-10">
+						<div class="input-group mb-2">
+							<input type="text" class="form-control" placeholder="우편번호" id="zipCode" readonly>
+							<button class="btn btn-outline-secondary" type="button" id="findZipCodeBtn">우편번호 찾기</button>
+						</div>
+						<input type="text" class="form-control mb-2" placeholder="기본 주소" id="address1" readonly>
+						<input type="text" class="form-control" placeholder="상세 주소 입력" id="address2">
+					</div>
+				</div>
+				<div class="d-flex justify-content-end">
+					<button type="submit" class="btn btn-primary">정보 수정</button>
+					<button type="button" class="btn btn-outline-danger ms-2">회원 탈퇴</button>
+				</div>
+			</form>
+		</div>
+	</div>
 	
 </th:block>
 </html>

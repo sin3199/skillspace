@@ -177,7 +177,7 @@
         	select="selectImages"/>
 </resultMap>
 
-<!-- Category 정보 조회 -->
+<!-- HostSpace 정보 조회 -->
 <select id="selectHostSpace" resultType="com.skillspace.sgs.host.space.HostSpaceDTO">
     select 
 	    host_space_id,

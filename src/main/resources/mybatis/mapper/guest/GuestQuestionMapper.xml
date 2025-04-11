@@ -19,21 +19,124 @@
 		
 </insert>
 
-
-    <!-- getQuestionWithAnswerBySpaceId --> 
-
-    <select id="getQuestionWithAnswerBySpaceId" resultType="com.skillspace.sgs.guest.question.QuestionDTO">
+    <select id="getQuestionWithAnswerBySpaceId" resultMap="qnaResultMap">
         select
             q.question_id,
             q.user_id,
             q.user_nick,
             q.host_space_id,
             q.question_content,
-            q.created_at
+            q.question_status,
+            q.created_at as question_created_at,
+            a.answer_id,
+            a.answer_content,
+            a.created_at as answer_created_at
+        from
+            questions q
+        left outer join
+            answer a
+        on
+            q.question_id = a.question_id
+        where
+            q.host_space_id = #{host_space_id}
+        order by
+            q.created_at desc
+        limit #{cri.pageStart}, #{cri.perPageNum}
+            
+    </select>
+
+    <resultMap type="com.skillspace.sgs.guest.question.QuestionDTO" id="qnaResultMap">
+        <id property="question_id" column="question_id"/>
+        <result property="user_id" column="user_id"/>
+        <result property="user_nick" column="user_nick"/>
+        <result property="host_space_id" column="host_space_id"/>
+        <result property="question_content" column="question_content"/>
+        <result property="question_status" column="question_status"/>
+        <result property="created_at" column="question_created_at"/>
+        
+        <!-- 답변 -->
+        <association property="answer" javaType="java.util.Map">
+            <result property="answer_id" column="answer_id"/>
+            <result property="answer_content" column="answer_content"/>
+            <result property="answer_created_at" column="answer_created_at"/>
+        </association>
+    </resultMap>
+
+    
+
+    <select id="countQuestionsBySpaceId" resultType="int" parameterType="int">
+        select 
+            count(*)
+        from 
+            questions
+        where 
+            host_space_id = #{host_space_id}
+    </select>
+
+
+
+
+
+    <select id="getQuestionListByUserId" resultMap="MypageQnaResultMap">
+        select
+            q.question_id,
+            q.user_id,
+            q.user_nick,
+            q.host_space_id,
+            q.question_content,
+            q.question_status,
+            q.created_at as question_created_at,
+            hs.main_title,
+            a.answer_id,
+            a.answer_content,
+            a.created_at as answer_created_at
+        from
+            questions q
+        inner join 
+            host_space hs 
+        on 
+            q.host_space_id = hs.host_space_id
+        left outer join
+            answer a
+        on
+            q.question_id = a.question_id
+        where
+            q.user_id = #{user_id}
+        order by
+            q.created_at desc
+        limit #{cri.pageStart}, #{cri.perPageNum} 
+            
+
+    </select>
+    <resultMap type="com.skillspace.sgs.guest.mypage.MyPageQnaDTO" id="MypageQnaResultMap">
+        <id property="question_id" column="question_id"/>
+        <result property="user_id" column="user_id"/>
+        <result property="user_nick" column="user_nick"/>
+        <result property="host_space_id" column="host_space_id"/>
+        <result property="question_content" column="question_content"/>
+        <result property="question_status" column="question_status"/>
+        <result property="question_created_at" column="question_created_at"/>
+        <association property="hostSpace" javaType="java.util.Map">
+            <result property="main_title" column="main_title"/>
+        </association>
+        <association property="answer" javaType="java.util.Map">
+            <result property="answer_id" column="answer_id"/>
+            <result property="answer_content" column="answer_content"/>
+            <result property="answer_created_at" column="answer_created_at"/>
+        </association>
+    </resultMap>
+
+    <!-- getCountQuestionListByUserId --> 
+
+    <select id="getCountQuestionListByUserId" resultType="int">
+        select
+            count(*)
         from
             questions q
         where
-            q.host_space_id = #{host_space_id}
-            
-    </select>
-</mapper>
+            q.user_id = #{user_id}
+
+    </select>    
+
+
+    </mapper>

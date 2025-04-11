@@ -2,22 +2,50 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:laout="http://www.ultraq.net.nz/thymeleaf/laout"
    layout:decorate="~{layouts/layout1}">
 
+<th:block layout:fragment="css">
+   <th:block th:replace="~{guest/mypage/mypageTab :: mypageTab-css}"></th:block>
+
+   <style>
+      .input-group .btn {
+         width: 135px;
+      }
+
+      .card-user-info {
+         max-width: 992px;
+      }
+
+      .col-form-label {
+         font-weight: bold;
+         font-size: 15px;
+      }
+
+      .btn-primary {
+         background-color: #6c5ce7;
+         border-color: #6c5ce7;
+      }
+
+      .btn-primary:hover {
+         background-color: #5b46fd;
+         border-color: #5b46fd;
+      }
+   </style>
+</th:block>
 <th:block layout:fragment="content">
-   <h1 class="mt-3 mb-4 text-center">마이 페이지</h1>
-   <div class="row w-75 mx-auto container-sm">
-      <div class="col">
-         <div class="card card-info">
-            <div class="card-header">
+   <th:block th:replace="~{guest/mypage/mypageTab :: mypageTab}"></th:block>
+   
+   <div class="container mb-5">
+         <div class="card card-user-info mx-auto border shadow-sm">
+            <div class="card-header border-bottom-0 pt-4 px-4">
                <h3 class="card-title text-center">정보 수정</h3>
             </div>
 
             <form class="needs-validation" method="post" action="#" novalidate>
                <div class="card-body">
                   <div class="row form-group mb-2">
-                     <div class="col-2">
+                     <div class="col-md-2">
                         <label for="user_id" class="col-form-label">아이디</label>
                      </div>
-                     <div class="col-10">
+                     <div class="col-md-10">
                         <div class="input-group">
                            <!-- 아이디 입력 -->
                            <input type="text" class="form-control" id="user_id" name="user_id" th:value="${guestDTO.user_id}" readonly>
@@ -25,10 +53,10 @@
                      </div>
                   </div>
                   <div class="row form-group mb-2">
-                     <div class="col-2">
+                     <div class="col-md-2">
                         <label for="user_pw" class="col-form-label">비밀번호</label>
                      </div>
-                     <div class="col-10">
+                     <div class="col-md-10">
                         <!-- 비밀번호 입력 -->
                         <input type="password" class="form-control" id="user_pw" name="user_pw" placeholder="비밀번호" required>
 
@@ -41,10 +69,10 @@
                      </div>
                   </div>
                   <div class="row form-group mb-2">
-                     <div class="col-2">
+                     <div class="col-md-2">
                         <label for="user_name" class="col-form-label">이름</label>
                      </div>
-                     <div class="col-10">
+                     <div class="col-md-10">
                         <!-- 이름 입력 -->
                         <input type="text" class="form-control" id="user_name" name="user_name" 
                                  th:value="${guestDTO.user_name}" placeholder="이름" required>
@@ -53,16 +81,16 @@
                      </div>
                   </div>
                   <div class="row form-group mb-2">
-                     <div class="col-2">
+                     <div class="col-md-2">
                         <label for="user_nick" class="col-form-label">닉네임</label>
                      </div>
-                     <div class="col-10">
+                     <div class="col-md-10">
                         <div class="input-group">
                            <!-- 닉네임 입력 -->
                            <input type="text" class="form-control" id="user_nick" name="user_nick" th:value="${guestDTO.user_nick}" placeholder="닉네임"
                               required>
                            <!-- 닉네임 중복체크 -->
-                           <button type="button" class="btn btn-outline-primary ms-2 w-25" id="btnNickCheck">Nick
+                           <button type="button" class="btn btn-outline-primary ms-2" id="btnNickCheck">Nick
                               중복체크</button>
                            <!-- 유효성 검사 오류 메시지 -->
                            <div class="invalid-feedback" id="nickError">닉네임을 입력하세요</div>
@@ -72,16 +100,16 @@
                      </div>
                   </div>
                   <div class="row form-group mb-2">
-                     <div class="col-2">
+                     <div class="col-md-2">
                         <label for="user_email" class="col-form-label">이메일</label>
                      </div>
-                     <div class="col-10">
+                     <div class="col-md-10">
                         <div class="input-group">
                            <!-- 이메일 입력 -->
                            <input type="email" class="form-control" id="user_email" name="user_email" th:value="${guestDTO.user_email}" placeholder="이메일"
                               required>
                            <!-- 메일인증 요청 -->
-                           <button type="button" class="btn btn-outline-primary ms-2 w-25" id="btnMailAuthcode">메일인증
+                           <button type="button" class="btn btn-outline-primary ms-2" id="btnMailAuthcode">메일인증
                               요청</button>
                            <!-- 유효성 검사 오류 메시지 -->
                            <div class="invalid-feedback">이메일을 입력하세요</div>
@@ -89,16 +117,16 @@
                      </div>
                   </div>
                   <div class="row form-group mb-2">
-                     <div class="col-2">
+                     <div class="col-md-2">
                         <label for="user_authcode" class="col-form-label">인증 확인</label>
                      </div>
-                     <div class="col-10">
+                     <div class="col-md-10">
                         <div class="input-group">
                            <!-- 인증 코드 입력 -->
                            <input type="text" class="form-control" id="user_authcode" name="user_authcode"
                               placeholder="인증코드">
                            <!-- 인증 코드 확인 -->
-                           <button type="button" class="btn btn-outline-primary ms-2 w-25"
+                           <button type="button" class="btn btn-outline-primary ms-2"
                               id="btnConfirmAuth">인증확인</button>
                            <!-- 유효성 검사 오류 메시지 -->
                            <div class="invalid-feedback">인증코드를 입력하세요</div>
@@ -106,16 +134,16 @@
                      </div>
                   </div>
                   <div class="row form-group mb-2">
-                     <div class="col-2">
-                        <label for="sample2_postcode" class="col-form-label">우편번호</label>
+                     <div class="col-md-2">
+                        <label for="sample2_postcode" class="col-form-label">주소</label>
                      </div>
-                     <div class="col-10">
+                     <div class="col-md-10">
                         <div class="input-group">
                            <!-- 우편번호 입력 -->
                            <input type="text" class="form-control" id="sample2_postcode" name="user_zipcode" th:value="${guestDTO.user_zipcode}"
                               placeholder="우편번호" required maxlength="6">
                            <!-- 우편번호 찾기 -->
-                           <button type="button" class="btn btn-outline-primary ms-2 w-25"
+                           <button type="button" class="btn btn-outline-primary ms-2"
                               onclick="sample2_execDaumPostcode()">우편번호 찾기</button>
                            <!-- 유효성 검사 오류 메시지 -->
                            <div class="invalid-feedback">우편번호를 입력하세요</div>
@@ -123,22 +151,20 @@
                      </div>
                   </div>
                   <div class="row form-group mb-2">
-                     <div class="col-2">
-                        <label for="sample2_address" class="col-form-label">기본주소</label>
+                     <div class="col-md-2">
                      </div>
-                     <div class="col-10">
+                     <div class="col-md-10">
                         <!-- 기본주소 입력 -->
                         <input type="text" class="form-control" id="sample2_address" name="user_addr" th:value="${guestDTO.user_addr}" placeholder="기본주소"
-                           required>
+                           readonly required>
                         <!-- 유효성 검사 오류 메시지 -->
                         <div class="invalid-feedback">기본주소를 입력하세요</div>
                      </div>
                   </div>
                   <div class="row form-group mb-2">
-                     <div class="col-2">
-                        <label for="sample2_detailAddress" class="col-form-label">상세주소</label>
+                     <div class="col-md-2">
                      </div>
-                     <div class="col-10">
+                     <div class="col-md-10">
                         <!-- 상세주소 입력 -->
                         <input type="text" class="form-control" id="sample2_detailAddress" name="user_addrdetail" th:value="${guestDTO.user_addrdetail}"
                            placeholder="상세주소" required> <input type="hidden" id="sample2_extraAddress"
@@ -148,10 +174,10 @@
                      </div>
                   </div>
                   <div class="row form-group mb-2">
-                     <div class="col-2">
+                     <div class="col-md-2">
                         <label for="user_phone" class="col-form-label">전화번호</label>
                      </div>
-                     <div class="col-10">
+                     <div class="col-md-10">
                         <!-- 전화번호 입력 -->
                         <input type="text" class="form-control" id="user_phone" name="user_phone" th:value="${guestDTO.user_phone}"
                            placeholder="전화번호 - 빼고 숫자만 입력" maxlength="11" required>
@@ -160,10 +186,10 @@
                      </div>
                   </div>
                   <div class="row form-group mb-2">
-                     <div class="col-2">
+                     <div class="col-md-2">
                         <label for="user_phone" class="col-form-label">메일 수신</label>
                      </div>
-                     <div class="col-10">
+                     <div class="col-md-10 align-content-center">
                         <!-- 메일 수신 체크 -->
                         <div class="form-check form-check-inline">
                            <input class="form-check-input" type="radio" name="user_email_receive" id="inlineRadio1" th:checked= "${guestDTO.user_email_receive == 'Y'}"
@@ -183,9 +209,9 @@
                </div>
 
 
-               <div class="card-footer">
-                  <button type="submit" class="btn btn-info">Sign up</button>
-                  <button type="reset" class="btn btn-danger">Cancel</button>
+               <div class="card-footer border-top-0 px-4 d-flex justify-content-center gap-2">
+                  <button type="submit" class="btn btn-primary w-25">정보수정</button>
+                  <button type="reset" class="btn btn-secondary w-25">취소</button>
                </div>
 
 
@@ -194,7 +220,6 @@
 
 
          </div>
-      </div>
    </div>
    <!-- iOS에서는 position:fixed 버그가 있음, 적용하는 사이트에 맞게 position:absolute 등을 이용하여 top,left값 조정 필요 -->
    <div id="layer"
@@ -209,6 +234,7 @@
 </th:block>
 <th:block layout:fragment="scriptBottom">
    <script th:inline="javascript">
+
       (() => {
          'use strict'
 

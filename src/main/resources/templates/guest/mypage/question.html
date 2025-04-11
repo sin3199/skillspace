@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:laout="http://www.ultraq.net.nz/thymeleaf/laout"
+    layout:decorate="~{layouts/layout1}">
+
+<th:block layout:fragment="css">
+    <th:block th:replace="~{guest/mypage/mypageTab :: mypageTab-css}"></th:block>
+
+    <style>
+        
+    </style>
+</th:block>
+<th:block layout:fragment="content">
+    <th:block th:replace="~{guest/mypage/mypageTab :: mypageTab}"></th:block>
+    <style>
+        .feedback-text {
+            font-size: 15px;
+        }
+        
+        .text-purple {
+            color: #6c5ce7;
+        }
+        .text-bg-purple {
+            background-color: #6c5ce7;
+        }
+
+        .border-bottom-purple {
+            border-bottom: #6c5ce7 solid 1px;
+        }
+
+        .feedback-list-container hr {
+            border-bottom: #6c5ce7 solid 2px;
+            opacity: 1 !important;
+        }
+
+        .btn-purple {
+            background-color: #fff;
+            color: #6c5ce7;
+            border: solid 1px #6c5ce7;
+            border-radius: 5px;
+            height: 30px;
+            font-size: 14px;
+            padding: 4px 8px;
+            vertical-align: middle; /* 세로 정렬 기준 */
+            line-height: normal; /* 버튼 내 텍스트 세로 중앙 정렬 도움 */
+            white-space: nowrap; /* 버튼 텍스트 줄바꿈 방지 */
+
+        }
+
+        .btn-purple:hover {
+            background-color: #563bb7;
+            color: #fff;
+        }
+        
+        /*.feedback-item 에 hover 효과 손가락 표시 및 색상 효과*/
+        .feedback-item:hover {
+            cursor: pointer;
+            background-color: #f8f9fa;
+        }
+
+        .active>.page-link, .page-link.active {
+			background-color: #6c5ce7;
+			border-color: #6c5ce7;
+			z-index: 3;
+		}
+
+
+    </style>
+    
+    <div class="card feedback-list-container mb-4">
+    
+        <!-- Q&A 목록 컨테이너 -->
+        <div class="card-body">
+            <th:block th:if="${not #lists.isEmpty(questionList)}" th:each="questionDTO : ${questionList}">
+                <!-- 예시 Q&A 항목 1 -->
+                <div class="feedback-item question-block mb-3 d-flex flex-column border border-3 p-3" th:data-status="${questionDTO.question_status}">
+                    <div class="d-flex justify-content-between align-items-center mb-2 border-bottom-purple">
+                        <div>
+                            <strong>[[${questionDTO.hostSpace.main_title}]]</strong>
+                        </div>
+                    </div>
+                    <div class="feedback-text mb-1">[[${questionDTO.question_content}]]</div>
+                    <small class="text-muted mb-1" th:text="${#temporals.format(questionDTO.question_created_at, 'yyyy.MM.dd')}"></small>
+                    <div class="d-flex justify-content-between align-items-end">
+                        <small class="badge text-bg-success" th:if="${questionDTO.question_status == 'Y'}">답변 완료</small>
+                        <small class="badge text-bg-warning" th:unless="${questionDTO.question_status == 'Y'}">답변 대기중</small>
+                        <div>
+                            <a class="btn btn-purple" th:href="@{/guest/space/spaceDetail(host_space_id=${questionDTO.host_space_id})}">공간으로</a>
+                            <button class="btn btn-sm btn-outline-danger">질문삭제</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- 답변 -->
+                <div class="answer-block mb-3" th:if="${questionDTO.answer != null}" style="display: none;">
+                    <div class="d-flex border border-3 p-3">
+                        <div class="me-3">
+                            <span class="badge text-bg-purple">답변</span>
+                        </div>
+                        <div>
+                            <div class="feedback-text">
+                                [[${questionDTO.answer. answer_content}]]
+                            </div>
+                            <small class="text-muted">[[${#temporals.format(questionDTO.answer.answer_created_at, 'yyyy.MM.dd')}]]</small>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <hr class="my-3">
+            </th:block>
+            <th:block th:if="${#lists.isEmpty(questionList)}">
+                <div class="text-center text-muted py-5 align-content-center" style="height: 350px;">
+                    <p><i class="bi bi-chat-square-dots fs-1"></i></p>
+                    <p class="fw-bold">아직 작성된 질문이 없습니다.</p>
+                </div>
+            </th:block>
+            
+            <!-- 페이지네이션 -->
+            <nav aria-label="Q&A page navigation" class="mt-0" th:if="${not #lists.isEmpty(questionList)}">
+                <ul class="pagination pagination-sm justify-content-center">
+                    <!-- 이전 버튼 -->
+                    <li class="page-item" th:classappend="${!pageMaker.prev} ? 'disabled'">
+                        <a class="page-link" th:href="|/guest/mypage/question${pageMaker.makeQuery(pageMaker.startPage - 1)}|"
+                            aria-label="Previous">
+                            &laquo;
+                        </a>
+                    </li>
+            
+                    <!-- 페이지 번호 -->
+                    <li class="page-item" th:each="pageNum : ${#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}"
+                        th:classappend="${pageMaker.cri.page == pageNum} ? 'active'"
+                        th:attr="aria-current=${pageMaker.cri.page == pageNum} ? 'page' : null">
+                        <a class="page-link" th:href="|/guest/mypage/question${pageMaker.makeQuery(pageNum)}|"
+                            th:text="${pageNum}"></a>
+                    </li>
+            
+                    <!-- 다음 버튼 -->
+                    <li class="page-item" th:classappend="${!pageMaker.next} ? 'disabled'">
+                        <a class="page-link" th:href="|/guest/mypage/question${pageMaker.makeQuery(pageMaker.endPage + 1)}|"
+                            aria-label="Next">
+                            &raquo;
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            </div>
+    </div><!-- // #feedback-list-container 끝 -->
+
+
+</th:block>
+<th:block layout:fragment="scriptBottom">
+    <script th:inline="javascript">
+        $(document).ready(function () {
+                console.log("질문 목록", [[${questionList}]]);
+                console.log("pageMaker", [[${pageMaker}]]);
+
+                $('.feedback-list-container').on('click', '.question-block', function () {
+                    const status = $(this).data('status');
+                    console.log("답변상태", status);
+
+                    if (status === 'Y') {
+                        const $answerBlock = $(this).next('.answer-block');
+                        $answerBlock.slideToggle(300);
+                    } 
+                });
+
+            });
+        </script>
+</th:block>
+
+</html>

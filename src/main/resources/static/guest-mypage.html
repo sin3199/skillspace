@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en" class="h-100" data-bs-theme="auto" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SkillSpace 어서오시오</title>
+
+    <link rel="canonical" href="https://getbootstrap.kr/docs/5.3/examples/navbar-fixed/">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+    <!-- <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" > -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+    <!-- JQuery -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background-color: #dee2e6;
+        }
+
+        .public-footer {
+            background: #f8f9fa;
+            padding: 0.5rem 0;
+            font-size: 0.875rem;
+            text-align: center;
+            color: #6c757d;
+            width: 100%;
+        }
+
+        .container {
+            flex: 1;
+        }
+
+        .custom-toggler {
+            display: block !important; /* 항상 보이도록 설정 */
+            background: transparent;
+            border: none;
+        }
+
+        .custom-toggler:hover {
+            background: #e9ecef;
+        }
+
+        .custom-toggler .navbar-toggler-icon {
+            width: 1.2em; /* 아이콘 크기 줄이기 */
+            height: 1.2em;
+        }
+
+        .custom-hover {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            padding: 0.8rem 1rem;
+        }
+        .custom-hover:hover {
+            background-color: #d2e0f5; /* 밝은 청록색 */
+            color: #0A1828;
+        }
+
+        /* 카테고리 메뉴 스타일 */
+        .nav-item .nav-link {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            padding: 0.8rem 1rem;
+        }
+
+
+    </style>
+
+
+</head>
+
+<body class="d-flex flex-column h-100">
+
+    <header class="pt-3 bg-body-tertiary">
+        <!-- 헤더 상단 -->
+        <div class="container-fluid d-flex flex-wrap justify-content-center justify-content-md-between">
+            <a href="/"
+                class="d-flex align-items-center mb-2 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+                <span class="fs-4 fw-bold ms-md-2">SkillSpace</span>
+            </a>
+            <form class="col-12 col-md-auto " role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control " name="keyword" id="keyword"
+                        th:value="${pageMaker.cri.keyword}" placeholder="검색어 입력">
+                    <button class="btn btn-outline-secondary btn-sm" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 헤더 하단 -->
+        <nav class="navbar navbar-expand-md py-2 bg-body-tertiary">
+            <div class="container-fluid d-flex flex-wrap justify-content-between">
+                    <button class="navbar-toggler p-1 custom-toggler" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasNavbarLight" aria-controls="offcanvasNavbarLight"
+                        aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+        
+                    <div class="collapse navbar-collapse" id="">
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">여행/레저</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">아동/가족</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    맛집/카페
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#">할인권</a></li>
+                                    <li><a class="dropdown-item" href="#">식사권</a></li>
+                                    <li><a class="dropdown-item" href="#">교환권</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+            
+                    </div>
+                    <ul class="nav">
+                        <li class="nav-item"><a href="#" class="nav-link link-body-emphasis px-2">로그인</a></li>
+                        <li class="nav-item"><a href="#" class="nav-link link-body-emphasis px-2">회원가입</a></li>
+                    </ul>
+            </div>
+        </nav>
+
+        <!-- 오프캔버스 -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbarLight"
+            aria-labelledby="offcanvasNavbarLightLabel">
+            <div class="offcanvas-header border-bottom">
+                <h5 class="offcanvas-title" id="offcanvasNavbarLightLabel">SkillSpace</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <!-- 로그인 섹션 -->
+                <div class="user-section border-bottom pb-3 mb-3">
+                    <div th:if="${session.login_auth == null}">
+                        <p class="mb-3">로그인하고 다양한 서비스를 이용해보세요!</p>
+                        <div class="d-flex gap-2">
+                            <a href="/guest/login" class="btn btn-outline-primary flex-grow-1">로그인</a>
+                            <a href="/guest/join" class="btn btn-outline-primary flex-grow-1">회원가입</a>
+                        </div>
+                    </div>
+                    <div th:if="${session.login_auth != null}">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-grow-1 ms-3">
+                                <p class="fw-bold mb-0" th:text="${session.login_name}">사용자명</p>
+                                <small class="text-muted" th:text="${session.login_email}">이메일</small>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="/guest/mypage" class="btn btn-outline-secondary flex-grow-1">마이페이지</a>
+                            <a href="/guest/logout" class="btn btn-outline-secondary flex-grow-1">로그아웃</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 카테고리 메뉴 -->
+                <div class="accordion" id="categoryAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button collapsed custom-hover" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                전체 카테고리
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#categoryAccordion">
+                            <div class="accordion-body py-1">
+                                <div class="list-group list-group-flush">
+                                    <a href="#" class="list-group-item list-group-item-action">전체보기</a>
+                                    <a href="#" class="list-group-item list-group-item-action">인기 클래스</a>
+                                    <a href="#" class="list-group-item list-group-item-action">신규 클래스</a>
+                                    <a href="#" class="list-group-item list-group-item-action">프로그래밍</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                고객지원
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#categoryAccordion">
+                            <div class="accordion-body py-0">
+                                <ul class="dropdown-menu position-static d-grid gap-1 p-2 rounded-3 mx-0 shadow w-220px" data-bs-theme="light">
+                                    <li><a class="dropdown-item rounded-2 active" href="#">Action</a></li>
+                                    <li><a class="dropdown-item rounded-2" href="#">Another action</a></li>
+                                    <li><a class="dropdown-item rounded-2" href="#">Something else here</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item rounded-2" href="#">Separated link</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div><!-- offcanvas-body end -->
+        </div>
+    </header>
+
+
+<style>
+    .category-title {
+        color: #333;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+    }
+
+    .category-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        height: 3px;
+        background-color: #007bff;
+    }
+
+    .category-card {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        text-align: center;
+    }
+
+    /* 활성 탭 강조 (선택 사항) */
+    .nav-pills .nav-link.active {
+        font-weight: bold;
+        background-color: #6c5ce7;
+        border-color: #6c5ce7;
+    }
+
+    .nav-pills .nav-link:hover {
+        background-color: #b4acf0;
+        color: #fff;
+    }
+
+    .col-form-label {
+        font-weight: bold;
+        font-size: 15px;
+    }
+</style>
+    <main class="container">
+        <section>
+            <div class="card mb-5 category-card">
+                <h2 class="category-title">마이페이지</h2>
+                <!-- 탭 네비게이션 -->
+                <ul class="nav nav-pills nav-fill" id="myPageTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="info-tab" href="/info">정보수정</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="orders-tab" href="/orders">주문내역</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="reservations-tab" href="/reservations">예약내역</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="qa-tab" href="/qa">Q&A</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="reviews-tab" href="/reviews">이용후기</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="wishlist-tab" href="/wishlist">찜목록</a>
+                    </li>
+                </ul>
+            </div>
+        
+        
+        
+            <!-- 탭 컨텐츠 영역 -->
+            <div class="card" id="myPageTabContent">
+                <!-- 정보수정 탭 -->
+                <div class="card-body" id="info-content">
+                    <h4>나의 Q&A</h4>
+                    <p>상품 또는 서비스에 대해 문의하신 내역입니다.</p>
+                    <!-- Q&A 목록 테이블 또는 리스트 구현 필요 -->
+                    <div class="list-group">
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">상품 A 사이즈 문의</h5>
+                                <small class="text-muted">3일 전</small>
+                            </div>
+                            <p class="mb-1">M 사이즈 재입고 예정 있나요?</p>
+                            <small class="text-success">답변 완료</small>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">땡떙땡 공간</h5>
+                                <small class="text-muted">5일 전</small>
+                            </div>
+                            <p class="mb-1">언제쯤 받을 수 있을까요?</p>
+                            <small class="text-warning">답변 대기중</small>
+                        </a>
+                    </div>
+                    <div class="alert alert-light mt-3" role="alert">
+                        문의 내역이 더 이상 없습니다. (Q&A 목록 실제 데이터 연동 필요)
+                    </div>
+                </div>
+            </div>
+
+            <div class="my-3"></div>
+
+            <style>
+                .feedback-text {
+                    font-size: 15px;
+                }
+                
+                .text-purple {
+                    color: #6c5ce7;
+                }
+                .text-bg-purple {
+                    background-color: #6c5ce7;
+                }
+        
+                .border-bottom-purple {
+                    border-bottom: #6c5ce7 solid 1px;
+                }
+        
+                .feedback-list-container hr {
+                    border-bottom: #6c5ce7 solid 2px;
+                }
+
+                .btn-purple {
+                    background-color: #fff;
+                    color: #6c5ce7;
+                    border: solid 1px #6c5ce7;
+                    border-radius: 5px;
+                    height: 30px;
+                    font-size: 14px;
+                    padding: 4px 8px;
+                    vertical-align: middle; /* 세로 정렬 기준 */
+                    line-height: normal; /* 버튼 내 텍스트 세로 중앙 정렬 도움 */
+                    white-space: nowrap; /* 버튼 텍스트 줄바꿈 방지 */
+
+                }
+
+                .btn-purple:hover {
+                    background-color: #563bb7;
+                    color: #fff;
+                }
+                
+                /*.feedback-item 에 hover 효과 손가락 표시 및 색상 효과*/
+                .feedback-item:hover {
+                    cursor: pointer;
+                    background-color: #f8f9fa;
+                }
+
+        
+            </style>
+            
+            <div class="card feedback-list-container">
+            
+                <!-- Q&A 목록 컨테이너 -->
+                <div class="card-body">
+                    <th:block th:if="${not #lists.isEmpty(questionList)}" th:each="questionDTO : ${questionList}">
+                        <!-- 예시 Q&A 항목 1 -->
+                        <div class="feedback-item mb-3 d-flex flex-column border p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2 border-bottom-purple">
+                                <div>
+                                    <strong>[[${공간-공간이름(해당공간으로 링크)}]]</strong>
+                                </div>
+                            </div>
+                            <div class="feedback-text">[[${questionDTO.question_content}]] 질문내용</div>
+                            <small class="text-muted" th:text="${#temporals.format(questionDTO.created_at, 'yyyy.MM.dd')}"></small>
+                        </div>
+                        <!-- 답변 -->
+                        <div class="feedback-item mb-3 d-flex border p-3" th:if="${questionDTO.answer != null}">
+                            <div class="me-3">
+                                <span class="badge text-bg-purple">답변</span>
+                            </div>
+                            <div>
+                                <div class="feedback-text">
+                                    [[${questionDTO.answer.answer_content}]]
+                                </div>
+                                <small class="text-muted">[[${#temporals.format(questionDTO.answer.created_at,
+                                    'yyyy.MM.dd')}]]</small>
+                            </div>
+                        </div>
+                        <hr class="my-3"> <!-- 리뷰 구분선 -->
+                    </th:block>
+                    <th:block th:if="${#lists.isEmpty(questionList)}">
+                        <div class="text-center text-muted py-5 align-content-center" style="height: 400px;">
+                            <p><i class="bi bi-chat-square-dots fs-1"></i></p>
+                            <p>아직 작성된 질문이 없습니다.dddd</p>
+                        </div>
+                    </th:block>
+            
+                    <!-- 예시 Q&A 항목 2 -->
+                    <div class="feedback-item mb-3 d-flex flex-column border p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2 border-bottom-purple">
+                            <strong class="">땡떙땡 공간</strong>
+                        </div>
+                        <div class="feedback-text mb-1">
+                            위치도 찾기 쉽고, 필요한 장비들이 잘 갖춰져 있어서 만족스러웠습니다. 예약 시스템도 간편해서 좋네요.
+                        </div>
+                        <small class="text-muted mb-2">2024.05.18</small>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-success">답변 완료</small>
+                            <div>
+                                <a class="btn btn-purple">공간으로</a>
+                                <button class="btn btn-sm btn-outline-danger">질문삭제</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 답변 -->
+                    <div class="feedback-item mb-3 d-flex border p-3">
+                        <div class="me-3">
+                            <span class="badge text-bg-purple">답변</span>
+                        </div>
+                        <div>
+                            <div class="feedback-text mb-1">
+                                어쩌구 저쩌구 답변을 달았다
+                            </div>
+                            <small class="text-muted">2024.05.20</small>
+                        </div>
+                    </div>
+                    <hr class="my-3"> <!-- Q&A 구분선 -->
+            
+                    <!-- 예시 Q&A 항목 2 -->
+                    <div class="feedback-item mb-3 d-flex flex-column border p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2 border-bottom-purple">
+                            <div>
+                                <strong class="">박*영</strong>
+                            </div>
+                        </div>
+                        <div class="feedback-text">
+                            위치도 찾기 쉽고, 필요한 장비들이 잘 갖춰져 있어서 만족스러웠습니다. 예약 시스템도 간편해서 좋네요.
+                        </div>
+                        <small class="text-muted">2024.05.18</small>
+                    </div>
+                    <!-- 답변 -->
+                    <div class="feedback-item mb-3 d-flex border p-3">
+                        <div class="me-3">
+                            <span class="badge text-bg-purple">답변</span>
+                        </div>
+                        <div>
+                            <div class="feedback-text">
+                                어쩌구 저쩌구 답변을 달았다
+                            </div>
+                            <small class="text-muted">2024.05.20</small>
+                        </div>
+                    </div>
+                    <hr class="my-3"> <!-- Q&A 구분선 -->
+            
+            
+                    <!-- 리뷰가 없을 경우 표시 (주석 처리됨 - 필요시 활성화) -->
+                    <!--
+                         <div class="text-center text-muted py-5">
+                             <p><i class="bi bi-chat-square-dots fs-1"></i></p>
+                             <p>아직 작성된 이용 후기가 없습니다.</p>
+                         </div>
+                          -->
+            
+            
+            
+                    <!-- 페이지네이션 -->
+                    <nav aria-label="Review page navigation" class="mt-0">
+                        <ul class="pagination pagination-sm justify-content-center">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                            </li>
+                            <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">&raquo;</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div><!-- // #feedback-list-container 끝 -->
+        </section>
+    </main>
+
+
+    
+
+    <footer class="public-footer">
+        © 2024 Total Admin. All rights reserved.
+    </footer>
+    <!-- <script src="/bootstrap/js/bootstrap.bundle.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            
+
+        }); // ready end.
+    </script>
+</body>
+
+</html>
