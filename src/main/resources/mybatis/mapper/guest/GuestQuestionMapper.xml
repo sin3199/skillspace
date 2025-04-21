@@ -26,7 +26,7 @@
             q.user_nick,
             q.host_space_id,
             q.question_content,
-            q.question_status,
+            q.answer_status,
             q.created_at as question_created_at,
             a.answer_id,
             a.answer_content,
@@ -51,7 +51,7 @@
         <result property="user_nick" column="user_nick"/>
         <result property="host_space_id" column="host_space_id"/>
         <result property="question_content" column="question_content"/>
-        <result property="question_status" column="question_status"/>
+        <result property="answer_status" column="answer_status"/>
         <result property="created_at" column="question_created_at"/>
         
         <!-- 답변 -->
@@ -84,7 +84,7 @@
             q.user_nick,
             q.host_space_id,
             q.question_content,
-            q.question_status,
+            q.answer_status,
             q.created_at as question_created_at,
             hs.main_title,
             a.answer_id,
@@ -108,13 +108,13 @@
             
 
     </select>
-    <resultMap type="com.skillspace.sgs.guest.mypage.MyPageQnaDTO" id="MypageQnaResultMap">
+    <resultMap type="com.skillspace.sgs.guest.mypage.QnaWithSpaceDTO" id="MypageQnaResultMap">
         <id property="question_id" column="question_id"/>
         <result property="user_id" column="user_id"/>
         <result property="user_nick" column="user_nick"/>
         <result property="host_space_id" column="host_space_id"/>
         <result property="question_content" column="question_content"/>
-        <result property="question_status" column="question_status"/>
+        <result property="answer_status" column="answer_status"/>
         <result property="question_created_at" column="question_created_at"/>
         <association property="hostSpace" javaType="java.util.Map">
             <result property="main_title" column="main_title"/>

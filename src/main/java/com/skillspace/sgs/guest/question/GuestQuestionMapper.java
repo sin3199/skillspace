@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.skillspace.sgs.common.utils.SearchCriteria;
-import com.skillspace.sgs.guest.mypage.MyPageQnaDTO;
+import com.skillspace.sgs.guest.mypage.QnaWithSpaceDTO;
 
 public interface GuestQuestionMapper {
 
@@ -22,7 +22,7 @@ public interface GuestQuestionMapper {
 
 
     // 유저 아이디로 조회하는 질문목록
-    List<MyPageQnaDTO> getQuestionListByUserId(
+    List<QnaWithSpaceDTO> getQuestionListByUserId(
             @Param("user_id") String user_id,
             @Param("cri") SearchCriteria cri);
 

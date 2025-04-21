@@ -68,7 +68,7 @@ CREATE TABLE `category` (
 	`sort_order`	int			NOT NULL DEFAULT 0	COMMENT '정렬 순서'
 );
 
-ALTER TABLE `catagory`
+ALTER TABLE `category`
 MODIFY `cate_id` INT NOT NULL AUTO_INCREMENT,
 ADD PRIMARY KEY (`cate_id`);
 
@@ -248,6 +248,7 @@ CREATE TABLE `Questions` (
 	`host_space_id`		int				NOT NULL,
 	`user_id`			varchar(30)		NOT NULL,
 	`question_content`	varchar(200)	NOT NULL,
+	`answer_status`		char(1)			NOT NULL	DEFAULT 'N',
 	`created_at`		datetime		NOT NULL	DEFAULT now()
 );
 
@@ -276,7 +277,8 @@ ADD PRIMARY KEY (`answer_id`);
 ALTER TABLE `Answer` 
 ADD CONSTRAINT `FK_Question_TO_Answer_1` 
 FOREIGN KEY (`question_id`)
-REFERENCES `Question` (`question_id`);
+REFERENCES `Question` (`question_id`)
+on cascade delete;
 
 
 -- 찜 목록

@@ -105,6 +105,7 @@ public class HostSpaceService {
 		}
 	}
 
+	// 유저 아이디로 공간 조회
 	public List<HostSpaceDTO> getHostSpaceByUserId(String user_id) {
 		return hostSpaceMapper.getHostSpaceByUserId(user_id);
 	}

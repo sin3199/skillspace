@@ -16,7 +16,7 @@ public class QuestionDTO {
 	private String 			user_id;			// 게스트 유저 아이디
 	private String 			user_nick;			// 게스트 유저 닉네임
 	private String 			question_content;	// 질문 내용
-	private String 			question_status;	// 답변 상태 Y,N
+	private String 			answer_status;	// 답변 상태 Y,N
 	private LocalDateTime 	created_at;			// 생성일
 	
 	private Map<String, Object> 		answer;	// 답변

@@ -66,7 +66,7 @@ public class GuestMypageController {
         pageMaker.setCri(cri);
         pageMaker.setTotalCount(guestQuestionService.getCountQuestionListByUserId(user_id));
         
-        List<MyPageQnaDTO> questionList = guestQuestionService.getQuestionListByUserId(user_id, cri);
+        List<QnaWithSpaceDTO> questionList = guestQuestionService.getQuestionListByUserId(user_id, cri);
         
         model.addAttribute("questionList", questionList);
         model.addAttribute("pageMaker", pageMaker);

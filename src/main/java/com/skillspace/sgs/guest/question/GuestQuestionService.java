@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.skillspace.sgs.common.utils.SearchCriteria;
-import com.skillspace.sgs.guest.mypage.MyPageQnaDTO;
+import com.skillspace.sgs.guest.mypage.QnaWithSpaceDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,7 +21,7 @@ public class GuestQuestionService {
 
     }
 
-    // 질문 목록 (답변 목록 나중에 추가)
+    // 질문 목록
     public List<QuestionDTO> getQuestionWithAnswerBySpaceId(Integer host_space_id, SearchCriteria cri) {
         return guestQuestionMapper.getQuestionWithAnswerBySpaceId(host_space_id, cri);
     }
@@ -32,7 +32,7 @@ public class GuestQuestionService {
 
 
     // 유저 아이디로 조회하는 질문 목록
-    public List<MyPageQnaDTO> getQuestionListByUserId(String user_id, SearchCriteria cri) {
+    public List<QnaWithSpaceDTO> getQuestionListByUserId(String user_id, SearchCriteria cri) {
         return guestQuestionMapper.getQuestionListByUserId(user_id, cri);
     }
     // 유저 아이디로 조회하는 질문 개수

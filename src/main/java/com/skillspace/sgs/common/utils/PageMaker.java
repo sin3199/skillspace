@@ -110,17 +110,39 @@ public class PageMaker {
 	// ?page=2&perPageNum=10&searchType&keyword
 	// 호스트 상품, 공간 목록에서 사용
 	public String makeSearch(int page) {
-		UriComponents uriComponents = 
+		UriComponentsBuilder builder = 
 				UriComponentsBuilder.newInstance()
 				.queryParam("page", 			page)
 				.queryParam("perPageNum", 		cri.getPerPageNum())
-				.queryParam("searchType", 		cri.getSearchType())
-				.queryParam("keyword", 			cri.getKeyword())
-				.queryParam("orderBy", 			cri.getOrderBy())
+				.queryParam("orderBy", 		cri.getOrderBy())
 				.queryParam("start_date", 		cri.getStart_date())
-				.queryParam("end_date", 		cri.getEnd_date())
-				.queryParam("visible_status",	cri.getVisible_status())
-				.build();
+				.queryParam("end_date", 		cri.getEnd_date());
+				
+
+				// 검색 관련 파라미터 (값이 있을 때만 추가)
+				if (cri.getSearchType() != null && !cri.getSearchType().isEmpty()) {
+					builder.queryParam("searchType", cri.getSearchType());
+				}
+				if (cri.getKeyword() != null && !cri.getKeyword().isEmpty()) {
+					builder.queryParam("keyword", cri.getKeyword());
+				}
+		
+				// 상품 관련 필터 파라미터
+				if (cri.getVisible_status() != null && !cri.getVisible_status().isEmpty()) {
+					builder.queryParam("visible_status", cri.getVisible_status());
+				}
+				
+				// Q&A 관련 필터 파라미터
+				if (cri.getAnswer_status() != null && !cri.getAnswer_status().isEmpty()) {
+					builder.queryParam("answer_status", cri.getAnswer_status());
+				}
+
+				// space_id 필터 파라미터
+				if (cri.getSpace_id() != null) {
+					builder.queryParam("space_id", cri.getSpace_id());
+				}
+		
+				UriComponents uriComponents = builder.build();
 		
 		return uriComponents.toUriString();
 	}
