@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:laout="http://www.ultraq.net.nz/thymeleaf/laout"
+    layout:decorate="~{layouts/layout1}">
+
+<th:block layout:fragment="css">
+    <th:block th:replace="~{guest/mypage/mypageTab :: mypageTab-css}"></th:block>
+    <style>
+        .feedback-text {
+            font-size: 15px;
+            white-space: pre-wrap;
+        }
+
+        .text-purple {
+            color: #6c5ce7;
+        }
+        .text-bg-purple {
+            background-color: #6c5ce7;
+        }
+
+        .border-bottom-purple {
+            border-bottom: #6c5ce7 solid 1px;
+        }
+
+        /* 버튼 스타일 유지 */
+        .btn-purple {
+            background-color: #fff;
+            color: #6c5ce7;
+            border: solid 1px #6c5ce7;
+            border-radius: 5px;
+            height: 30px;
+            font-size: 14px;
+            padding: 4px 8px;
+            vertical-align: middle; /* 세로 정렬 기준 */
+            line-height: normal; /* 버튼 내 텍스트 세로 중앙 정렬 도움 */
+            white-space: nowrap; /* 버튼 텍스트 줄바꿈 방지 */
+        }
+
+        .btn-purple:hover {
+            background-color: #563bb7;
+            color: #fff;
+        }
+
+        /* 페이지네이션 활성 링크 스타일 유지 */
+        .pagination .page-item.active .page-link { /* .pagination 추가하여 명확성 높임 */
+            background-color: #6c5ce7;
+            border-color: #6c5ce7;
+            color: #fff; /* 활성 페이지 텍스트 흰색 */
+            z-index: 3;
+        }
+
+        /* 페이지네이션 기본 링크 색상 */
+        .pagination .page-item .page-link {
+            color: #6c5ce7;
+        }
+        /* 페이지네이션 호버 효과 */
+        .pagination .page-link:hover {
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+        }
+        /* 페이지네이션 비활성 링크 색상 */
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+        }
+
+        /* 페이지네이션 엑트브 효과*/
+        .active>.page-link, .page-link.active {
+            background-color: #6c5ce7;
+            border-color: #6c5ce7;
+            z-index: 3;
+        }
+
+        /* 예약 목록 테이블 스타일 */
+        .reservation-table-container {
+            margin-top: 2rem; /* 탭 아래 여백 */
+            padding: 1.5rem;
+            background-color: #fff !important; /* 흰색 배경 */
+            border-radius: 10px; /* 둥근 모서리 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* 부드러운 그림자 */
+        }
+
+        .table thead th {
+            background-color: #f8f9fa; /* 헤더 배경색 */
+            border-bottom: 2px solid #dee2e6; /* 헤더 하단 구분선 */
+            text-align: center; /* 텍스트 가운데 정렬 */
+            vertical-align: middle; /* 수직 가운데 정렬 */
+            font-weight: 600; /* 헤더 폰트 약간 두껍게 */
+        }
+
+        .table tbody td {
+            text-align: center; /* 텍스트 가운데 정렬 */
+            vertical-align: middle; /* 수직 가운데 정렬 */
+            font-size: 0.95rem; /* 본문 폰트 크기 살짝 조정 */
+        }
+
+        /* 예약 내역 없을 때 메시지 */
+        .no-reservations {
+            text-align: center !important;
+            padding: 3rem 0;
+            color: #6c757d;
+            font-size: 1.2rem;
+        }
+        /* tr hover 시에  .space-link 에 커스텀 링크 효과 */
+
+
+        .space-link {
+            color: black;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        tr:hover .space-link {
+            color: #6c5ce7;
+            font-weight: bold;
+        }
+
+        @media (max-width: 992px) {
+            /* 테이블 반응형 처리 */
+            .table-responsive {
+                overflow-x: auto;
+            }
+
+            .table-responsive > .table {
+                min-width: 902px;
+            }
+        }
+
+        td .btn {
+            font-size: 12px;
+            width: 90px;
+        }
+
+        /* 모달 스타일 */
+        .list-group-item {
+			background-color: rgba(255, 255, 255, 0.05);
+			margin-bottom: 8px;
+			padding: 6px 12px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.list-group-item strong{
+			width: 110px;
+			display: inline-block;
+			flex-shrink: 0;
+		}
+
+        .hr-custom {
+			border: none;
+			border-top: 3px solid #704de4;
+			opacity: 1;
+		}
+
+		#payment_amount {
+			color: #704de4;
+			font-weight: bold;
+			font-size: 25px;
+		}
+
+        .modal-header {
+			background-color: #6c5ce7;
+			color: #fff;
+		}
+
+        .modal-body {
+            background-color: #dee2e6;
+        }
+
+
+    </style>
+</th:block>
+<th:block layout:fragment="content">
+    <th:block th:replace="~{guest/mypage/mypageTab :: mypageTab}"></th:block>
+    
+    <!-- 예약 내역 목록 섹션 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-end align-items-center mb-3">
+                <div class="d-flex gap-1">
+                    <select class="form-select form-select-sm w-auto" id="change_orderBy">
+                       <option value="desc" th:selected= "${pageMaker.cri.orderBy == 'desc'}">등록일 ▼</option>
+                       <option value="" th:selected= "${pageMaker.cri.orderBy == '' || pageMaker.cri.orderBy == null}">등록일 ▲</option>
+                    </select>
+                    <select class="form-select form-select-sm w-auto" id="change_perPageNum">
+                       <option value="5" th:selected= "${pageMaker.cri.perPageNum == 5}">5개씩</option>
+                       <option value="10" th:selected= "${pageMaker.cri.perPageNum == 10}">10개씩</option>
+                    </select>
+                 </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width: 12%;">예약상태</th>
+                            <th style="width: 25%;">공간명</th>
+                            <th style="width: 15%;">이용시간</th>
+                            <th style="width: 12%;">예약일</th>
+                            <th style="width: 12%;">결제금액</th>
+                            <th style="width: 12%;">결제상태</th>
+                            <th style="width: 12%;">관리</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 예약 목록 반복 출력 -->
+                        <th:block th:if="${reservationList != null and !#lists.isEmpty(reservationList)}">
+                            <tr th:each="reservation : ${reservationList}">
+                                <td>
+                                    <span class="badge text-bg-secondary" th:text="${reservation.reservation_status}"
+                                        th:classappend="
+                                            ${reservation.reservation_status} == '예약대기' ? 'text-bg-warning' :
+                                            (${reservation.reservation_status} == '예약완료' ? 'text-bg-secondary' :
+                                            (${reservation.reservation_status} == '예약취소' ? 'text-bg-danger' : 
+                                            (${reservation.reservation_status} == '이용완료' ? 'text-bg-success' : '')))
+                                            ">
+                                        예약완료</span>
+                                </td>
+                                <td>
+                                    <a th:href="@{'/space/'}" th:text="${reservation.main_title}" class="space-link">공간 이름
+                                        예시</a>
+                                </td>
+                                <td
+                                    th:text="|${#dates.format(reservation.start_time, 'HH:mm')} ~ ${#dates.format(reservation.end_time, 'HH:mm')}|">
+                                    09:00 ~ 18:00</td>
+                                <td th:text="${#temporals.format(reservation.reservation_date, 'yyyy-MM-dd')}">2023-12-20
+                                </td>
+                                <td th:text="|${#numbers.formatInteger(reservation.amount, 0, 'COMMA')}원|">50,000원</td>
+                                <td>
+                                    <span class="badge" th:text="${reservation.payment_status}" th:classappend="
+                                                ${reservation.payment_status} == '입금대기' ? 'text-bg-warning' :
+                                                (${reservation.payment_status} == '결제완료' ? 'text-bg-secondary' :
+                                                (${reservation.payment_status} == '결제취소' ? 'text-bg-danger' : ''))
+                                            ">
+                                        결제 상태
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column gap-1 align-items-center">
+                                        <form
+                                            th:if="${(reservation.reservation_status == '예약완료' or reservation.reservation_status == '예약대기') and reservation.reservation_date != null and reservation.reservation_date.isAfter(T(java.time.LocalDate).now())}"
+                                            th:action="@{/guest/mypage/reservations/cancel/{id}(id=${reservation.reservation_id})}"
+                                            method="post" onsubmit="return confirm('정말로 이 예약을 취소하시겠습니까?');">
+                                            <button class="btn btn-sm btn-outline-danger">
+                                                예약취소
+                                            </button>
+    
+                                        </form>
+                                        <a th:if="${reservation.reservation_status == '예약완료' and reservation.is_review == 'N'}"
+                                            class="btn btn-sm btn-purple">
+                                            후기작성
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-secondary" name="btn_reservation_detail"
+                                            th:data-reservation_id="${reservation.reservation_id}">
+                                            상세보기
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </th:block>
+    
+                        <!-- 예약 내역이 없을 경우 메시지 표시 -->
+                        <tr th:unless="${reservationList != null and !#lists.isEmpty(reservationList)}">
+                            <td colspan="7" class="no-reservations">
+                                <i class="bi bi-info-circle me-2"></i>
+                                예약 내역이 존재하지 않습니다.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div> <!-- End table-responsive -->
+    
+            <!-- 페이지네이션 -->
+            <!-- pageMaker 객체가 존재하고 총 게시물 수가 0보다 클 때만 표시 -->
+            <nav aria-label="Page navigation" th:if="${pageMaker != null and pageMaker.totalCount > 0}"
+                class="d-flex justify-content-center mt-4">
+                <ul class="pagination">
+                    <!-- 이전 페이지 버튼 -->
+                    <li class="page-item" th:classappend="${!pageMaker.prev} ? 'disabled'">
+                        <a class="page-link"
+                            th:href="|/guest/mypage/reservations${pageMaker.makeSearch(pageMaker.startPage - 1)}|"
+                            aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+    
+                    <!-- 페이지 번호 목록 -->
+                    <li class="page-item" th:each="num : ${#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}"
+                        th:classappend="${num == pageMaker.cri.page} ? 'active'">
+                        <a class="page-link"
+                            th:href="|/guest/mypage/reservations${pageMaker.makeSearch(num)}|"
+                            th:text="${num}">1</a>
+                    </li>
+    
+                    <!-- 다음 페이지 버튼 -->
+                    <li class="page-item" th:classappend="${!pageMaker.next} ? 'disabled'">
+                        <a class="page-link"
+                            th:href="|/guest/mypage/reservations${pageMaker.makeSearch(pageMaker.endPage + 1)}|"
+                            aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <!-- End Pagination -->
+        </div>
+    
+    
+    </div> <!-- End reservation-table-container -->
+    
+    <!-- 상세보기 모달 -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="answerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="answerModalLabel">예약 상세보기</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- 리스트 그룹 -->
+                    <ul class="list-group">
+                        <h4 id="space_main_title" class="fw-bold">공간명</h4>
+                        <span id="product_name" class="text-muted">상품명</span>
+                        <hr class="hr-custom">
+                        <li class="list-group-item"><strong>예약날짜</strong> <span id="reserveDate">2025-05-05</span></li>
+                        <li class="list-group-item"><strong>예약시간</strong> <span id="reserveTime">13:00 ~ 16:00</span></li>
+                        <li class="list-group-item"><strong>예약인원</strong> <span id="headcount">1명</span></li>
+                        <li class="list-group-item"><strong>결제방식</strong> <span id="payment_method">카카오페이</span></li>
+                        <li class="list-group-item"><strong>예약자</strong> <span id="reservation_name">홍길동</span></li>
+                        <li class="list-group-item">
+                            <strong>연락처</strong>
+                            <span id="reservation_phone">010-1234-5678</span>
+                        </li>
+                        <li class="list-group-item"><strong>이메일</strong> <span id="reservation_email">asdf@naver.com</span>
+                        </li>
+                        <li class="list-group-item"><strong>결제상태</strong> <span class="badge text-bg-warning"
+                                id="payment_status">입금대기</span></li>
+                        <li class="list-group-item"><strong>예약상태</strong> <span class="badge text-bg-success"
+                                id="reservation_status">예약대기</span></li>
+                        <hr class="hr-custom">
+                        <li class="list-group-item m-0">
+                            <strong>결제금액</strong>
+                            <span id="payment_amount">￦137,700</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+    
+        </div>
+    </div>
+
+    <!-- 페이징과 검색 파라미터 정보 유지를 위한 Form -->
+    <form id="criteriaForm" action="" method="get">
+        <!-- 페이징 & 정렬 파라미터 -->
+        <input type="hidden" name="page"           th:value="${pageMaker.cri.page}"         id="page">
+        <input type="hidden" name="perPageNum"     th:value="${pageMaker.cri.perPageNum}"   id="perPageNum">
+        <input type="hidden" name="orderBy"        th:value="${pageMaker.cri.orderBy}"      id="orderBy">
+    </form>
+
+
+</th:block>
+<th:block layout:fragment="scriptBottom">
+    <script th:inline="javascript">
+        $(document).ready(function () {
+
+            /*<![CDATA[*/
+            const reservationList = /*[[${reservationList}]]*/ [];
+            const pageMaker = /*[[${pageMaker}]]*/ {};
+            
+            console.log("예약 목록:", reservationList);
+            console.log("PageMaker:", pageMaker);
+            /*]]>*/
+
+            /* errorMessage 로 넘어온 데이터가 있으면 경고창 출력 */
+            const errorMessage = /*[[${errorMessage} ?: null]]*/;
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+
+            // 모달 객체 생성
+            const detailModalElement = $("#detailModal");
+            const detailModal = new bootstrap.Modal(detailModalElement);
+            // 예약 상세보기
+            $("button[name=btn_reservation_detail]").on("click", function() {
+                // #detailModal 에 내용 채우기
+                const reservation_id = $(this).data("reservation_id");
+
+                const reservationData = reservationList.find(r => r.reservation_id === reservation_id);
+
+                console.log("reservation_id",reservation_id);
+                console.log("상세보기",reservationData);
+                if (reservationData) {
+                    $("#space_main_title").text(reservationData.main_title);
+                    $("#product_name").text(reservationData.product_name);
+                    $("#reserveDate").text(reservationData.reservation_date);
+                    $("#reserveTime").text(`${reservationData.start_time.slice(0, -3)} ~ ${reservationData.end_time.slice(0, -3)}`);
+                    $("#headcount").text(`${reservationData.headcount}명`);
+                    $("#payment_method").text(reservationData.payment_method);
+                    $("#reservation_name").text(reservationData.reservation_name);
+                    $("#reservation_phone").text(formatPhoneNumber(reservationData.reservation_phone));
+                    $("#reservation_email").text(reservationData.reservation_email);
+                    $("#payment_amount").text(`￦${reservationData.amount.toLocaleString()}`);
+                    $("#payment_status").text(reservationData.payment_status);
+                    $("#reservation_status").text(reservationData.reservation_status);
+                    // 결제상태에 따라 css 추가
+                    if (reservationData.payment_status === "입금대기") {
+                        $("#payment_status").removeClass().addClass("badge text-bg-warning").text("입금대기");
+                    } else if (reservationData.payment_status === "결제완료") {
+                        $("#payment_status").removeClass().addClass("badge text-bg-secondary").text("결제완료");
+                    } else if (reservationData.payment_status === "결제취소") {
+                        $("#payment_status").removeClass().addClass("badge text-bg-danger").text("결제취소");
+                    }
+                    // 예약상태에 따라 css 추가
+                    if (reservationData.reservation_status === "예약대기") {
+                        $("#reservation_status").removeClass().addClass("badge text-bg-warning").text("예약대기");
+                    } else if (reservationData.reservation_status === "예약완료") {
+                        $("#reservation_status").removeClass().addClass("badge text-bg-secondary").text("예약완료");
+                    } else if (reservationData.reservation_status === "예약취소") {
+                        $("#reservation_status").removeClass().addClass("badge text-bg-danger").text("예약취소");
+                    } else if (reservationData.reservation_status === "이용완료") {
+                        $("#reservation_status").removeClass().addClass("badge text-bg-success").text("이용완료");
+                    }
+                    
+                }
+                detailModal.show();
+
+            });
+
+            // 전화번호 형식 함수
+            function formatPhoneNumber(input) {
+                // 숫자만 남기기
+                const cleanInput = input.replace(/[^0-9]/g, "");
+                const length = cleanInput.length;
+                let result = "";
+
+                if (length === 8) {
+                    // 8자리(예: 1588-0000)
+                    result = cleanInput.replace(/(\d{4})(\d{4})/, '$1-$2');
+                } else if (cleanInput.startsWith("02") && (length === 9 || length === 10)) {
+                    // 서울번호(02-xxx-xxxx, 02-xxxx-xxxx)
+                    result = cleanInput.replace(/(\d{2})(\d{3,4})(\d{4})/, '$1-$2-$3');
+                } else if (!cleanInput.startsWith("02") && (length === 10 || length === 11)) {
+                    // 휴대폰, 지역번호(010-xxxx-xxxx, 031-xxx-xxxx 등)
+                    result = cleanInput.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
+                } else {
+                    result = input; // 인식 불가 시 원본 반환
+                }
+                return result;
+            }
+
+            // 페이지당 데이터 갯수 변경
+            const change_perPageNum = document.getElementById('change_perPageNum');
+            change_perPageNum.addEventListener('change', function() {
+                document.getElementById('perPageNum').value = this.value;
+                document.getElementById('page').value = 1; // 페이지 번호 1로 초기화
+                criteriaForm.action = '/guest/mypage/reservations';
+                criteriaForm.method = 'get';
+                criteriaForm.submit();
+            });
+
+            // 데이터 조회 정렬 변경
+            const change_orderBy = document.getElementById('change_orderBy');
+            change_orderBy.addEventListener('change', function() {
+                document.getElementById('orderBy').value = this.value;
+                document.getElementById('page').value = 1;
+                criteriaForm.action = '/guest/mypage/reservations';
+                criteriaForm.method = 'get';
+                criteriaForm.submit();
+            });
+            
+            
+        });
+        </script>
+</th:block>
+
+</html>

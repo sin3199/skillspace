@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -46,7 +47,7 @@ public class GuestReserveController {
 		model.addAttribute("productDTO", productDTO);
 	}
 	
-	@PostMapping("reservation")
+	@PostMapping("/reservation")
 	public String reservation(
 			ReservationDTO dto,
 			String payment_method, String account_transfer, String sender,
@@ -68,7 +69,7 @@ public class GuestReserveController {
 		return "redirect:/guest/reserve/reserve_result";
 	}
 
-	@GetMapping("reserve_result")
+	@GetMapping("/reserve_result")
 	public void reserve_result(Integer reservation_id, Model model) throws Exception {
 		
 		log.info("예약결과에서 reservation_id : {}", reservation_id);
@@ -76,5 +77,7 @@ public class GuestReserveController {
 		Map<String, Object> reservationResult = guestReserveService.getReservationResultByReservationId(reservation_id);
 		model.addAttribute("reservationResult", reservationResult);
 	}
+
+	
 	
 }

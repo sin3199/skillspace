@@ -155,7 +155,7 @@ CREATE TABLE `Reservations` (
 	`user_id`			varchar(30)		NOT NULL	COMMENT '게스트 회원 아이디',
 	`product_id`		int 			NOT NULL,
 	`total_payment`		decimal(10, 2)	NOT NULL,
-	`status`			varchar(15)		NOT NULL	COMMENT 'Pending, Completed, Cancelled',
+	`status`			varchar(15)		NOT NULL	COMMENT '예약대기, 예약완료, 예약취소, 이용완료',
 	`reservation_date`  DATE            NOT NULL 	COMMENT '예약 날짜',
     `start_time`        TIME            NOT NULL 	COMMENT '예약 시작 시간',
     `end_time`          TIME            NOT NULL 	COMMENT '예약 종료 시간',
@@ -189,7 +189,7 @@ CREATE TABLE `Payments` (
 	`reservation_id`	int				NOT NULL,
 	`payment_method`	varchar(100)	NOT NULL	COMMENT '카드, 계좌이체, pay 등',
 	`amount`			decimal(10, 2)	NOT NULL,
-	`status`			varchar(15)		NOT NULL	COMMENT 'Pending, Completed , Failed, Refunded',
+	`status`			varchar(15)		NOT NULL	COMMENT '결제완료, 입금대기, 결제취소, 환불대기, 환불완료',
 	`created_at`		datetime		NOT NULL	DEFAULT now(),
 	`updated_at`		datetime		NOT NULL	DEFAULT now()
 );

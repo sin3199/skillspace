@@ -114,10 +114,16 @@ public class PageMaker {
 				UriComponentsBuilder.newInstance()
 				.queryParam("page", 			page)
 				.queryParam("perPageNum", 		cri.getPerPageNum())
-				.queryParam("orderBy", 		cri.getOrderBy())
-				.queryParam("start_date", 		cri.getStart_date())
-				.queryParam("end_date", 		cri.getEnd_date());
-				
+				.queryParam("orderBy", 		cri.getOrderBy());
+
+				// 날짜 관련 파라미터
+				if (cri.getStart_date() != null && !cri.getStart_date().isEmpty()) {
+					builder.queryParam("start_date", cri.getStart_date());
+				}
+				if (cri.getEnd_date() != null && !cri.getEnd_date().isEmpty()) {
+					builder.queryParam("end_date", cri.getEnd_date());
+				}
+
 
 				// 검색 관련 파라미터 (값이 있을 때만 추가)
 				if (cri.getSearchType() != null && !cri.getSearchType().isEmpty()) {

@@ -280,6 +280,232 @@
                     </li>
                 </ul>
             </div>
+
+            <style>
+                /* 기존 스타일 유지 */
+                .feedback-text {
+                    font-size: 15px;
+                    white-space: pre-wrap;
+                }
+        
+                .text-purple {
+                    color: #6c5ce7;
+                }
+                .text-bg-purple {
+                    background-color: #6c5ce7;
+                }
+        
+                .border-bottom-purple {
+                    border-bottom: #6c5ce7 solid 1px;
+                }
+        
+                /* 버튼 스타일 유지 */
+                .btn-purple {
+                    background-color: #fff;
+                    color: #6c5ce7;
+                    border: solid 1px #6c5ce7;
+                    border-radius: 5px;
+                    height: 30px;
+                    font-size: 14px;
+                    padding: 4px 8px;
+                    vertical-align: middle; /* 세로 정렬 기준 */
+                    line-height: normal; /* 버튼 내 텍스트 세로 중앙 정렬 도움 */
+                    white-space: nowrap; /* 버튼 텍스트 줄바꿈 방지 */
+                }
+        
+                .btn-purple:hover {
+                    background-color: #563bb7;
+                    color: #fff;
+                }
+        
+                /* 페이지네이션 활성 링크 스타일 유지 */
+                .pagination .page-item.active .page-link { /* .pagination 추가하여 명확성 높임 */
+                    background-color: #6c5ce7;
+                    border-color: #6c5ce7;
+                    color: #fff; /* 활성 페이지 텍스트 흰색 */
+                    z-index: 3;
+                }
+        
+                /* 페이지네이션 기본 링크 색상 */
+                .pagination .page-item .page-link {
+                    color: #6c5ce7;
+                }
+                /* 페이지네이션 호버 효과 */
+                .pagination .page-link:hover {
+                    background-color: #e9ecef;
+                    border-color: #dee2e6;
+                }
+                /* 페이지네이션 비활성 링크 색상 */
+                .pagination .page-item.disabled .page-link {
+                    color: #6c757d;
+                }
+        
+                /* 예약 목록 테이블 스타일 */
+                .reservation-table-container {
+                    margin-top: 2rem; /* 탭 아래 여백 */
+                    padding: 1.5rem;
+                    background-color: #fff; /* 흰색 배경 */
+                    border-radius: 10px; /* 둥근 모서리 */
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* 부드러운 그림자 */
+                }
+        
+                .table thead th {
+                    background-color: #f8f9fa; /* 헤더 배경색 */
+                    border-bottom: 2px solid #dee2e6; /* 헤더 하단 구분선 */
+                    text-align: center; /* 텍스트 가운데 정렬 */
+                    vertical-align: middle; /* 수직 가운데 정렬 */
+                    font-weight: 600; /* 헤더 폰트 약간 두껍게 */
+                }
+        
+                .table tbody td {
+                    text-align: center; /* 텍스트 가운데 정렬 */
+                    vertical-align: middle; /* 수직 가운데 정렬 */
+                    font-size: 0.95rem; /* 본문 폰트 크기 살짝 조정 */
+                }
+        
+                /* 예약 상태별 색상 */
+                .reservation-status {
+                    font-weight: bold;
+                    padding: 0.2em 0.6em;
+                    border-radius: 0.25rem;
+                    font-size: 0.9em;
+                }
+                .status-confirmed { color: #198754; background-color: rgba(25, 135, 84, 0.1); } /* 예약 확정 (초록) */
+                .status-pending { color: #ffc107; background-color: rgba(255, 193, 7, 0.1); } /* 예약 대기 (노랑) */
+                .status-cancelled { color: #dc3545; background-color: rgba(220, 53, 69, 0.1); } /* 예약 취소 (빨강) */
+                .status-completed { color: #6c757d; background-color: rgba(108, 117, 125, 0.1); } /* 이용 완료 (회색) */
+                /* 추가 상태가 있다면 여기에 정의 */
+        
+                /* 예약 내역 없을 때 메시지 */
+                .no-reservations {
+                    text-align: center;
+                    padding: 3rem 0;
+                    color: #6c757d;
+                    font-size: 1.2rem;
+                }
+        
+                /* 테이블 반응형 처리 */
+                .table-responsive {
+                     overflow-x: auto;
+                }
+        
+                /* 제목 스타일 */
+                .content-title {
+                    font-size: 1.8rem; /* 제목 크기 조정 */
+                    font-weight: 600;
+                    margin-bottom: 1.5rem; /* 제목 아래 여백 */
+                    padding-bottom: 0.5rem; /* 보라색 밑줄과의 간격 */
+                    /* border-bottom-purple 클래스 사용 */
+                }
+        
+            </style>
+
+             <!-- 예약 내역 목록 섹션 -->
+    <div class="reservation-table-container">
+        <h4 class="content-title border-bottom-purple pb-2">나의 예약 내역</h4>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle"> <!-- align-middle 추가로 수직 정렬 보장 -->
+                <thead>
+                    <tr>
+                        <th>공간명</th>
+                        <th>이용 시간</th>
+                        <th>예약일</th>
+                        <th>결제 금액</th>
+                        <th>예약 상태</th>
+                        <th>관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 예약 목록 반복 출력 -->
+                    <!-- th:if 와 th:unless 를 사용하여 목록 유무에 따라 다른 내용 표시 -->
+                    <th:block th:if="${reservations != null and !#lists.isEmpty(reservations)}">
+                        <tr th:each="reservation : ${reservations}">
+                            <!-- 공간명 (클릭 시 상세 페이지로 이동 가능하도록 링크 추가 고려) -->
+                            <td>
+                                <a th:href="@{'/space/' + ${reservation.spaceId}}" th:text="${reservation.spaceName}" class="text-decoration-none text-dark">공간 이름 예시</a>
+                            </td>
+                            <!-- 이용 시간 -->
+                            <td th:text="|${#temporals.format(reservation.usageStartDate, 'HH:mm')} ~ ${#temporals.format(reservation.usageEndDate, 'HH:mm')}|">09:00 ~ 18:00</td>
+                            
+                            <!-- 예약 신청일 -->
+                            <td th:text="${#temporals.format(reservation.reservationDate, 'yyyy-MM-dd')}">2023-12-20</td>
+                            <!-- 결제 금액 (숫자 포맷 적용) -->
+                            <td th:text="|${#numbers.formatInteger(reservation.totalPrice, 0, 'COMMA')}원|">50,000원</td>
+                            <!-- 예약 상태 (상태에 따라 다른 스타일 적용) -->
+                            <td>
+                                <span class="reservation-status"
+                                      th:text="${reservation.status.displayName}"
+                                      th:classappend="|status-${#strings.toLowerCase(reservation.status.name())}|">
+                                    예약 확정
+                                </span>
+                                <!-- 예시: reservation.status가 Enum이고 displayName 속성과 name() 메소드가 있다고 가정 -->
+                                <!-- CONFIRMED -> status-confirmed, PENDING -> status-pending 등 -->
+                            </td>
+                            <!-- 관리 버튼 (상태에 따라 다른 버튼 표시) -->
+                            <td>
+                                <!-- 예약 취소 버튼 (예: '확정' 또는 '대기' 상태일 때만 표시) -->
+                                <a th:if="${reservation.status.name() == 'CONFIRMED' or reservation.status.name() == 'PENDING'}"
+                                   th:href="@{/guest/reservations/cancel/{id}(id=${reservation.reservationId})}"
+                                   class="btn btn-sm btn-outline-danger me-1"
+                                   onclick="return confirm('정말로 이 예약을 취소하시겠습니까?');">
+                                   예약취소
+                                </a>
+                                <!-- 후기 작성 버튼 (예: '이용 완료' 상태이고 아직 후기 미작성 시 표시) -->
+                                <a th:if="${reservation.status.name() == 'COMPLETED' and !reservation.reviewWritten}"
+                                   th:href="@{/reviews/write(reservationId=${reservation.reservationId})}"
+                                   class="btn btn-sm btn-purple me-1">
+                                   후기작성
+                                </a>
+                                <!-- 예약 상세 보기 버튼 -->
+                                <a th:href="@{/guest/reservations/detail/{id}(id=${reservation.reservationId})}"
+                                   class="btn btn-sm btn-outline-secondary">
+                                   상세보기
+                                </a>
+                                <!-- 필요에 따라 다른 관리 버튼 추가 -->
+                            </td>
+                        </tr>
+                    </th:block>
+
+                    <!-- 예약 내역이 없을 경우 메시지 표시 -->
+                    <tr th:unless="${reservations != null and !#lists.isEmpty(reservations)}">
+                        <td colspan="7" class="no-reservations">
+                            <i class="bi bi-info-circle me-2"></i> <!-- 아이콘 추가 (Bootstrap Icons 필요) -->
+                            예약 내역이 존재하지 않습니다.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div> <!-- End table-responsive -->
+
+        <!-- 페이지네이션 -->
+        <!-- pageMaker 객체가 존재하고 총 게시물 수가 0보다 클 때만 표시 -->
+        <nav aria-label="Page navigation" th:if="${pageMaker != null and pageMaker.totalCount > 0}" class="d-flex justify-content-center mt-4">
+            <ul class="pagination">
+                <!-- 이전 페이지 버튼 -->
+                <li class="page-item" th:classappend="${!pageMaker.prev} ? 'disabled'">
+                    <a class="page-link" th:href="@{/guest/mypage/reservations(page=${pageMaker.startPage - 1}, size=${pageMaker.cri.size}, type=${pageMaker.cri.type}, keyword=${pageMaker.cri.keyword})}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                <!-- 페이지 번호 목록 -->
+                <li class="page-item" th:each="num : ${#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}"
+                    th:classappend="${num == pageMaker.cri.page} ? 'active'">
+                    <a class="page-link" th:href="@{/guest/mypage/reservations(page=${num}, size=${pageMaker.cri.size}, type=${pageMaker.cri.type}, keyword=${pageMaker.cri.keyword})}" th:text="${num}">1</a>
+                </li>
+
+                <!-- 다음 페이지 버튼 -->
+                <li class="page-item" th:classappend="${!pageMaker.next} ? 'disabled'">
+                    <a class="page-link" th:href="@{/guest/mypage/reservations(page=${pageMaker.endPage + 1}, size=${pageMaker.cri.size}, type=${pageMaker.cri.type}, keyword=${pageMaker.cri.keyword})}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <!-- End Pagination -->
+
+    </div> <!-- End reservation-table-container -->
         
         
         

@@ -15,7 +15,7 @@ public class PaymentDTO {
     private Integer         reservation_id;
     private String          payment_method;
     private BigDecimal      amounts;
-    private String          status;
+    private String          status;         // 결제완료, 입금대기, 결제취소, 환불대기, 환불완료
     private LocalDateTime   created_at;
     private LocalDateTime   updated_at;
 }

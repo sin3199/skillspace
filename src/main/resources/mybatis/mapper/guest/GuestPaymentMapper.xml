@@ -18,6 +18,30 @@
 		)
 </insert>
 
+<!-- reservation_id로 결제정보 조회 -->
+<select id="getPaymentByReservationId" parameterType="Integer" resultType="com.skillspace.sgs.guest.payment.PaymentDTO">
+	select
+		payment_id,
+		reservation_id,
+		payment_method,
+		amount,
+		status,
+		created_at,
+		updated_at
+	from
+		payments
+	where
+		reservation_id = #{reservation_id}
+</select>
 
+<!-- 결제상태 변경 -->
+<update id="updatePaymentStatus" parameterType="Map">
+	update
+		payments
+	set
+		status = #{status}
+	where
+		payment_id = #{payment_id}
+</update>
 
 </mapper>

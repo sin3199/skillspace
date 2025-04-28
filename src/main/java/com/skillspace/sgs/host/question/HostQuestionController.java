@@ -1,6 +1,5 @@
 package com.skillspace.sgs.host.question;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -10,11 +9,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes; // 추가
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.skillspace.sgs.common.utils.PageMaker;
 import com.skillspace.sgs.common.utils.SearchCriteria;
@@ -70,7 +68,7 @@ public class HostQuestionController {
         // 1. 파라미터 및 세션 유효성 검사
         if (question_id == null || question_id <= 0) {
             rttr.addFlashAttribute("errorMessage", "잘못된 요청입니다.");
-            addSearchAndPagingParams(cri, rttr); // 리다이렉트 파라미터 추가
+            addSearchAndPagingParams(cri, rttr);
             return QUESTION_LIST_URL;
         }
 

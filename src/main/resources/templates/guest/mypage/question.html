@@ -4,16 +4,10 @@
 
 <th:block layout:fragment="css">
     <th:block th:replace="~{guest/mypage/mypageTab :: mypageTab-css}"></th:block>
-
-    <style>
-        
-    </style>
-</th:block>
-<th:block layout:fragment="content">
-    <th:block th:replace="~{guest/mypage/mypageTab :: mypageTab}"></th:block>
     <style>
         .feedback-text {
             font-size: 15px;
+            white-space: pre-wrap;
         }
         
         .text-purple {
@@ -54,7 +48,11 @@
         /*.feedback-item 에 hover 효과 손가락 표시 및 색상 효과*/
         .feedback-item:hover {
             cursor: pointer;
-            background-color: #f8f9fa;
+            background-color: #e9ecf0;
+        }
+
+        .answer-block {
+            background-color: #e9ecf0;
         }
 
         .active>.page-link, .page-link.active {
@@ -62,9 +60,10 @@
 			border-color: #6c5ce7;
 			z-index: 3;
 		}
-
-
     </style>
+</th:block>
+<th:block layout:fragment="content">
+    <th:block th:replace="~{guest/mypage/mypageTab :: mypageTab}"></th:block>
     
     <div class="card feedback-list-container mb-4">
     
@@ -96,9 +95,7 @@
                             <span class="badge text-bg-purple">답변</span>
                         </div>
                         <div>
-                            <div class="feedback-text">
-                                [[${questionDTO.answer. answer_content}]]
-                            </div>
+                            <div class="feedback-text">[[${questionDTO.answer. answer_content}]]</div>
                             <small class="text-muted">[[${#temporals.format(questionDTO.answer.answer_created_at, 'yyyy.MM.dd')}]]</small>
                         </div>
                     </div>
@@ -156,7 +153,6 @@
 
                 $('.feedback-list-container').on('click', '.question-block', function () {
                     const status = $(this).data('status');
-                    console.log("답변상태", status);
 
                     if (status === 'Y') {
                         const $answerBlock = $(this).next('.answer-block');

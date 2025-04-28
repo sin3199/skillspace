@@ -18,7 +18,7 @@ public class ReservationDTO {
     private String 			user_id; 			// 게스트 회원 아이디
     private Integer 		product_id; 		// 상품 ID
     private BigDecimal 		total_payment;		// 총 결제 금액
-    private String 			status; 			// 예약 상태 (Pending, Completed, Cancelled)
+    private String 			status; 			// 예약 상태 (예약대기, 예약완료, 예약취소, 이용완료)
     private LocalDate 		reservation_date; 	// 예약 날짜
     private LocalTime 		start_time; 		// 시작 시간
     private LocalTime 		end_time; 			// 종료 시간
