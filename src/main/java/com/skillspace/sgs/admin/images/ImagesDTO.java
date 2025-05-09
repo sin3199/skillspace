@@ -16,4 +16,12 @@ public class ImagesDTO {
 	private String			image_up_folder;
 	private String			image_name;
 	private LocalDateTime	created_at;
+
+	public void setImage_up_folder(String image_up_folder) {
+		if(image_up_folder != null) {
+			this.image_up_folder = image_up_folder.replace("\\", "/");
+		}else {
+			this.image_up_folder = image_up_folder;
+		}
+	}
 }

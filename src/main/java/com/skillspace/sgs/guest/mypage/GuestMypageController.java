@@ -1,5 +1,6 @@
 package com.skillspace.sgs.guest.mypage;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -10,10 +11,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.skillspace.sgs.common.utils.PageMaker;
@@ -22,6 +25,9 @@ import com.skillspace.sgs.guest.GuestDTO;
 import com.skillspace.sgs.guest.GuestService;
 import com.skillspace.sgs.guest.question.GuestQuestionService;
 import com.skillspace.sgs.guest.reserve.GuestReserveService;
+import com.skillspace.sgs.guest.review.GuestReviewService;
+import com.skillspace.sgs.guest.review.ReviewDTO;
+import com.skillspace.sgs.guest.review.ReviewWithImageDTO;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -37,11 +43,14 @@ public class GuestMypageController {
     private final PasswordEncoder passwordEncoder;
     private final GuestQuestionService guestQuestionService;
 	private final GuestReserveService guestReserveService;
+	private final GuestReviewService guestReviewService;
     
 
     // 회원 정보 수정 폼
 	@GetMapping("/modify")
-	public void modify(Model model, HttpSession session) {
+	public void modify(
+			Model model, 
+			HttpSession session) {
 		
 		GuestDTO dto = guestService.modify(((GuestDTO)session.getAttribute("login_auth")).getUser_id());
 		model.addAttribute("guestDTO", dto);
@@ -49,7 +58,8 @@ public class GuestMypageController {
 	
 	// 회원 정보 수정 처리
 	@PostMapping("/modify")
-	public String modify_save(GuestDTO dto) throws Exception {
+	public String modify_save(
+			GuestDTO dto) throws Exception {
 		
 		guestService.modify_save(dto);
 		
@@ -58,7 +68,10 @@ public class GuestMypageController {
 
     // 내 Q&A 목록 폼
     @GetMapping("/question")
-    public void question(HttpSession session, SearchCriteria cri, Model model) throws Exception {
+    public void question(
+			HttpSession session, 
+			SearchCriteria cri, 
+			Model model) throws Exception {
 
         String user_id = ((GuestDTO)session.getAttribute("login_auth")).getUser_id();
         
@@ -82,8 +95,9 @@ public class GuestMypageController {
 	}
 	
 	@PostMapping("/pwchange")
-	public ResponseEntity<String> pwchange(@RequestParam("cur_pw") String user_pw, 
-											String new_pw, HttpSession session) {
+	public ResponseEntity<String> pwchange(
+			@RequestParam("cur_pw") String user_pw, 
+			String new_pw, HttpSession session) {
 		
 		log.info("user_pw : " + user_pw + " new_pw : " + new_pw); 
 		ResponseEntity<String> entity = null;
@@ -110,9 +124,9 @@ public class GuestMypageController {
 
 	@GetMapping("/reservations")
 	public void reservations(
-							SearchCriteria cri, 
-							HttpSession session, 
-							Model model) {
+			SearchCriteria cri, 
+			HttpSession session, 
+			Model model) {
 
 		// 1) 로그인 유저 조회
 		String user_id = ((GuestDTO)session.getAttribute("login_auth")).getUser_id();
@@ -120,9 +134,9 @@ public class GuestMypageController {
 		// 2) 페이지메이커
 		PageMaker pageMaker = new PageMaker();
 		if(cri.getPerPageNum() == 0) {
-			cri.setPerPageNum(3);
+			cri.setPerPageNum(5);
 		}
-		pageMaker.setDisplayPageNum(5);
+		pageMaker.setDisplayPageNum(3);
 		pageMaker.setCri(cri);
 		pageMaker.setTotalCount(guestReserveService.getCountReservationListByUserId(user_id));
 
@@ -145,9 +159,10 @@ public class GuestMypageController {
 
 	// 예약 취소
 	@PostMapping("/reservations/cancel/{reservation_id}")
-	public String cancelReservation(@PathVariable("reservation_id") Integer reservation_id,
-						HttpSession session,
-						RedirectAttributes rttr) {
+	public String cancelReservation(
+			@PathVariable("reservation_id") Integer reservation_id,
+			HttpSession session,
+			RedirectAttributes rttr) {
 
 		log.info("예약 취소 요청 수신 - 예약 ID: {}", reservation_id);
 
@@ -191,4 +206,93 @@ public class GuestMypageController {
 
 		return "redirect:/guest/mypage/reservations";
 	}
+
+	// 리뷰쓰기
+	@PostMapping("/reviews/write")
+	public ResponseEntity<?> writeReview(
+			@ModelAttribute("reviewDTO") ReviewDTO reviewDTO,
+			@RequestParam(value = "images", required = false) List<MultipartFile> imageFiles,
+			HttpSession session) {
+
+		log.info("리뷰 작성 요청 수신 (MyBatis): {}", reviewDTO);
+		// imageFiles 로그 출력
+		if (imageFiles != null) {
+			for (MultipartFile image : imageFiles) {
+				log.info("이미지 파일 이름: {}, 크기: {}", image.getOriginalFilename(), image.getSize());
+			}
+		}
+
+		// 로그인 유저 정보
+		GuestDTO loginUser = (GuestDTO) session.getAttribute("login_auth");
+		if (loginUser == null) {
+			log.warn("로그인되지 않은 사용자의 리뷰 작성 시도.");
+			return new ResponseEntity<>("로그인이 필요합니다.", HttpStatus.UNAUTHORIZED);
+		}
+		String loggedInUserId = loginUser.getUser_id();
+		log.debug("요청 사용자 ID: {}", loggedInUserId);
+
+		if (reviewDTO.getReservation_id() == null || reviewDTO.getRating() < 1 || reviewDTO.getRating() > 5 || reviewDTO.getReview_text() == null || reviewDTO.getReview_text().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "별점과 내용은 필수 입력 항목입니다."));
+        }
+        if (imageFiles != null && imageFiles.size() > 3) {
+            return ResponseEntity.badRequest().body(Map.of("message", "이미지는 최대 3개까지만 첨부할 수 있습니다."));
+        }
+
+		try {
+            guestReviewService.createReview(reviewDTO, imageFiles, loggedInUserId);
+
+            log.info("사용자 '{}'의 예약 ID '{}'에 대한 리뷰 등록 성공 (MyBatis)", loggedInUserId, reviewDTO.getReservation_id());
+            return ResponseEntity.ok(Map.of("message", "리뷰가 성공적으로 등록되었습니다."));
+
+        } catch (NoSuchElementException | IllegalArgumentException | IllegalStateException e) {
+            // 서비스에서 발생시킨 예외 처리 (이전 답변과 동일)
+            log.warn("리뷰 등록 실패 (MyBatis): {}", e.getMessage());
+            // 상태 코드 조정 가능
+            if (e instanceof NoSuchElementException) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", e.getMessage()));
+            } else if (e instanceof IllegalArgumentException) {
+				return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+            } else { // IllegalStateException
+				return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
+            }
+        } catch (IOException e) {
+            log.error("리뷰 이미지 파일 저장 중 오류 발생 (MyBatis, 예약 ID: {})", reviewDTO.getReservation_id(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "이미지 파일 저장 중 오류가 발생했습니다."));
+        } catch (Exception e) {
+            log.error("리뷰 등록 중 예상치 못한 오류 발생 (MyBatis, 예약 ID: {})", reviewDTO.getReservation_id(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "리뷰 등록 중 오류가 발생했습니다."));
+        }
+
+	}
+
+	@GetMapping("/reviews")
+	public void reviews(
+			SearchCriteria cri,
+			Model model, 
+			HttpSession session) {
+
+		// 1) 로그인 유저 정보
+		String user_id = ((GuestDTO)session.getAttribute("login_auth")).getUser_id();
+
+		// 2) 페이지메이커
+		PageMaker pageMaker = new PageMaker();
+		if(cri.getPerPageNum() == 0) {
+			cri.setPerPageNum(5);
+		}
+		pageMaker.setDisplayPageNum(3);
+		pageMaker.setCri(cri);
+		
+		// 3) 리뷰 목록 조회
+		try {
+			pageMaker.setTotalCount(guestReviewService.getCountReviewListByUserId(user_id));
+			List<ReviewWithImageDTO> reviewList = guestReviewService.getReviewListByUserId(user_id, cri);
+			model.addAttribute("reviewList", reviewList);
+			model.addAttribute("pageMaker", pageMaker);
+		} catch (Exception e) {
+			log.error("사용자 {}의 리뷰 목록 조회 중 오류 발생", user_id, e);
+			model.addAttribute("errorMessage", "리뷰 목록을 불러오는 중 오류가 발생했습니다.");
+		}
+
+	}
+	
 }

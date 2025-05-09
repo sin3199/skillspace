@@ -149,13 +149,22 @@
 		r.reservation_id = #{reservation_id}
 </select>
 
-
 <!-- 예약상태 변경 -->
 <update id="updateReservationStatus">
 	update
 		reservations
 	set
 		status = #{status}
+	where
+		reservation_id = #{reservation_id}
+</update>
+
+<!-- 리뷰작성 상태변경 -->
+<update id="updateReviewStatus">
+	update
+		reservations
+	set
+		is_review = #{is_review}
 	where
 		reservation_id = #{reservation_id}
 </update>

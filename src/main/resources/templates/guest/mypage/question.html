@@ -55,10 +55,53 @@
             background-color: #e9ecf0;
         }
 
+        /* 페이지네이션 활성 링크 스타일 유지 */
+        .pagination .page-item.active .page-link { /* .pagination 추가하여 명확성 높임 */
+            background-color: #6c5ce7;
+            border-color: #6c5ce7;
+            color: #fff; /* 활성 페이지 텍스트 흰색 */
+            z-index: 3;
+        }
+
+        /* 페이지네이션 기본 링크 색상 */
+        .pagination .page-item .page-link {
+            color: #6c5ce7;
+        }
+        /* 페이지네이션 호버 효과 */
+        .pagination .page-link:hover {
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+        }
+        /* 페이지네이션 비활성 링크 색상 */
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+        }
+
+        /* 페이지네이션 엑트브 효과*/
         .active>.page-link, .page-link.active {
+            background-color: #6c5ce7;
+            border-color: #6c5ce7;
+            z-index: 3;
+        }
+
+        /* 질문 수정 모달 */
+        .modal-header {
+			background-color: #6c5ce7;
+			color: #fff;
+		}
+		
+		textarea {
+			resize: none;
+		}
+
+		#questionModifyModal .btn-primary {
 			background-color: #6c5ce7;
 			border-color: #6c5ce7;
-			z-index: 3;
+		}
+
+		#questionModifyModal .btn-primary:hover {
+			background-color: #5b46fd;
+			border-color: #5b46fd;
 		}
     </style>
 </th:block>
@@ -69,8 +112,20 @@
     
         <!-- Q&A 목록 컨테이너 -->
         <div class="card-body">
+            <div class="d-flex justify-content-end align-items-center mb-3">
+                <div class="d-flex gap-1">
+                    <select class="form-select form-select-sm w-auto" id="change_orderBy">
+                       <option value="desc" th:selected= "${pageMaker.cri.orderBy == 'desc'}">등록일 ▼</option>
+                       <option value="" th:selected= "${pageMaker.cri.orderBy == '' || pageMaker.cri.orderBy == null}">등록일 ▲</option>
+                    </select>
+                    <select class="form-select form-select-sm w-auto" id="change_perPageNum">
+                       <option value="5" th:selected= "${pageMaker.cri.perPageNum == 5}">5개씩</option>
+                       <option value="10" th:selected= "${pageMaker.cri.perPageNum == 10}">10개씩</option>
+                    </select>
+                 </div>
+            </div>
             <th:block th:if="${not #lists.isEmpty(questionList)}" th:each="questionDTO : ${questionList}">
-                <!-- 예시 Q&A 항목 1 -->
+                <!-- Q&A 항목 -->
                 <div class="feedback-item question-block mb-3 d-flex flex-column border border-3 p-3" th:data-status="${questionDTO.answer_status}">
                     <div class="d-flex justify-content-between align-items-center mb-2 border-bottom-purple">
                         <div>
@@ -82,9 +137,16 @@
                     <div class="d-flex justify-content-between align-items-end">
                         <small class="badge text-bg-success" th:if="${questionDTO.answer_status == 'Y'}">답변 완료</small>
                         <small class="badge text-bg-warning" th:unless="${questionDTO.answer_status == 'Y'}">답변 대기중</small>
-                        <div>
+                        <div class="button-group">
                             <a class="btn btn-purple" th:href="@{/guest/space/spaceDetail(host_space_id=${questionDTO.host_space_id})}">공간으로</a>
-                            <button class="btn btn-sm btn-outline-danger">질문삭제</button>
+                            <button class="btn btn-sm btn-outline-success" 
+                                    th:if="${questionDTO.answer_status == 'N'}"
+                                    name="btn_question_modify"
+                                    th:data-question_id="${questionDTO.question_id}"
+                                    th:data-question_content="${questionDTO.question_content}">질문수정</button>
+                            <button class="btn btn-sm btn-outline-danger" 
+                                    name="btn_question_delete"
+                                    th:data-question_id="${questionDTO.question_id}">질문삭제</button>
                         </div>
                     </div>
                 </div>
@@ -116,7 +178,7 @@
                 <ul class="pagination pagination-sm justify-content-center">
                     <!-- 이전 버튼 -->
                     <li class="page-item" th:classappend="${!pageMaker.prev} ? 'disabled'">
-                        <a class="page-link" th:href="|/guest/mypage/question${pageMaker.makeQuery(pageMaker.startPage - 1)}|"
+                        <a class="page-link" th:href="|/guest/mypage/question${pageMaker.makeSearch(pageMaker.startPage - 1)}|"
                             aria-label="Previous">
                             &laquo;
                         </a>
@@ -126,13 +188,13 @@
                     <li class="page-item" th:each="pageNum : ${#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}"
                         th:classappend="${pageMaker.cri.page == pageNum} ? 'active'"
                         th:attr="aria-current=${pageMaker.cri.page == pageNum} ? 'page' : null">
-                        <a class="page-link" th:href="|/guest/mypage/question${pageMaker.makeQuery(pageNum)}|"
+                        <a class="page-link" th:href="|/guest/mypage/question${pageMaker.makeSearch(pageNum)}|"
                             th:text="${pageNum}"></a>
                     </li>
             
                     <!-- 다음 버튼 -->
                     <li class="page-item" th:classappend="${!pageMaker.next} ? 'disabled'">
-                        <a class="page-link" th:href="|/guest/mypage/question${pageMaker.makeQuery(pageMaker.endPage + 1)}|"
+                        <a class="page-link" th:href="|/guest/mypage/question${pageMaker.makeSearch(pageMaker.endPage + 1)}|"
                             aria-label="Next">
                             &raquo;
                         </a>
@@ -140,8 +202,44 @@
                 </ul>
             </nav>
             
-            </div>
+        </div>
     </div><!-- // #feedback-list-container 끝 -->
+
+    <!-- 질문 수정 모달 -->
+    <div class="modal fade" id="questionModifyModal" tabindex="-1" aria-labelledby="questionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="questionModalLabel">질문 수정하기</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="questionForm">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-content-center">
+                                <label for="questionContent" class="form-label fw-bold">질문</label>
+                                <span><span id="textCount">0</span> / 200</span>
+                            </div>
+                            <textarea class="form-control" id="questionContent" name="questionContent" rows="5" placeholder="질문 내용을 자세히 작성해주세요" maxlength="200" required></textarea>
+                            <input type="hidden" id="question_id" name="question_id">
+                        </div>
+                    </form>
+                    <div class="d-flex justify-content-center align-content-center gap-2">
+                        <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-primary w-50" id="submitQuestion">질문 등록</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 페이징과 검색 파라미터 정보 유지를 위한 Form -->
+    <form id="criteriaForm" action="" method="get">
+        <!-- 페이징 & 정렬 파라미터 -->
+        <input type="hidden" name="page"           th:value="${pageMaker.cri.page}"         id="page">
+        <input type="hidden" name="perPageNum"     th:value="${pageMaker.cri.perPageNum}"   id="perPageNum">
+        <input type="hidden" name="orderBy"        th:value="${pageMaker.cri.orderBy}"      id="orderBy">
+    </form>
 
 
 </th:block>
@@ -151,13 +249,136 @@
                 console.log("질문 목록", [[${questionList}]]);
                 console.log("pageMaker", [[${pageMaker}]]);
 
-                $('.feedback-list-container').on('click', '.question-block', function () {
+                $('.feedback-list-container').on('click', '.question-block', function (event) {
                     const status = $(this).data('status');
+
+                    // .button-group 내부 클릭 시 토글 방지
+                    if ($(event.target).closest('.button-group').length) {
+                        return; 
+                    }
 
                     if (status === 'Y') {
                         const $answerBlock = $(this).next('.answer-block');
                         $answerBlock.slideToggle(300);
                     } 
+                });
+
+                // 질문 수정 모달
+                const questionModifyModalElement = $("#questionModifyModal");
+                const questionModifyModal = new bootstrap.Modal(questionModifyModalElement);
+
+                // 질문 수정 버튼 클릭 시 모달 열기
+                $("button[name='btn_question_modify']").on("click", function() {
+                    const question_id = $(this).data("question_id");
+                    $("#question_id").val(question_id);
+
+                    const question_content = $(this).data("question_content");
+                    $("#questionContent").val(question_content);
+                    $("#textCount").text(question_content.length);
+
+                    questionModifyModal.show();
+                });
+
+                // 글자 수 카운트 이벤트
+                $("#questionContent").on("input", function() {
+                    const textLength = $(this).val().length;
+                    $("#textCount").text(textLength);
+                });
+
+                // 모달 내부 질문수정 등록
+                $("#submitQuestion").on("click", function() {
+                    const questionContent = $("#questionContent").val().trim(); // 앞뒤 공백 제거
+
+                    if (!questionContent) {
+                        alert("질문 내용을 입력해주세요.");
+                        $("#questionContent").focus();
+                        return;
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/guest/question/modify",
+                        data: {
+                            question_id: $("#question_id").val(),
+                            question_content: questionContent
+                        },
+                        success: function(result) {
+                            if (result === "success") {
+                                alert("질문이 성공적으로 수정되었습니다.");
+                                questionModifyModal.hide();
+                                location.reload();
+                            } else if (result === "auth_fail") {
+                                alert("질문을 수정할 권한이 없습니다.");
+                            } else if (result === "not_found") {
+                                alert("수정할 질문을 찾을 수 없습니다.");
+                            } else if (result === "answered") {
+                                alert("이미 답변이 완료된 질문은 수정할 수 없습니다.");
+                            } else {
+                                alert("질문 수정 중 오류가 발생했습니다. 다시 시도해주세요. (오류: " + result + ")");
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            alert("질문 수정 요청 중 서버 오류가 발생했습니다.");
+                            console.error("AJAX error:", xhr, status, error);
+                        }
+                    });
+                });
+
+                // 질문 삭제 기능
+                $("button[name='btn_question_delete']").on("click", function() {
+
+                    if(!confirm("정말로 삭제하시겠습니까?")) return;
+
+                    const question_id = $(this).data("question_id");
+                    $.ajax({
+                        type: "POST",
+                        url: "/guest/question/delete",
+                        data: { question_id: question_id },
+                        success: function(result) {
+                            if (result === "success") {
+                                alert("질문이 삭제되었습니다.");
+                                location.reload();
+                            } else if (result === "auth_fail") {
+                                alert("질문을 삭제할 권한이 없습니다.");
+                            } else if (result === "not_found") {
+                                alert("삭제할 질문을 찾을 수 없습니다.");
+                            } else {
+                                alert("질문 삭제 중 오류가 발생했습니다. 다시 시도해주세요. (오류: " + result + ")");
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            alert("질문 삭제 요청 중 서버 오류가 발생했습니다.");
+                            console.error("AJAX error:", xhr, status, error);
+                        }
+                    });
+                    
+
+
+
+                });
+
+
+                /* 페이지 조회 기능 */
+                const criteriaForm = $('#criteriaForm');
+
+                // 페이지당 데이터 갯수 변경
+                const change_perPageNum = $('#change_perPageNum');
+                change_perPageNum.on('change', function() {
+                    $('#perPageNum').val(this.value);
+                    $('#page').val(1); // 페이지 번호 1로 초기화
+                    criteriaForm.attr('action', '/guest/mypage/question');
+                    criteriaForm.attr('method', 'get');
+                    criteriaForm.submit();
+                });
+
+                // 데이터 조회 정렬 변경
+                const change_orderBy = $('#change_orderBy');
+                change_orderBy.on('change', function() {
+                    $('#orderBy').val(this.value);
+                    $('#page').val(1);
+                    criteriaForm.attr('action', '/guest/mypage/question');
+                    criteriaForm.attr('method', 'get');
+                    criteriaForm.submit();
                 });
 
             });

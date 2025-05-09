@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:laout="http://www.ultraq.net.nz/thymeleaf/laout"
+    layout:decorate="~{layouts/layout1}">
+
+<th:block layout:fragment="css">
+    <th:block th:replace="~{guest/mypage/mypageTab :: mypageTab-css}"></th:block>
+    <style>
+        .feedback-text {
+            font-size: 15px;
+            white-space: pre-wrap;
+        }
+        
+        .text-purple {
+            color: #6c5ce7;
+        }
+        .text-bg-purple {
+            background-color: #6c5ce7;
+        }
+
+        .border-bottom-purple {
+            border-bottom: #6c5ce7 solid 1px;
+        }
+
+        .feedback-list-container hr {
+            border-bottom: #6c5ce7 solid 2px;
+            opacity: 1 !important;
+        }
+
+        .btn-purple {
+            background-color: #fff;
+            color: #6c5ce7;
+            border: solid 1px #6c5ce7;
+            border-radius: 5px;
+            height: 30px;
+            font-size: 14px;
+            padding: 4px 8px;
+            vertical-align: middle; /* 세로 정렬 기준 */
+            line-height: normal; /* 버튼 내 텍스트 세로 중앙 정렬 도움 */
+            white-space: nowrap; /* 버튼 텍스트 줄바꿈 방지 */
+
+        }
+
+        .btn-purple:hover {
+            background-color: #563bb7;
+            color: #fff;
+        }
+        
+        /* hover 효과 색상 효과*/
+        .feedback-item:hover {
+            background-color: #e9ecf0;
+        }
+
+        .answer-block {
+            background-color: #e9ecf0;
+        }
+
+        /* 페이지네이션 활성 링크 스타일 유지 */
+        .pagination .page-item.active .page-link { /* .pagination 추가하여 명확성 높임 */
+            background-color: #6c5ce7;
+            border-color: #6c5ce7;
+            color: #fff; /* 활성 페이지 텍스트 흰색 */
+            z-index: 3;
+        }
+
+        /* 페이지네이션 기본 링크 색상 */
+        .pagination .page-item .page-link {
+            color: #6c5ce7;
+        }
+        /* 페이지네이션 호버 효과 */
+        .pagination .page-link:hover {
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+        }
+        /* 페이지네이션 비활성 링크 색상 */
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+        }
+
+        /* 페이지네이션 엑트브 효과*/
+        .active>.page-link, .page-link.active {
+            background-color: #6c5ce7;
+            border-color: #6c5ce7;
+            z-index: 3;
+        }
+    </style>
+</th:block>
+<th:block layout:fragment="content">
+    <th:block th:replace="~{guest/mypage/mypageTab :: mypageTab}"></th:block>
+    
+    <div class="card feedback-list-container mb-4">
+    
+        <!-- 리뷰 목록 컨테이너 -->
+        <div class="card-body">
+            <div class="d-flex justify-content-end align-items-center mb-3">
+                <div class="d-flex gap-1">
+                    <select class="form-select form-select-sm w-auto" id="change_orderBy">
+                       <option value="desc" th:selected= "${pageMaker.cri.orderBy == 'desc'}">등록일 ▼</option>
+                       <option value="" th:selected= "${pageMaker.cri.orderBy == '' || pageMaker.cri.orderBy == null}">등록일 ▲</option>
+                    </select>
+                    <select class="form-select form-select-sm w-auto" id="change_perPageNum">
+                       <option value="5" th:selected= "${pageMaker.cri.perPageNum == 5}">5개씩</option>
+                       <option value="10" th:selected= "${pageMaker.cri.perPageNum == 10}">10개씩</option>
+                    </select>
+                 </div>
+            </div>
+            <th:block th:if="${not #lists.isEmpty(reviewList)}" th:each="reviewData : ${reviewList}">
+                <!-- 리뷰 항목  -->
+                <div class="feedback-item mb-3 d-flex flex-column border border-3 p-3 py-2">
+                    <div class="fw-bold">[[${reviewData.main_title}]]</div>
+                    <div class="d-flex justify-content-between align-items-center mb-2 border-bottom-purple">
+                        <span><i class="bi bi-arrow-return-right me-1"></i>[[${reviewData.product_name}]]</span>
+                        <div class="mb-1">
+                            <span th:each="star : ${#numbers.sequence(1, 5)}">
+                                <i class="bi" th:classappend="${star <= reviewData.rating} ? 'bi-star-fill text-warning' : 'bi-star text-muted'"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="feedback-text mb-1">[[${reviewData.review_text}]]</div>
+                    <!-- 리뷰 이미지 출력 -->
+                    <div th:if="${reviewData.images != null and not #lists.isEmpty(reviewData.images)}" class="mt-2 mb-2 d-flex flex-wrap gap-2">
+                        <div th:each="image : ${reviewData.images}" style="max-width: 300px; max-height: 300px;">
+                            <img th:src="@{/api/image/display/{folder}/{filename}(folder=${image.image_up_folder}, filename='s_' + ${image.image_name})}"
+                                 class="img-thumbnail"
+                                 alt="리뷰 이미지"
+                                 style="object-fit: cover;">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted mb-1" th:text="${#temporals.format(reviewData.created_at, 'yyyy.MM.dd')}"></small>
+                        <div>
+                            <a class="btn btn-purple" th:href="@{/guest/space/spaceDetail(host_space_id=${reviewData.host_space_id})}">공간으로</a>
+                            <button class="btn btn-sm btn-outline-danger">질문삭제</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-3">
+            </th:block>
+            <th:block th:if="${#lists.isEmpty(reviewList)}">
+                <div class="text-center text-muted py-5 align-content-center" style="height: 350px;">
+                    <p><i class="bi bi-chat-square-dots fs-1"></i></p>
+                    <p class="fw-bold">아직 작성된 이용후기가 없습니다.</p>
+                </div>
+            </th:block>
+            
+            <!-- 페이지네이션 -->
+            <nav aria-label="Review page navigation" class="mt-0" th:if="${not #lists.isEmpty(pageMaker)}">
+                <ul class="pagination pagination-sm justify-content-center">
+                    <!-- 이전 버튼 -->
+                    <li class="page-item" th:classappend="${!pageMaker.prev} ? 'disabled'">
+                        <a class="page-link" th:href="|/guest/mypage/reviews${pageMaker.makeSearch(pageMaker.startPage - 1)}|"
+                            aria-label="Previous">
+                            &laquo;
+                        </a>
+                    </li>
+            
+                    <!-- 페이지 번호 -->
+                    <li class="page-item" th:each="pageNum : ${#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}"
+                        th:classappend="${pageMaker.cri.page == pageNum} ? 'active'"
+                        th:attr="aria-current=${pageMaker.cri.page == pageNum} ? 'page' : null">
+                        <a class="page-link" th:href="|/guest/mypage/reviews${pageMaker.makeSearch(pageNum)}|"
+                            th:text="${pageNum}"></a>
+                    </li>
+            
+                    <!-- 다음 버튼 -->
+                    <li class="page-item" th:classappend="${!pageMaker.next} ? 'disabled'">
+                        <a class="page-link" th:href="|/guest/mypage/reviews${pageMaker.makeSearch(pageMaker.endPage + 1)}|"
+                            aria-label="Next">
+                            &raquo;
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+        </div>
+    </div><!-- // #feedback-list-container 끝 -->
+
+    <!-- 페이징과 검색 파라미터 정보 유지를 위한 Form -->
+    <form id="criteriaForm" action="" method="get">
+        <!-- 페이징 & 정렬 파라미터 -->
+        <input type="hidden" name="page"           th:value="${pageMaker.cri.page}"         id="page">
+        <input type="hidden" name="perPageNum"     th:value="${pageMaker.cri.perPageNum}"   id="perPageNum">
+        <input type="hidden" name="orderBy"        th:value="${pageMaker.cri.orderBy}"      id="orderBy">
+    </form>
+
+
+</th:block>
+<th:block layout:fragment="scriptBottom">
+    <script th:inline="javascript">
+        $(document).ready(function () {
+                console.log("리뷰 목록", [[${reviewList}]]);
+                console.log("pageMaker", [[${pageMaker}]]);
+
+                /* 페이지 조회 기능 */
+                const criteriaForm = $('#criteriaForm');
+
+                // 페이지당 데이터 갯수 변경
+                const change_perPageNum = $('#change_perPageNum');
+                change_perPageNum.on('change', function() {
+                    $('#perPageNum').val(this.value);
+                    $('#page').val(1); // 페이지 번호 1로 초기화
+                    criteriaForm.attr('action', '/guest/mypage/reviews');
+                    criteriaForm.attr('method', 'get');
+                    criteriaForm.submit();
+                });
+
+                // 데이터 조회 정렬 변경
+                const change_orderBy = $('#change_orderBy');
+                change_orderBy.on('change', function() {
+                    $('#orderBy').val(this.value);
+                    $('#page').val(1);
+                    criteriaForm.attr('action', '/guest/mypage/reviews');
+                    criteriaForm.attr('method', 'get');
+                    criteriaForm.submit();
+                });
+
+            });
+        </script>
+</th:block>
+
+</html>

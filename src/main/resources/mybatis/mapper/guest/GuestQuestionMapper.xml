@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.skillspace.sgs.guest.question.GuestQuestionMapper">
+    <!-- 질문 등록 -->
+    <insert id="createQuestion">
+        insert into 
+            questions(
+                user_id,
+                user_nick,
+                host_space_id,
+                question_content
+            )
+            values(
+                #{user_id},
+                #{user_nick},
+                #{host_space_id},
+                #{question_content}
+            )
+            
+    </insert>
 
-<insert id="createQuestion">
-	insert into 
-		questions(
-			user_id,
-			user_nick,
-			host_space_id,
-			question_content
-		)
-		values(
-			#{user_id},
-			#{user_nick},
-			#{host_space_id},
-			#{question_content}
-		)
-		
-</insert>
-
+    <!-- 질문 목록(답변 포함) -->
     <select id="getQuestionWithAnswerBySpaceId" resultMap="qnaResultMap">
         select
             q.question_id,
@@ -64,6 +65,7 @@
 
     
 
+    <!-- 전체 질문 개수 조회 -->
     <select id="countQuestionsBySpaceId" resultType="int" parameterType="int">
         select 
             count(*)
@@ -73,10 +75,7 @@
             host_space_id = #{host_space_id}
     </select>
 
-
-
-
-
+    <!-- 유저 아이디로 조회하는 질문목록  -->
     <select id="getQuestionListByUserId" resultMap="MypageQnaResultMap">
         select
             q.question_id,
@@ -103,7 +102,7 @@
         where
             q.user_id = #{user_id}
         order by
-            q.created_at desc
+            q.created_at <if test="cri.orderBy.equals('desc')">desc</if>
         limit #{cri.pageStart}, #{cri.perPageNum} 
             
 
@@ -126,7 +125,7 @@
         </association>
     </resultMap>
 
-    <!-- getCountQuestionListByUserId --> 
+    <!-- 유저 아이디로 조회하는 질문 개수 --> 
 
     <select id="getCountQuestionListByUserId" resultType="int">
         select
@@ -138,5 +137,40 @@
 
     </select>    
 
+
+    <!-- 질문 아이디로 조회 --> 
+    <select id="getQuestionById" resultType="com.skillspace.sgs.guest.question.QuestionDTO">
+        select
+            question_id,
+            host_space_id,
+            user_id,
+            user_nick,
+            question_content,
+            answer_status,
+            created_at
+        from
+            questions
+        where
+            question_id = #{question_id}
+    </select>
+
+    <!-- 질문 수정 --> 
+    <update id="modifyQuestion">
+        update
+            questions
+        set
+            question_content = #{question_content},
+            created_at = now()
+        where
+            question_id = #{question_id}
+    </update>
+    
+    <!-- 질문 삭제 --> 
+    <delete id="deleteQuestion">
+        delete from
+            questions
+        where
+            question_id = #{question_id}
+    </delete>    
 
     </mapper>

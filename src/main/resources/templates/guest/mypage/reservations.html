@@ -3,6 +3,7 @@
     layout:decorate="~{layouts/layout1}">
 
 <th:block layout:fragment="css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <th:block th:replace="~{guest/mypage/mypageTab :: mypageTab-css}"></th:block>
     <style>
         .feedback-text {
@@ -165,7 +166,98 @@
         .modal-body {
             background-color: #dee2e6;
         }
+        
+        .modal-footer {
+            background-color: #dee2e6;
+        }
 
+        /* 리뷰 모달 */
+        /* 별점 스타일 */
+        .star-rating {
+            font-size: 1.5rem; /* 별 크기 */
+            color: #ccc; /* 기본 별 색상 */
+        }
+
+        .star-rating .star {
+            cursor: pointer;
+            padding-right: 5px; /* 별 사이 간격 */
+            transition: color 0.2s; /* 색상 변경 시 부드러운 효과 */
+        }
+
+        /* 마우스 올렸을 때 효과 (hover) */
+        .star-rating .star:hover,
+        .star-rating .star.hover {
+            color: #f6ba08; /* 호버/선택 시 별 색상 */
+        }
+
+        /* 선택된 별 뒤의 별들에도 hover 효과 적용 */
+        .star-rating:hover .star:hover ~ .star {
+            color: #ccc; /* 호버된 별 뒤는 다시 기본색으로 */
+        }
+
+        /* 선택 완료된 별 표시 */
+        .star-rating .star.selected {
+            color: #f6ba08;
+        }
+
+        /* 이미지 미리보기 아이템 컨테이너 */
+        .image-preview-item {
+            position: relative; /* 삭제 버튼의 absolute 위치 기준 */
+            display: inline-block; /* 아이템들을 옆으로 나열 */
+            margin-right: 10px; /* 아이템 간 오른쪽 여백 */
+            margin-bottom: 10px; /* 아이템 간 하단 여백 */
+        }
+
+        /* 미리보기 이미지 스타일 (기존 스타일 유지 또는 조정) */
+        .image-preview-item img {
+            max-width: 145px;
+            max-height: 145px;
+            border: 1px solid #ddd;
+            object-fit: cover;
+            display: block; /* 이미지 아래 불필요한 공간 제거 */
+        }
+
+        /* 미리보기 삭제 버튼 */
+        .remove-preview-btn {
+            position: absolute;
+            top: 2px; /* 상단에서의 위치 */
+            right: 2px; /* 우측에서의 위치 */
+            background-color: rgba(255, 0, 0, 0.7); /* 반투명 빨간 배경 */
+            color: white; /* 흰색 아이콘/텍스트 */
+            border: none;
+            border-radius: 50%; /* 원형 버튼 */
+            width: 20px; /* 버튼 너비 */
+            height: 20px; /* 버튼 높이 */
+            font-size: 12px; /* 아이콘/텍스트 크기 */
+            line-height: 18px; /* 텍스트 세로 중앙 정렬 */
+            text-align: center; /* 텍스트 가로 중앙 정렬 */
+            cursor: pointer;
+            padding: 0; /* 내부 패딩 제거 */
+            z-index: 10; /* 다른 요소 위에 오도록 설정 */
+        }
+
+        .remove-preview-btn:hover {
+            background-color: rgba(255, 0, 0, 1); /* 호버 시 진한 빨간 배경 */
+        }
+
+        textarea {
+            resize: none;
+        }
+
+        #reviewModal label {
+            font-weight: bold;
+        }
+
+        #reviewModal .modal-footer .btn-primary {
+            background-color: #6c5ce7;
+            color: #fff;
+            border-color: #6c5ce7;
+        }
+
+        #reviewModal .modal-footer .btn-primary:hover {
+            background-color: #563bb7;
+            border-color: #563bb7;
+        }
 
     </style>
 </th:block>
@@ -235,21 +327,26 @@
                                 </td>
                                 <td>
                                     <div class="d-flex flex-column gap-1 align-items-center">
-                                        <form
-                                            th:if="${(reservation.reservation_status == '예약완료' or reservation.reservation_status == '예약대기') and reservation.reservation_date != null and reservation.reservation_date.isAfter(T(java.time.LocalDate).now())}"
-                                            th:action="@{/guest/mypage/reservations/cancel/{id}(id=${reservation.reservation_id})}"
-                                            method="post" onsubmit="return confirm('정말로 이 예약을 취소하시겠습니까?');">
+                                        <form th:if="${(reservation.reservation_status == '예약완료' or reservation.reservation_status == '예약대기') and reservation.reservation_date != null and reservation.reservation_date.isAfter(T(java.time.LocalDate).now())}"
+                                              th:action="@{/guest/mypage/reservations/cancel/{id}(id=${reservation.reservation_id})}"
+                                              method="post" onsubmit="return confirm('정말로 이 예약을 취소하시겠습니까?');">
                                             <button class="btn btn-sm btn-outline-danger">
                                                 예약취소
                                             </button>
-    
                                         </form>
-                                        <a th:if="${reservation.reservation_status == '예약완료' and reservation.is_review == 'N'}"
-                                            class="btn btn-sm btn-purple">
+                                        <button th:if="${reservation.reservation_status == '이용완료' and reservation.is_review == 'N'}"
+                                                class="btn btn-sm btn-purple"
+                                                name="btn_review_write"
+                                                type="button"
+                                                th:data-reservation_id="${reservation.reservation_id}"
+                                                >
                                             후기작성
-                                        </a>
-                                        <button class="btn btn-sm btn-outline-secondary" name="btn_reservation_detail"
-                                            th:data-reservation_id="${reservation.reservation_id}">
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" 
+                                                name="btn_reservation_detail"
+                                                type="button"
+                                                th:data-reservation_id="${reservation.reservation_id}"
+                                                >
                                             상세보기
                                         </button>
                                     </div>
@@ -346,6 +443,62 @@
     
         </div>
     </div>
+
+    <!-- 후기작성 모달 -->
+    <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reviewModalLabel">후기 작성</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pb-1">
+                    <h4 id="review_modal_space_main_title" class="fw-bold">공간명</h4>
+                    <span id="review_modal_product_name" class="text-muted">상품명</span>
+                    <hr class="hr-custom">
+                    <form id="reviewForm">
+                        <!-- 별점 -->
+                        <div class="mb-1">
+                            <label class="col-form-label">별점:</label>
+                            <div class="star-rating">
+                                <i class="far fa-star star" data-value="1"></i>
+                                <i class="far fa-star star" data-value="2"></i>
+                                <i class="far fa-star star" data-value="3"></i>
+                                <i class="far fa-star star" data-value="4"></i>
+                                <i class="far fa-star star" data-value="5"></i>
+                                <input type="hidden" name="rating" id="review-rating-value" value="0"> <!-- 선택된 별점 값 저장 -->
+                            </div>
+                        </div>
+
+                        <!-- 리뷰 내용 -->
+                        <div class="mb-1">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <label for="review-content" class="col-form-label">내용:</label>
+                                <span><span id="textCount">0</span> / 3000</span>
+                            </div>
+                            <textarea class="form-control" id="review-content" name="review_text" rows="8" maxlength="3000"></textarea>
+                        </div>
+
+                        <!-- 이미지 첨부 -->
+                        <div class="mb-1">
+                            <label for="review-images" class="col-form-label">이미지 첨부 (최대 3개):</label>
+                            <input class="form-control" type="file" id="review-images" name="images" multiple accept="image/*">
+                            <div id="image-preview" class="mt-2">
+                                <!-- 이미지 미리보기 영역 -->
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="review_modal_reservation_id" name="reservation_id" value="">
+                    </form>
+                </div>
+                <div class="modal-footer py-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="submitReview">작성 완료</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 
     <!-- 페이징과 검색 파라미터 정보 유지를 위한 Form -->
     <form id="criteriaForm" action="" method="get">
@@ -446,23 +599,248 @@
                 return result;
             }
 
+            // 리뷰쓰기 모달
+
+            const reviewModalElement = $("#reviewModal");
+            const reviewModal = new bootstrap.Modal(reviewModalElement);
+
+            $("button[name='btn_review_write']").on("click", function() {
+                const reservation_id = $(this).data("reservation_id");
+                const reservationData = reservationList.find(r => r.reservation_id === reservation_id);
+
+                $("#review_modal_space_main_title").text(reservationData.main_title);
+                $("#review_modal_product_name").text(reservationData.product_name);
+
+                // 리뷰쓰기 모달 hidden 필드
+                $("#review_modal_reservation_id").val(reservationData.reservation_id);
+
+                reviewModal.show();
+            });
+
+            // --- 별점 처리 ---
+            let selectedRating = 0; // 현재 선택된 별점 값 저장 변수
+
+            // 별에 마우스 올렸을 때
+            $('.star-rating .star').on('mouseenter', function() {
+                let hoverValue = $(this).data('value');
+                $('.star-rating .star').each(function() {
+                    if ($(this).data('value') <= hoverValue) {
+                        $(this).removeClass('far').addClass('fas hover'); // 채워진 별 + hover 클래스
+                    } else {
+                        $(this).removeClass('fas hover').addClass('far'); // 빈 별 + hover 클래스 제거
+                    }
+                });
+            });
+
+            // 별 영역에서 마우스 나갔을 때
+            $('.star-rating').on('mouseleave', function() {
+                $('.star-rating .star').each(function() {
+                    if ($(this).data('value') <= selectedRating) {
+                        // 선택된 별점 이하만 채워진 별로 표시 (hover 클래스 제거)
+                        $(this).removeClass('far hover').addClass('fas selected');
+                    } else {
+                        // 선택되지 않은 별은 빈 별로 표시 (hover 클래스 제거)
+                        $(this).removeClass('fas hover selected').addClass('far');
+                    }
+                });
+            });
+
+            // 별 클릭했을 때
+            $('.star-rating .star').on('click', function() {
+                selectedRating = $(this).data('value');
+                $('#review-rating-value').val(selectedRating); // 숨겨진 input에 값 설정
+
+                // 클릭 시 선택된 상태 업데이트 (selected 클래스)
+                $('.star-rating .star').each(function() {
+                    if ($(this).data('value') <= selectedRating) {
+                        $(this).removeClass('far hover').addClass('fas selected'); // 선택됨
+                    } else {
+                        $(this).removeClass('fas hover selected').addClass('far'); // 선택 안됨
+                    }
+                });
+            });
+
+            // 글자 수 이벤트
+            $("#review-content").on("input", function() {
+                const textCount = $(this).val().length;
+                $("#textCount").text(textCount);
+            });
+
+            // --- 이미지 첨부 처리 ---
+            const maxImages = 3; // 최대 첨부 가능 이미지 수
+            const imagePreviewContainer  = $('#image-preview');
+            const imageInput = $('#review-images');
+            let selectedFiles = []; // 사용자가 선택한 파일들을 관리할 배열 (File 객체 저장)
+
+
+            imageInput.on('change', function(event) {
+                imagePreviewContainer.empty(); // 기존 미리보기 이미지 제거
+                const files = event.target.files;
+                let currentFiles = Array.from(files);
+
+                if (currentFiles.length > maxImages) {
+                    alert(`이미지는 최대 ${maxImages}개까지만 첨부할 수 있습니다.`);
+                    // 파일 입력 필드 초기화 (선택 취소)
+                    imageInput.val('');
+                    selectedFiles = [];
+                    imagePreviewContainer.empty();
+                    return;
+                }
+
+                selectedFiles = currentFiles.filter(file => file.type.startsWith('image/'));
+                imagePreviewContainer.empty();
+
+
+               // 선택된 각 파일에 대해 미리보기 생성
+                selectedFiles.forEach((file, index) => {
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        // 각 미리보기를 감싸는 div 생성
+                        const previewWrapper = $('<div>').addClass('image-preview-item');
+
+                        // 이미지 요소 생성
+                        const imgElement = $('<img>').attr('src', e.target.result);
+
+                        // 삭제 버튼 생성 ('&times;'는 'X' 문자)
+                        const deleteButton = $('<button>')
+                            .addClass('remove-preview-btn')
+                            .html('&times;')
+                            // data 속성에 파일의 고유 이름(또는 index) 저장하여 어떤 파일을 삭제할지 식별
+                            .attr('data-file-name', file.name);
+
+                        // wrapper에 이미지와 삭제 버튼 추가
+                        previewWrapper.append(imgElement);
+                        previewWrapper.append(deleteButton);
+
+                        // 미리보기 컨테이너에 wrapper 추가
+                        imagePreviewContainer.append(previewWrapper);
+                    }
+                    reader.readAsDataURL(file); // 파일을 Data URL로 읽기
+                });
+
+            });
+
+            // 미리보기 삭제 버튼 클릭 이벤트 처리 (이벤트 위임 사용)
+            imagePreviewContainer.on('click', '.remove-preview-btn', function() {
+                const fileNameToRemove = $(this).attr('data-file-name'); // 삭제할 파일 이름 가져오기
+
+                // 1. selectedFiles 배열에서 해당 파일 제거
+                selectedFiles = selectedFiles.filter(file => file.name !== fileNameToRemove);
+
+                // 2. DOM에서 해당 미리보기 아이템(div) 제거
+                $(this).closest('.image-preview-item').remove();
+
+                // 3. 파일 입력(<input type="file">) 요소의 값 업데이트 (주의: FileList는 직접 수정 불가)
+                //    - DataTransfer 객체를 사용하여 남은 파일들로 새로운 FileList를 만들어 설정
+                const dataTransfer = new DataTransfer();
+                selectedFiles.forEach(file => {
+                    dataTransfer.items.add(file);
+                });
+                imageInput[0].files = dataTransfer.files; // input 요소의 files 속성 업데이트
+            });
+
+
+            // --- 모달 닫힐 때 폼 초기화 ---
+            $('#reviewModal').on('hidden.bs.modal', function () {
+                // 폼 리셋
+                $('#reviewForm')[0].reset();
+
+                // 별점 리셋
+                selectedRating = 0;
+                $('#review-rating-value').val(0);
+                $('.star-rating .star').removeClass('fas selected hover').addClass('far');
+
+                // 글자 수 리셋
+                $("#textCount").text(0);
+
+                // 이미지 미리보기 리셋
+                imagePreviewContainer.empty();
+                imageInput.val('');
+                selectedFiles = [];
+            });
+
+
+            // --- 작성 완료 버튼 클릭 시 (실제 서버 전송 로직은 여기에 추가) ---
+            $('#submitReview').on('click', function() {
+                // 입력 값 가져오기 예시
+                const rating = $('#review-rating-value').val();
+                const content = $('#review-content').val();
+                const images = imageInput[0].files; // FileList 객체
+
+                // 유효성 검사 (예: 별점, 내용 필수)
+                if (rating == 0) {
+                    alert('별점을 선택해주세요.');
+                    return;
+                }
+                if (!content.trim()) {
+                    alert('리뷰 내용을 입력해주세요.');
+                    $('#review-content').focus();
+                    return;
+                }
+
+                // FormData 객체를 사용하여 서버에 전송 준비 (AJAX 사용 시)
+                const formData = new FormData($('#reviewForm')[0]); // 폼 요소 자체를 넘겨 기본 데이터 포함
+                formData.delete('images'); // 기존 images 필드 삭제
+
+                selectedFiles.forEach((file) => {
+                    formData.append('images', file); // 서버에서 받을 이름('images')으로 각 파일 추가
+                });
+
+
+                const reservation_id = $("#review_modal_reservation_id").val();
+                console.log('--- 전송할 데이터 ---');
+                console.log('별점:', rating);
+                console.log('내용:', content);
+                console.log('첨부 이미지 개수:', selectedFiles.length);
+                console.log('예약 아이디:', reservation_id);
+                
+                $.ajax({
+                    url: '/guest/mypage/reviews/write',
+                    type: 'POST',
+                    data: formData,
+                    processData: false, // FormData 사용 시 필수
+                    contentType: false, // FormData 사용 시 필수
+                    success: function(response) {
+                        if(response) {
+                            console.log("리뷰성공 메시지", response);
+                            alert(response.message);
+                        }
+                        
+                        alert('리뷰가 성공적으로 등록되었습니다.');
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        alert('리뷰 등록 중 오류가 발생했습니다.');
+                        console.error("Error: ", error);
+                    }
+                });
+
+                $('#reviewModal').modal('hide');
+            });
+
+
+
+            /* 페이지 조회 기능 */
+            const criteriaForm = $('#criteriaForm');
+
             // 페이지당 데이터 갯수 변경
-            const change_perPageNum = document.getElementById('change_perPageNum');
-            change_perPageNum.addEventListener('change', function() {
-                document.getElementById('perPageNum').value = this.value;
-                document.getElementById('page').value = 1; // 페이지 번호 1로 초기화
-                criteriaForm.action = '/guest/mypage/reservations';
-                criteriaForm.method = 'get';
+            const change_perPageNum = $('#change_perPageNum');
+            change_perPageNum.on('change', function() {
+                $('#perPageNum').val(this.value);
+                $('#page').val(1); // 페이지 번호 1로 초기화
+                criteriaForm.attr('action', '/guest/mypage/reservations');
+                criteriaForm.attr('method', 'get');
                 criteriaForm.submit();
             });
 
             // 데이터 조회 정렬 변경
-            const change_orderBy = document.getElementById('change_orderBy');
-            change_orderBy.addEventListener('change', function() {
-                document.getElementById('orderBy').value = this.value;
-                document.getElementById('page').value = 1;
-                criteriaForm.action = '/guest/mypage/reservations';
-                criteriaForm.method = 'get';
+            const change_orderBy = $('#change_orderBy');
+            change_orderBy.on('change', function() {
+                $('#orderBy').val(this.value);
+                $('#page').val(1);
+                criteriaForm.attr('action', '/guest/mypage/reservations');
+                criteriaForm.attr('method', 'get');
                 criteriaForm.submit();
             });
             

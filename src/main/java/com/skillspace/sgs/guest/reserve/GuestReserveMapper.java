@@ -33,6 +33,12 @@ public interface GuestReserveMapper {
         @Param("status") String status
     );
 
+    // 리뷰작성 상태 변경
+    int updateReviewStatus(
+        @Param("reservation_id") Integer reservation_id,
+        @Param("is_review") String is_review
+    );
+
     
 
 

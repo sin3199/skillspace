@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.skillspace.sgs.guest.review.GuestReviewMapper">
+
+<!-- 리뷰저장 --> 
+<insert id="createReview" useGeneratedKeys="true" keyProperty="review_id">
+    insert into 
+        reviews(
+            reservation_id,
+            rating,
+            review_text
+            )
+        values(
+            #{reservation_id},
+            #{rating},
+            #{review_text}
+            )
+</insert>
+
+
+<!-- 유저 리뷰목록 조회 --> 
+<select id="getReviewListByUserId" resultMap="ReviewWithImagesResultMap">
+    select
+        r.review_id,
+        r.reservation_id,
+        r.rating,
+        r.review_text,
+        r.created_at,
+        r.updated_at,
+        hs.main_title,
+        hs.host_space_id,
+        pro.name as product_name
+    from
+        reviews r
+    inner join
+        reservations res
+    on
+        r.reservation_id = res.reservation_id
+    inner join
+        products pro
+    on res.product_id = pro.product_id
+    inner join
+        host_space hs
+    on 
+        pro.host_space_id = hs.host_space_id
+    where
+        res.user_id = #{user_id}
+    order by
+        r.created_at <if test="cri.orderBy.equals('desc')">desc</if>
+    limit #{cri.pageStart}, #{cri.perPageNum}
+</select>
+
+<resultMap id="ReviewWithImagesResultMap" type="com.skillspace.sgs.guest.review.ReviewWithImageDTO">
+    <id property="review_id"            column="review_id"/>
+    <result property="reservation_id"   column="reservation_id"/>
+    <result property="rating"           column="rating"/>
+    <result property="review_text"      column="review_text"/>
+    <result property="created_at"       column="created_at"/>
+    <result property="updated_at"       column="updated_at"/>
+    <result property="main_title"       column="main_title"/>
+    <result property="host_space_id"    column="host_space_id"/>
+    <result property="product_name"     column="product_name"/>
+
+    <!-- Images 1:N 매핑 -->
+     <collection 
+     	property="images" 
+     	javaType="java.util.ArrayList" 
+     	ofType="com.skillspace.sgs.admin.images.ImagesDTO" 
+     	column="review_id" 
+     	select="selectImages"/>
+</resultMap>
+
+<!-- images 목록 조회 -->
+<select id="selectImages" resultType="com.skillspace.sgs.admin.images.ImagesDTO">
+    select
+        image_id,
+        entity_type,
+        entity_id,
+        image_up_folder,
+        image_name,
+        created_at
+    from
+        images
+    where
+        entity_type = 'reviews'
+        and entity_id = #{review_id}
+</select>
+
+<!-- 유저 리뷰 목록 갯수 --> 
+<select id="getCountReviewListByUserId">
+     select
+        count(*)
+    from
+        reviews r
+    inner join
+        reservations res
+    on
+        r.reservation_id = res.reservation_id
+    where
+        res.user_id = #{user_id}
+</select>
+
+
+</mapper>
