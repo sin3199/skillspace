@@ -100,5 +100,40 @@
         res.user_id = #{user_id}
 </select>
 
+<!-- 리뷰 수정 --> 
+<update id="modifyReview">
+    update
+        reviews
+    set
+        rating = #{rating},
+        review_text = #{review_text},
+        updated_at = now()
+    where
+        review_id = #{review_id}
+
+</update>
+
+<!-- 리뷰 아이디로 리뷰 조회 --> 
+<select id="getReviewById" resultType="com.skillspace.sgs.guest.review.ReviewDTO">
+    select
+        review_id,
+        reservation_id,
+        rating,
+        review_text,
+        created_at,
+        updated_at
+    from
+        reviews
+    where
+        review_id = #{review_id}
+</select>
+
+<!-- 리뷰 삭제 --> 
+<delete id="deleteReview">
+    delete from
+        reviews
+    where
+        review_id = #{review_id}
+</delete>
 
 </mapper>

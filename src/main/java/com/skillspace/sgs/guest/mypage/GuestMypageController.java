@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -265,6 +266,7 @@ public class GuestMypageController {
 
 	}
 
+	// 마이페이지 내 이용후기
 	@GetMapping("/reviews")
 	public void reviews(
 			SearchCriteria cri,
@@ -294,5 +296,73 @@ public class GuestMypageController {
 		}
 
 	}
+
+	// 리뷰 수정
+	@PostMapping("/reviews/modify")
+	public ResponseEntity<String> modifyReview(
+			ReviewDTO dto,
+			@RequestParam(value = "new_images", required = false) List<MultipartFile> new_images,
+			@RequestParam(value = "delete_image_ids[]", required = false) List<Integer> delete_image_ids,
+			HttpSession session) {
+
+		// 넘어온 데이터 출력
+		log.info("dto : " + dto);
+		log.info("new_images 개수: " + (new_images != null ? new_images.size() : 0));
+		log.info("delete_image_ids : " + delete_image_ids);
+
+		GuestDTO loginUser = (GuestDTO) session.getAttribute("login_auth");
+		if (loginUser == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+		}
+		String loggedInUserId = loginUser.getUser_id();
+
+		try {
+			guestReviewService.modifyReview(dto, new_images, delete_image_ids, loggedInUserId); 
+			return ResponseEntity.ok("success");
+		} catch (NoSuchElementException e) {
+			log.warn("리뷰 수정 실패: {}", e.getMessage());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		} catch (IllegalArgumentException e) {
+			log.warn("리뷰 수정 실패: {}", e.getMessage());
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 권한 없음
+		} catch (IOException e) {
+			log.error("리뷰 수정 중 파일 처리 오류 발생, Review ID: {}", dto.getReview_id(), e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이미지 처리 중 오류가 발생했습니다.");
+		} catch (Exception e) {
+			log.error("리뷰 수정 중 예상치 못한 오류 발생, Review ID: {}", dto.getReview_id(), e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("리뷰 수정 중 오류가 발생했습니다.");
+		}
+
+	}
+
+	// 리뷰 삭제
+	@DeleteMapping("/reviews/{review_id}")
+	public ResponseEntity<String> deleteReview(
+			@PathVariable("review_id") Integer review_id,
+			HttpSession session) {
+
+		log.info("삭제할 리뷰아이디: {}", review_id);
+
+		GuestDTO loginUser = (GuestDTO) session.getAttribute("login_auth");
+		if (loginUser == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+		}
+		String loggedInUserId = loginUser.getUser_id();
+
+		try {
+			guestReviewService.deleteReview(review_id, loggedInUserId);
+		} catch (NoSuchElementException e) {
+			log.warn("리뷰 삭제 실패: {}", e.getMessage());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		} catch (IllegalArgumentException e) {
+			log.warn("리뷰 삭제 실패: {}", e.getMessage());
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage()); // 권한 없음
+		} catch (Exception e) {
+			log.error("리뷰 삭제 중 예상치 못한 오류 발생, Review ID: {}", review_id, e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("리뷰 삭제 중 오류가 발생했습니다.");
+		}
+		return ResponseEntity.ok("success");
+	}
+
 	
 }

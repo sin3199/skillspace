@@ -3,6 +3,7 @@
     layout:decorate="~{layouts/layout1}">
 
 <th:block layout:fragment="css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <th:block th:replace="~{guest/mypage/mypageTab :: mypageTab-css}"></th:block>
     <style>
         .feedback-text {
@@ -82,6 +83,135 @@
             border-color: #6c5ce7;
             z-index: 3;
         }
+
+        /* 모달 스타일 */
+        .list-group-item {
+			background-color: rgba(255, 255, 255, 0.05);
+			margin-bottom: 8px;
+			padding: 6px 12px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.list-group-item strong{
+			width: 110px;
+			display: inline-block;
+			flex-shrink: 0;
+		}
+
+        .hr-custom {
+			border: none;
+			border-top: 3px solid #704de4;
+			opacity: 1;
+		}
+
+		#payment_amount {
+			color: #704de4;
+			font-weight: bold;
+			font-size: 25px;
+		}
+
+        .modal-header {
+			background-color: #6c5ce7;
+			color: #fff;
+		}
+
+        .modal-body {
+            background-color: #dee2e6;
+        }
+        
+        .modal-footer {
+            background-color: #dee2e6;
+        }
+
+        /* 리뷰 모달 */
+        /* 별점 스타일 */
+        .star-rating {
+            font-size: 1.5rem; /* 별 크기 */
+            color: #ccc; /* 기본 별 색상 */
+        }
+
+        .star-rating .star {
+            cursor: pointer;
+            padding-right: 5px; /* 별 사이 간격 */
+            transition: color 0.2s; /* 색상 변경 시 부드러운 효과 */
+        }
+
+        /* 마우스 올렸을 때 효과 (hover) */
+        .star-rating .star:hover,
+        .star-rating .star.hover {
+            color: #f6ba08; /* 호버/선택 시 별 색상 */
+        }
+
+        /* 선택된 별 뒤의 별들에도 hover 효과 적용 */
+        .star-rating:hover .star:hover ~ .star {
+            color: #ccc; /* 호버된 별 뒤는 다시 기본색으로 */
+        }
+
+        /* 선택 완료된 별 표시 */
+        .star-rating .star.selected {
+            color: #f6ba08;
+        }
+
+        /* 이미지 미리보기 아이템 컨테이너 */
+        .image-preview-item {
+            position: relative; /* 삭제 버튼의 absolute 위치 기준 */
+            display: inline-block; /* 아이템들을 옆으로 나열 */
+            margin-right: 10px; /* 아이템 간 오른쪽 여백 */
+            margin-bottom: 10px; /* 아이템 간 하단 여백 */
+        }
+
+        /* 미리보기 이미지 스타일 (기존 스타일 유지 또는 조정) */
+        .image-preview-item img {
+            max-width: 145px;
+            max-height: 145px;
+            border: 1px solid #ddd;
+            object-fit: cover;
+            display: block; /* 이미지 아래 불필요한 공간 제거 */
+        }
+
+        /* 미리보기 삭제 버튼 */
+        .remove-preview-btn {
+            position: absolute;
+            top: 2px; /* 상단에서의 위치 */
+            right: 2px; /* 우측에서의 위치 */
+            background-color: rgba(255, 0, 0, 0.7); /* 반투명 빨간 배경 */
+            color: white; /* 흰색 아이콘/텍스트 */
+            border: none;
+            border-radius: 50%; /* 원형 버튼 */
+            width: 20px; /* 버튼 너비 */
+            height: 20px; /* 버튼 높이 */
+            font-size: 12px; /* 아이콘/텍스트 크기 */
+            line-height: 18px; /* 텍스트 세로 중앙 정렬 */
+            text-align: center; /* 텍스트 가로 중앙 정렬 */
+            cursor: pointer;
+            padding: 0; /* 내부 패딩 제거 */
+            z-index: 10; /* 다른 요소 위에 오도록 설정 */
+        }
+
+        .remove-preview-btn:hover {
+            background-color: rgba(255, 0, 0, 1); /* 호버 시 진한 빨간 배경 */
+        }
+
+        textarea {
+            resize: none;
+        }
+
+        #reviewModal label {
+            font-weight: bold;
+        }
+
+        #reviewModal .modal-footer .btn-primary {
+            background-color: #6c5ce7;
+            color: #fff;
+            border-color: #6c5ce7;
+        }
+
+        #reviewModal .modal-footer .btn-primary:hover {
+            background-color: #563bb7;
+            border-color: #563bb7;
+        }
     </style>
 </th:block>
 <th:block layout:fragment="content">
@@ -118,18 +248,23 @@
                     <div class="feedback-text mb-1">[[${reviewData.review_text}]]</div>
                     <!-- 리뷰 이미지 출력 -->
                     <div th:if="${reviewData.images != null and not #lists.isEmpty(reviewData.images)}" class="mt-2 mb-2 d-flex flex-wrap gap-2">
-                        <div th:each="image : ${reviewData.images}" style="max-width: 300px; max-height: 300px;">
+                        <div th:each="image : ${reviewData.images}">
                             <img th:src="@{/api/image/display/{folder}/{filename}(folder=${image.image_up_folder}, filename='s_' + ${image.image_name})}"
                                  class="img-thumbnail"
                                  alt="리뷰 이미지"
-                                 style="object-fit: cover;">
+                                 style="max-width: 300px; max-height: 300px; object-fit: cover; width: auto; height: auto;">
                         </div>
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
                         <small class="text-muted mb-1" th:text="${#temporals.format(reviewData.created_at, 'yyyy.MM.dd')}"></small>
                         <div>
                             <a class="btn btn-purple" th:href="@{/guest/space/spaceDetail(host_space_id=${reviewData.host_space_id})}">공간으로</a>
-                            <button class="btn btn-sm btn-outline-danger">질문삭제</button>
+                            <button class="btn btn-sm btn-outline-success"
+                                    name="btn_review_modfiy"
+                                    th:data-review_id="${reviewData.review_id}">리뷰수정</button>
+                            <button class="btn btn-sm btn-outline-danger"
+                                    name="btn_review_delete"
+                                    th:data-review_id="${reviewData.review_id}">리뷰삭제</button>
                         </div>
                     </div>
                 </div>
@@ -144,7 +279,7 @@
             </th:block>
             
             <!-- 페이지네이션 -->
-            <nav aria-label="Review page navigation" class="mt-0" th:if="${not #lists.isEmpty(pageMaker)}">
+            <nav aria-label="Review page navigation" class="mt-0" th:if="${not #lists.isEmpty(reviewList)}">
                 <ul class="pagination pagination-sm justify-content-center">
                     <!-- 이전 버튼 -->
                     <li class="page-item" th:classappend="${!pageMaker.prev} ? 'disabled'">
@@ -175,6 +310,61 @@
         </div>
     </div><!-- // #feedback-list-container 끝 -->
 
+    <!-- 후기작성 모달 -->
+    <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reviewModalLabel">후기 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pb-1">
+                    <h4 id="review_modal_space_main_title" class="fw-bold">공간명</h4>
+                    <span id="review_modal_product_name" class="text-muted">상품명</span>
+                    <hr class="hr-custom">
+                    <form id="reviewForm">
+                        <!-- 별점 -->
+                        <div class="mb-1">
+                            <label class="col-form-label">별점:</label>
+                            <div class="star-rating">
+                                <i class="far fa-star star" data-value="1"></i>
+                                <i class="far fa-star star" data-value="2"></i>
+                                <i class="far fa-star star" data-value="3"></i>
+                                <i class="far fa-star star" data-value="4"></i>
+                                <i class="far fa-star star" data-value="5"></i>
+                                <input type="hidden" name="rating" id="review-rating-value" value="0"> <!-- 선택된 별점 값 저장 -->
+                            </div>
+                        </div>
+
+                        <!-- 리뷰 내용 -->
+                        <div class="mb-1">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <label for="review-content" class="col-form-label">내용:</label>
+                                <span><span id="textCount">0</span> / 3000</span>
+                            </div>
+                            <textarea class="form-control" id="review-content" name="review_text" rows="8" maxlength="3000"></textarea>
+                        </div>
+
+                        <!-- 이미지 첨부 -->
+                        <div class="mb-1">
+                            <label for="review-images" class="col-form-label">이미지 첨부 (최대 3개):</label>
+                            <input class="form-control" type="file" id="review-images" name="images" multiple accept="image/*">
+                            <div id="image-preview" class="mt-2">
+                                <!-- 이미지 미리보기 영역 -->
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="review_modal_review_id" name="review_id" value="">
+                    </form>
+                </div>
+                <div class="modal-footer py-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="submitReview">수정 완료</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 페이징과 검색 파라미터 정보 유지를 위한 Form -->
     <form id="criteriaForm" action="" method="get">
         <!-- 페이징 & 정렬 파라미터 -->
@@ -188,33 +378,308 @@
 <th:block layout:fragment="scriptBottom">
     <script th:inline="javascript">
         $(document).ready(function () {
-                console.log("리뷰 목록", [[${reviewList}]]);
-                console.log("pageMaker", [[${pageMaker}]]);
 
-                /* 페이지 조회 기능 */
-                const criteriaForm = $('#criteriaForm');
+            /*<![CDATA[*/
+            const reviewList = /*[[${reviewList}]]*/ [];
+            const pageMaker = /*[[${pageMaker}]]*/ {};
+            
+            console.log("리뷰 목록:", reviewList);
+            console.log("PageMaker:", pageMaker);
+            /*]]>*/
 
-                // 페이지당 데이터 갯수 변경
-                const change_perPageNum = $('#change_perPageNum');
-                change_perPageNum.on('change', function() {
-                    $('#perPageNum').val(this.value);
-                    $('#page').val(1); // 페이지 번호 1로 초기화
-                    criteriaForm.attr('action', '/guest/mypage/reviews');
-                    criteriaForm.attr('method', 'get');
-                    criteriaForm.submit();
+            /* 페이지 조회 기능 */
+            const criteriaForm = $('#criteriaForm');
+
+            // 페이지당 데이터 갯수 변경
+            const change_perPageNum = $('#change_perPageNum');
+            change_perPageNum.on('change', function() {
+                $('#perPageNum').val(this.value);
+                $('#page').val(1); // 페이지 번호 1로 초기화
+                criteriaForm.attr('action', '/guest/mypage/reviews');
+                criteriaForm.attr('method', 'get');
+                criteriaForm.submit();
+            });
+
+            // 데이터 조회 정렬 변경
+            const change_orderBy = $('#change_orderBy');
+            change_orderBy.on('change', function() {
+                $('#orderBy').val(this.value);
+                $('#page').val(1);
+                criteriaForm.attr('action', '/guest/mypage/reviews');
+                criteriaForm.attr('method', 'get');
+                criteriaForm.submit();
+            });
+
+
+            // 리뷰수정 모달
+            const reviewModalElement = $("#reviewModal");
+            const reviewModal = new bootstrap.Modal(reviewModalElement);
+
+            let existingImages = []; // 기존 이미지 정보
+
+            $("button[name='btn_review_modfiy']").on("click", function() {
+                const review_id = $(this).data("review_id");
+                const reviewData = reviewList.find(r => r.review_id === review_id);
+                if (!reviewData) {
+                    alert("리뷰 정보를 찾을 수 없습니다.");
+                    return;
+                }
+
+                $("#review_modal_space_main_title").text(reviewData.main_title);
+                $("#review_modal_product_name").text(reviewData.product_name);
+
+                // 리뷰수정 모달 hidden 필드
+                $("#review_modal_review_id").val(reviewData.review_id);
+
+                $("#review-content").val(reviewData.review_text);
+                $("#textCount").text(reviewData.review_text ? reviewData.review_text.length : 0);
+                
+                selectedRating = reviewData.rating; // 전역 변수 selectedRating 업데이트
+                checkStar(selectedRating);
+
+                if (reviewData.images && reviewData.images.length > 0) {
+                    reviewData.images.forEach(image => {
+                        // 서버에서 받은 이미지 정보로 existingImages 배열 채우기
+                        // image 객체에 image_id, image_name, image_up_folder가 있다고 가정
+                        existingImages.push({ id: image.image_id, name: image.image_name, up_folder: image.image_up_folder, deleted: false });
+
+                        const previewWrapper = $('<div>').addClass('image-preview-item');
+                        const imgElement = $('<img>').attr('src', `/api/image/display/${image.image_up_folder}/s_${image.image_name}`);
+                        const deleteButton = $('<button>').addClass('remove-preview-btn').html('&times;')
+                                             .attr('data-image-id', image.image_id); // 기존 이미지 식별용 ID
+                        previewWrapper.append(imgElement).append(deleteButton);
+                        imagePreviewContainer.append(previewWrapper);
+                    });
+                }
+
+                reviewModal.show();
+            });
+
+            // --- 별점 처리 ---
+            let selectedRating = 0; // 현재 선택된 별점 값 저장 변수
+
+            // 별에 마우스 올렸을 때
+            $('.star-rating .star').on('mouseenter', function() {
+                let hoverValue = $(this).data('value');
+                $('.star-rating .star').each(function() {
+                    if ($(this).data('value') <= hoverValue) {
+                        $(this).removeClass('far').addClass('fas hover'); // 채워진 별 + hover 클래스
+                    } else {
+                        $(this).removeClass('fas hover').addClass('far'); // 빈 별 + hover 클래스 제거
+                    }
+                });
+            });
+
+            // 별 영역에서 마우스 나갔을 때
+            $('.star-rating').on('mouseleave', function() {
+                $('.star-rating .star').each(function() {
+                    if ($(this).data('value') <= selectedRating) {
+                        // 선택된 별점 이하만 채워진 별로 표시 (hover 클래스 제거)
+                        $(this).removeClass('far hover').addClass('fas selected');
+                    } else {
+                        // 선택되지 않은 별은 빈 별로 표시 (hover 클래스 제거)
+                        $(this).removeClass('fas hover selected').addClass('far');
+                    }
+                });
+            });
+
+            // 별 클릭했을 때
+            $('.star-rating .star').on('click', function() {
+                selectedRating = $(this).data('value');
+                checkStar(selectedRating);
+            });
+            // 별 체크 함수
+            function checkStar(checkRating) {
+                $('#review-rating-value').val(checkRating); // 숨겨진 input에 값 설정
+
+                // 클릭 시 선택된 상태 업데이트 (selected 클래스)
+                $('.star-rating .star').each(function() {
+                    if ($(this).data('value') <= checkRating) {
+                        $(this).removeClass('far hover').addClass('fas selected'); // 선택됨
+                    } else {
+                        $(this).removeClass('fas hover selected').addClass('far'); // 선택 안됨
+                    }
+                });
+            }
+
+            // 글자 수 이벤트
+            $("#review-content").on("input", function() {
+                const textCount = $(this).val().length;
+                $("#textCount").text(textCount);
+            });
+
+            // --- 이미지 첨부 처리 ---
+            const maxImages = 3; // 최대 첨부 가능 이미지 수
+            const imagePreviewContainer  = $('#image-preview');
+            const imageInput = $('#review-images');
+            let selectedFiles = []; // 사용자가 선택한 파일들을 관리할 배열 (File 객체 저장)
+
+            // 이미지 파일 변경 시
+            imageInput.on('change', function(event) {
+                const filesFromInput = Array.from(event.target.files).filter(file => file.type.startsWith('image/'));
+
+                const countNonDeletedExisting = existingImages.filter(img => !img.deleted).length;
+                if (countNonDeletedExisting + filesFromInput.length + selectedFiles.length > maxImages) {
+                    alert(`이미지는 최대 ${maxImages}개까지만 첨부할 수 있습니다.`);
+                    // 입력된 파일들을 반영하지 않도록 input의 files를 기존 상태로 복원
+                    const dataTransfer = new DataTransfer();
+                    selectedFiles.forEach(file => dataTransfer.items.add(file));
+                    imageInput[0].files = dataTransfer.files; // 이전 상태로 되돌림
+                    return;
+                }
+
+                filesFromInput.forEach(file => {
+                    // selectedFiles에 중복 이름 파일이 없는 경우에만 추가
+                    if (!selectedFiles.find(f => f.name === file.name)) {
+                        selectedFiles.push(file);
+
+                        // 미리보기 이미지 생성
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const previewWrapper = $('<div>').addClass('image-preview-item');
+                            const imgElement = $('<img>').attr('src', e.target.result);
+                            const deleteButton = $('<button>').addClass('remove-preview-btn').html('&times;')
+                                                 .attr('data-file-name', file.name); // 새로 추가된 파일 식별용
+                            previewWrapper.append(imgElement).append(deleteButton);
+                            imagePreviewContainer.append(previewWrapper);
+                        }
+                        reader.readAsDataURL(file);
+                    }
                 });
 
-                // 데이터 조회 정렬 변경
-                const change_orderBy = $('#change_orderBy');
-                change_orderBy.on('change', function() {
-                    $('#orderBy').val(this.value);
-                    $('#page').val(1);
-                    criteriaForm.attr('action', '/guest/mypage/reviews');
-                    criteriaForm.attr('method', 'get');
-                    criteriaForm.submit();
-                });
+                // 최종 selectedFiles로 input의 files 업데이트
+                const finalDataTransfer = new DataTransfer();
+                selectedFiles.forEach(file => finalDataTransfer.items.add(file));
+                imageInput[0].files = finalDataTransfer.files;
+            });
+
+            // 미리보기 삭제 버튼 클릭 이벤트 처리 (이벤트 위임 사용)
+            imagePreviewContainer.on('click', '.remove-preview-btn', function() {
+                const imageId = $(this).attr('data-image-id'); // 기존 이미지의 ID
+                const fileName = $(this).attr('data-file-name'); // 새로 추가된 파일의 이름
+
+                if (imageId) { // 기존 이미지 삭제 경우
+                    const imgToMark = existingImages.find(img => img.id == imageId); // 문자열 ID 비교 주의, 필요시 parseInt
+                    if (imgToMark) {
+                        imgToMark.deleted = true; // 삭제 플래그 설정
+                    }
+                } else if (fileName) { // 새로 추가된 파일 삭제 경우
+                    selectedFiles = selectedFiles.filter(file => file.name !== fileName);
+                    // input의 files 속성도 업데이트
+                    const dataTransfer = new DataTransfer();
+                    selectedFiles.forEach(file => dataTransfer.items.add(file));
+                    imageInput[0].files = dataTransfer.files;
+                }
+
+                $(this).closest('.image-preview-item').remove();
+            });
+
+
+            // --- 모달 닫힐 때 폼 초기화 ---
+            $('#reviewModal').on('hidden.bs.modal', function () {
+                // 폼 리셋
+                $('#reviewForm')[0].reset();
+
+                // 별점 리셋
+                selectedRating = 0;
+                $('#review-rating-value').val(0);
+                $('.star-rating .star').removeClass('fas selected hover').addClass('far');
+
+                // 글자 수 리셋
+                $("#textCount").text(0);
+
+                // 이미지 미리보기 리셋
+                imagePreviewContainer.empty();
+                imageInput.val('');
+                selectedFiles = [];
+                existingImages = [];
 
             });
+
+
+            // --- 작성 완료 버튼 클릭 시 ---
+            $('#submitReview').on('click', function() {
+                // 입력 값 가져오기
+                const rating = $('#review-rating-value').val();
+                const content = $('#review-content').val().trim();
+                const review_id = $("#review_modal_review_id").val();
+                // const images = imageInput[0].files; // FileList 객체
+
+                // 유효성 검사 (예: 별점, 내용 필수)
+                if (rating == 0) {
+                    alert('별점을 선택해주세요.');
+                    return;
+                }
+                if (!content) {
+                    alert('리뷰 내용을 입력해주세요.');
+                    $('#review-content').focus();
+                    return;
+                }
+
+                // FormData 객체를 사용하여 서버에 전송 준비 (AJAX 사용)
+                const formData = new FormData();
+                formData.append('review_id', review_id);
+                formData.append('rating', rating);
+                formData.append('review_text', content);
+
+                // 새로 추가된 이미지들
+                selectedFiles.forEach((file) => {
+                    formData.append('new_images', file); 
+                });
+                // 기존 이미지 중 삭제된 이미지들
+                const imagesToDeleteIds = existingImages.filter(img => img.deleted).map(img => img.id);
+                if (imagesToDeleteIds.length > 0) {
+                    imagesToDeleteIds.forEach(id => formData.append('delete_image_ids[]', id)); // 배열로 전송
+                }
+                console.log('삭제할 이미지 IDs:', imagesToDeleteIds);
+
+
+
+                console.log('--- 전송할 데이터 ---');
+                console.log('별점:', rating);
+                console.log('내용:', content);
+                console.log('첨부 이미지 개수:', selectedFiles.length);
+                console.log('예약 아이디:', review_id);
+                
+                $.ajax({
+                    url: '/guest/mypage/reviews/modify',
+                    type: 'POST',
+                    data: formData,
+                    processData: false, // FormData 사용 시 필수
+                    contentType: false, // FormData 사용 시 필수
+                    success: function(response) {
+                        alert('리뷰가 성공적으로 등록되었습니다.');
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        alert('리뷰 등록 중 오류가 발생했습니다.');
+                        console.error("Error: ", error);
+                    }
+                });
+
+                $('#reviewModal').modal('hide');
+            });
+
+            // 리뷰삭제
+            $("button[name='btn_review_delete']").on("click", function() {
+                if(!confirm("정말 리뷰를 삭제하시겠습니까?")) return;
+
+                const review_id = $(this).data("review_id");
+                $.ajax({
+                    url: `/guest/mypage/reviews/${review_id}`,
+                    type: 'DELETE',
+                    success: function(response) {
+                        alert('리뷰가 성공적으로 삭제되었습니다.');
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        alert('리뷰 삭제 중 오류가 발생했습니다.');
+                        console.error("Error: ", error);
+                    }
+                });
+            });
+
+        });
         </script>
 </th:block>
 

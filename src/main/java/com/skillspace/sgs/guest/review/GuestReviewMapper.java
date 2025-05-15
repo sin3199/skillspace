@@ -15,4 +15,13 @@ public interface GuestReviewMapper {
     // 유저 리뷰 목록 갯수
     int getCountReviewListByUserId(String user_id);
 
+    // 리뷰 수정
+    void modifyReview(ReviewDTO dto);
+
+    // 리뷰 아이디로 리뷰 조회
+    ReviewDTO getReviewById(Integer reviewId);
+
+    // 리뷰 삭제
+    void deleteReview(Integer review_id);
+
 }

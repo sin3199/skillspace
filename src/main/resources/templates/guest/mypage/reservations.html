@@ -600,7 +600,6 @@
             }
 
             // 리뷰쓰기 모달
-
             const reviewModalElement = $("#reviewModal");
             const reviewModal = new bootstrap.Modal(reviewModalElement);
 
@@ -761,9 +760,9 @@
             });
 
 
-            // --- 작성 완료 버튼 클릭 시 (실제 서버 전송 로직은 여기에 추가) ---
+            // --- 작성 완료 버튼 클릭 시 ---
             $('#submitReview').on('click', function() {
-                // 입력 값 가져오기 예시
+                // 입력 값 가져오기
                 const rating = $('#review-rating-value').val();
                 const content = $('#review-content').val();
                 const images = imageInput[0].files; // FileList 객체
@@ -779,7 +778,7 @@
                     return;
                 }
 
-                // FormData 객체를 사용하여 서버에 전송 준비 (AJAX 사용 시)
+                // FormData 객체를 사용하여 서버에 전송 준비 (AJAX 사용)
                 const formData = new FormData($('#reviewForm')[0]); // 폼 요소 자체를 넘겨 기본 데이터 포함
                 formData.delete('images'); // 기존 images 필드 삭제
 

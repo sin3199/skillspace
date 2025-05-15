@@ -2,7 +2,6 @@ package com.skillspace.sgs.admin.images;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
