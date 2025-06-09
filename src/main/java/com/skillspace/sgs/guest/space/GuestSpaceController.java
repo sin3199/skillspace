@@ -18,6 +18,8 @@ import com.skillspace.sgs.common.utils.PageMaker;
 import com.skillspace.sgs.common.utils.SearchCriteria;
 import com.skillspace.sgs.guest.question.GuestQuestionService;
 import com.skillspace.sgs.guest.question.QuestionDTO;
+import com.skillspace.sgs.guest.review.GuestReviewService;
+import com.skillspace.sgs.guest.review.ReviewResponseDTO;
 import com.skillspace.sgs.host.product.HostProductDTO;
 import com.skillspace.sgs.host.space.HostSpaceDTO;
 
@@ -33,6 +35,7 @@ public class GuestSpaceController {
 	private final GuestSpaceService guestSpaceService;
 	private final AdminCategoryService adminCategoryService;
 	private final GuestQuestionService guestQuestionService;
+	private final GuestReviewService guestReviewService;
 	
 	// 게스트 공간 목록 페이지
 	@GetMapping("/spaceList")
@@ -98,6 +101,8 @@ public class GuestSpaceController {
 			separatorChange(productList);
 		}
 
+		
+
 		model.addAttribute("spaceInfo", hostSpaceDTO);
 		model.addAttribute("productList", productList);
 	}
@@ -138,6 +143,45 @@ public class GuestSpaceController {
             return ResponseEntity.status(500).body(response);
         }
     }
+
+	// 이용후기 목록 및 페이지 정도 비동기 조회 API
+	@GetMapping("/reviewList")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> getReviewList(
+			@RequestParam("host_space_id") Integer host_space_id,
+			SearchCriteria cri) {
+
+
+        Map<String, Object> response = new HashMap<>();
+
+		try {
+			// 초기요청인 경우
+			if(cri.getPerPageNum() == 0) {
+				cri.setPerPageNum(3); 	// 나중에 상수값으로 페이지 관리
+			}
+
+			PageMaker reviewPageMaker = new PageMaker();
+			reviewPageMaker.setDisplayPageNum(3);
+			reviewPageMaker.setCri(cri);
+			reviewPageMaker.setTotalCount(guestReviewService.countReviewsBySpaceId(host_space_id));
+
+			List<ReviewResponseDTO> reviewList = guestReviewService.getReviewsBySpaceId(host_space_id, cri);
+
+			response.put("reviewList", reviewList);
+			response.put("pageMaker", reviewPageMaker);
+			response.put("success", true);
+
+			return ResponseEntity.ok(response);
+
+		} catch (Exception e) {
+			log.error("Error fetching review list for space_id {}: {}", host_space_id, e.getMessage());
+			response.put("success", false);
+			response.put("message", "이용후기 목록을 불러오는 중 오류가 발생했습니다.");
+			return ResponseEntity.status(500).body(response);
+		}
+	}
+
+		
 
 	
 	// 이미지 경로 구분자를 변경

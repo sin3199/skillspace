@@ -491,6 +491,15 @@
                         <input type="hidden" id="review_modal_reservation_id" name="reservation_id" value="">
                     </form>
                 </div>
+
+                <!-- 로딩 오버레이 및 스피너 -->
++                <div id="loadingOverlay" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 1050; justify-content: center; align-items: center; flex-direction: column;">
++                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
++                        <span class="visually-hidden">Loading...</span>
++                    </div>
++                    <p class="mt-2 text-muted">처리 중입니다. 잠시만 기다려주세요...</p>
++                </div>
+
                 <div class="modal-footer py-0">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
                     <button type="button" class="btn btn-primary" id="submitReview">작성 완료</button>
@@ -762,6 +771,8 @@
 
             // --- 작성 완료 버튼 클릭 시 ---
             $('#submitReview').on('click', function() {
+                const $loadingOverlay = $('#loadingOverlay');
+
                 // 입력 값 가져오기
                 const rating = $('#review-rating-value').val();
                 const content = $('#review-content').val();
@@ -800,18 +811,21 @@
                     data: formData,
                     processData: false, // FormData 사용 시 필수
                     contentType: false, // FormData 사용 시 필수
+                    beforeSend: function() {
+                        // AJAX 요청 시작 전에 로딩 오버레이 표시
+                        $loadingOverlay.css('display', 'flex');
+                    },
                     success: function(response) {
-                        if(response) {
-                            console.log("리뷰성공 메시지", response);
-                            alert(response.message);
-                        }
-                        
                         alert('리뷰가 성공적으로 등록되었습니다.');
                         location.reload();
                     },
                     error: function(xhr, status, error) {
                         alert('리뷰 등록 중 오류가 발생했습니다.');
                         console.error("Error: ", error);
+                    },
+                    complete: function() {
+                        // AJAX 요청 완료 후에 로딩 오버레이 숨김
+                        $loadingOverlay.hide();
                     }
                 });
 

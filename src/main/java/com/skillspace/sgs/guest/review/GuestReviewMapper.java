@@ -24,4 +24,10 @@ public interface GuestReviewMapper {
     // 리뷰 삭제
     void deleteReview(Integer review_id);
 
+    // 공간 리뷰 목록 수 조회
+    int countReviewsBySpaceId(Integer host_space_id);
+
+    // 공간 리뷰 목록 조회
+    List<ReviewResponseDTO> getReviewsBySpaceId(Integer host_space_id, SearchCriteria cri);
+
 }

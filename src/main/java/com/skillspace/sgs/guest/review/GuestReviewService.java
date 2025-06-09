@@ -185,4 +185,14 @@ public class GuestReviewService {
         log.info("리뷰 삭제 서비스 성공 종료 - 리뷰 ID: {}", review_id);
     }
 
+    // 공간 리뷰 목록 수 조회
+    public int countReviewsBySpaceId(Integer host_space_id) {
+        return guestReviewMapper.countReviewsBySpaceId(host_space_id);
+    }
+
+    // 공간 리뷰 목록 조회
+    public List<ReviewResponseDTO> getReviewsBySpaceId(Integer host_space_id, SearchCriteria cri) {
+        return guestReviewMapper.getReviewsBySpaceId(host_space_id, cri);
+    }
+
 }
