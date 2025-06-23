@@ -11,7 +11,6 @@ CREATE TABLE `UserInfo` (
 	`user_zipcode`		char(5)			NOT NULL,
 	`user_addr`			varchar(100)	NOT NULL,
 	`user_addrdetail`	varchar(100)	NOT NULL,
-	`user_email_receive`char(1)			NOT NULL	COMMENT 'Y,  N',
 	`role`				char(1)			NOT NULL	default 'G' COMMENT '게스트 G, 호스트 H',
 	`created_at`		datetime		NOT NULL	DEFAULT now(),
 	`updated_at`		datetime		NOT NULL	DEFAULT now(),
@@ -240,13 +239,15 @@ ADD PRIMARY KEY (`reply_id`);
 ALTER TABLE `Reply` 
 ADD CONSTRAINT `FK_Reviews_TO_Reply_1` 
 FOREIGN KEY (`review_id`)
-REFERENCES `Reviews` (`review_id`);
+REFERENCES `Reviews` (`review_id`)
+ON DELETE CASCADE;
 
 -- 질문 테이블
 CREATE TABLE `Questions` (
 	`question_id`		int 			NOT NULL,
 	`host_space_id`		int				NOT NULL,
 	`user_id`			varchar(30)		NOT NULL,
+	`user_nick`			varchar(30)		NOT NULL,
 	`question_content`	varchar(200)	NOT NULL,
 	`answer_status`		char(1)			NOT NULL	DEFAULT 'N',
 	`created_at`		datetime		NOT NULL	DEFAULT now()
@@ -277,7 +278,7 @@ ADD PRIMARY KEY (`answer_id`);
 ALTER TABLE `Answer` 
 ADD CONSTRAINT `FK_Question_TO_Answer_1` 
 FOREIGN KEY (`question_id`)
-REFERENCES `Question` (`question_id`)
+REFERENCES `Questions` (`question_id`)
 on cascade delete;
 
 

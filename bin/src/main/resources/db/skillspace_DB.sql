@@ -1,7 +1,5 @@
 # skillspace 프로젝트 DB
 
-# skillspace 프로젝트 DB
-
 -- 회원 테이블
 CREATE TABLE `UserInfo` (
 	`user_id`			varchar(30)		NOT NULL,
@@ -13,7 +11,6 @@ CREATE TABLE `UserInfo` (
 	`user_zipcode`		char(5)			NOT NULL,
 	`user_addr`			varchar(100)	NOT NULL,
 	`user_addrdetail`	varchar(100)	NOT NULL,
-	`user_email_receive`char(1)			NOT NULL	COMMENT 'Y,  N',
 	`role`				char(1)			NOT NULL	default 'G' COMMENT '게스트 G, 호스트 H',
 	`created_at`		datetime		NOT NULL	DEFAULT now(),
 	`updated_at`		datetime		NOT NULL	DEFAULT now(),
@@ -36,7 +33,9 @@ CREATE TABLE `Hostuserinfo` (
 	`host_addrdetail`	varchar(100)	NOT NULL,
 	`host_phone`		varchar(13)		NOT NULL,
 	`description`		varchar(3000)	NOT NULL,
-	`host_status`		tinyint			NOT NULL	DEFAULT 1	COMMENT '활동 : 1, 휴면 : 2, 탈퇴 : 3, 정지 : 4',
+	`host_status`		tinyint			NOT NULL	DEFAULT 0	COMMENT '대기 : 0, 활동 : 1, 휴면 : 2, 탈퇴 : 3, 정지 : 4',
+	`created_at`		datetime		NOT NULL	DEFAULT now(),
+	`updated_at`		datetime		NOT NULL	DEFAULT now(),
 	`approval`			char(1)			NOT NULL	DEFAULT 'N'	COMMENT 'Y,  N 호스트 승인'
 );
 
@@ -59,42 +58,60 @@ ALTER TABLE `Admin` ADD CONSTRAINT `PK_ADMIN` PRIMARY KEY (`admin_id`);
 
 
 -- 카테고리 테이블
-CREATE TABLE `catagory` (
+drop table category;
+CREATE TABLE `category` (
 	`cate_id`		int 		NOT NULL,
 	`cate_prtcode`	int			NULL		COMMENT '상위 카테고리 참조(참조키 설정)',
 	`cate_name`		varchar(50)	NOT NULL,
-	`cate_level`	tinyint		NOT NULL	COMMENT '상품 카테고리 : 1, 메뉴 카테고리 : 2 ...'
+	`level`			tinyint		NOT NULL	COMMENT '1차 2차 3차 카테고리',
+	`sort_order`	int			NOT NULL DEFAULT 0	COMMENT '정렬 순서'
 );
 
-ALTER TABLE `catagory`
+ALTER TABLE `category`
 MODIFY `cate_id` INT NOT NULL AUTO_INCREMENT,
 ADD PRIMARY KEY (`cate_id`);
 
+ALTER TABLE category
+ADD CONSTRAINT FK_catagory
+FOREIGN KEY (cate_prtcode)
+REFERENCES category (cate_id)
+ON DELETE CASCADE;
 
--- 호스트 정보 테이블
-CREATE TABLE `Host_Guide` (
-	`host_guide_id`	int 			NOT NULL,
-	`user_id`		varchar(30)		NOT NULL	COMMENT '호스트 아이디',
-	`cate_id`		int				NOT NULL,
-	`title`			varchar(100)	NOT NULL,
-	`description`	varchar(3000)	NOT NULL,
-	`location`		varchar(100)	NOT NULL,
-	`phone_number`	varchar(13)		NOT NULL,
-	`created_at`	datetime		NOT NULL	DEFAULT now(),
-	`updated_at`	datetime		NOT NULL	DEFAULT now()
+SHOW CREATE TABLE category;
+ALTER TABLE category AUTO_INCREMENT = 1;
+
+
+
+
+-- 호스트 공간 정보 테이블
+CREATE TABLE `Host_Space` (
+	`host_space_id`		int 			NOT NULL,
+	`user_id`			varchar(30)		NOT NULL	COMMENT '호스트 아이디',
+	`cate_id`			int				NOT NULL,
+	`main_title`		varchar(100)	NOT NULL,
+	`sub_title`			varchar(100)	NOT NULL,
+	`space_name`		varchar(30)		NOT NULL,
+	`space_intro`		varchar(3000)	NOT NULL,
+	`space_guide`		varchar(3000)	NOT NULL,
+	`space_zipcode`		char(5)			NOT NULL,
+	`space_addr`		varchar(100)	NOT NULL,
+	`space_addrdetail`	varchar(100)	NOT NULL,
+	`created_at`		datetime		NOT NULL	DEFAULT now(),
+	`updated_at`		datetime		NOT NULL	DEFAULT now(),
+	`is_visible`		char(1)			not null
 );
 
-ALTER TABLE `Host_Guide`
-MODIFY `host_guide_id` INT NOT NULL AUTO_INCREMENT,
-ADD PRIMARY KEY (`host_guide_id`);
+ALTER TABLE `host_space`
+MODIFY `host_space_id` INT NOT NULL AUTO_INCREMENT,
+ADD PRIMARY KEY (`host_space_id`);
 
-ALTER TABLE `Host_Guide` 
-ADD CONSTRAINT `FK_Hostuserinfo_TO_Host_Guide_1` 
+ALTER TABLE `host_space` 
+ADD CONSTRAINT `FK_Hostuserinfo_TO_host_space_1` 
 FOREIGN KEY (`user_id`)
 REFERENCES `Hostuserinfo` (`user_id`);
 
-ALTER TABLE `Host_Guide` 
-ADD CONSTRAINT `FK_catagory_TO_Host_Guide_1` 
+ALTER TABLE `host_space` 
+ADD CONSTRAINT `FK_catagory_TO_host_space_1` 
 FOREIGN KEY (`cate_id`)
 REFERENCES `catagory` (`cate_id`);
 
@@ -102,9 +119,16 @@ REFERENCES `catagory` (`cate_id`);
 -- 상품 테이블
 CREATE TABLE `Products` (
 	`product_id`	int 			NOT NULL,
-	`host_guide_id`	int				NOT NULL,
+	`host_space_id`	int				NOT NULL,
+	`user_id`		varchar(30)		NOT NULL	COMMENT '호스트 아이디',
 	`name`			varchar(100)	NOT NULL,
+	`product_intro`	varchar(3000)	NOT NULL,
 	`price`			DECIMAL			NOT NULL	DEFAULT 0.00,
+	`max_headcount`	tinyint			NOT NULL	DEFAULT 1,
+	`is_visible`	char(1)			NOT NULL	COMMENT 'Y, N',
+	`time_slot`		tinyint			NOT NULL,
+	`open_time`		time			NOT NULL,
+	`close_time`	time			NOT null,
 	`created_at`	datetime		NOT NULL	DEFAULT now(),
 	`updated_at`	datetime		NOT NULL	DEFAULT now()
 );
@@ -114,43 +138,33 @@ MODIFY `product_id` INT NOT NULL AUTO_INCREMENT,
 ADD PRIMARY KEY (`product_id`);
 
 ALTER TABLE `Products` 
-ADD CONSTRAINT `FK_Host_Guide_TO_Products_1` 
-FOREIGN KEY (`host_guide_id`)
-REFERENCES `Host_Guide` (`host_guide_id`);
+ADD CONSTRAINT `FK_host_space_TO_Products_1` 
+FOREIGN KEY (`host_space_id`)
+REFERENCES `host_space` (`host_space_id`);
 
-
--- 날짜와 시간 단위로 나눈 예약 상품 테이블
-CREATE TABLE `Availability` (
-	`availability_id`		int 			NOT NULL,
-	`product_id`			int				NOT NULL,
-	`availability_datetime`	datetime		NOT NULL,
-	`is_available`			char(1)			NOT NULL	DEFAULT 'Y'	COMMENT '가능 : Y, 불가능 : N',
-	`additional_amount`		decimal(10, 2)	NOT NULL	DEFAULT 0.00,
-	`discount_amount`		decimal(10, 2)	NOT NULL	DEFAULT 0.00,
-	`max_capacity`			tinyint			NOT NULL	DEFAULT 1,
-	`current_capacity`		tinyint			NOT NULL	DEFAULT 0
-);
-
-ALTER TABLE `Availability`
-MODIFY `availability_id` INT NOT NULL AUTO_INCREMENT,
-ADD PRIMARY KEY (`availability_id`);
-
-ALTER TABLE `Availability` 
-ADD CONSTRAINT `FK_Products_TO_Availability_1` 
-FOREIGN KEY (`product_id`)
-REFERENCES `Products` (`product_id`);
+ALTER TABLE `Products` 
+ADD CONSTRAINT `FK_Hostuserinfo_TO_Products_1` 
+FOREIGN KEY (`user_id`)
+REFERENCES `Hostuserinfo` (`user_id`);
 
 
 -- 예약 테이블
 CREATE TABLE `Reservations` (
 	`reservation_id`	int 			NOT NULL,
-	`availability_id`	int				NOT NULL,
 	`user_id`			varchar(30)		NOT NULL	COMMENT '게스트 회원 아이디',
-	`total_price`		decimal(10, 2)	NOT NULL,
-	`status`			varchar(15)		NOT NULL	COMMENT 'Pending, Completed, Cancelled',
-	`reservation_date`	datetime		NOT NULL	DEFAULT now(),
-	`updated_at`		datetime		NOT NULL	DEFAULT now(),
-	`is_review`			char(1)			NOT NULL	DEFAULT 'N'	COMMENT '리뷰 1개만 가능 하게'
+	`product_id`		int 			NOT NULL,
+	`total_payment`		decimal(10, 2)	NOT NULL,
+	`status`			varchar(15)		NOT NULL	COMMENT '예약대기, 예약완료, 예약취소, 이용완료',
+	`reservation_date`  DATE            NOT NULL 	COMMENT '예약 날짜',
+    `start_time`        TIME            NOT NULL 	COMMENT '예약 시작 시간',
+    `end_time`          TIME            NOT NULL 	COMMENT '예약 종료 시간',
+	`headcount`			tinyint			NOT NULL,
+	`reservation_name`	varchar(30)		NOT NULL,
+	`reservation_phone`	varchar(13)		NOT NULL,
+	`reservation_email`	varchar(100)	NOT NULL,
+	`is_review`			char(1)			NOT NULL	DEFAULT 'N'	COMMENT '리뷰 1개만 가능 하게',
+	`created_at`		datetime		NOT NULL	DEFAULT now(),
+	`updated_at`		datetime		NOT NULL	DEFAULT now()
 );
 
 ALTER TABLE `Reservations`
@@ -158,9 +172,9 @@ MODIFY `reservation_id` INT NOT NULL AUTO_INCREMENT,
 ADD PRIMARY KEY (`reservation_id`);
 
 ALTER TABLE `Reservations` 
-ADD CONSTRAINT `FK_Availability_TO_Reservations_1`
-FOREIGN KEY (`availability_id`)
-REFERENCES `Availability` (`availability_id`);
+ADD CONSTRAINT `FK_Products_TO_Reservations_1`
+FOREIGN KEY (`product_id`)
+REFERENCES `Products` (`product_id`);
 
 ALTER TABLE `Reservations` 
 ADD CONSTRAINT `FK_UserInfo_TO_Reservations_1` 
@@ -170,15 +184,13 @@ REFERENCES `UserInfo` (`user_id`);
 
 -- 결제 테이블
 CREATE TABLE `Payments` (
-	`payment_id`	int 	NOT NULL,
-	`reservation_id`	int	NOT NULL,
-	`payment_method`	varchar(30)	NOT NULL	COMMENT '카드, 계좌이체, pay 등',
-	`amount`	decimal(10, 2)	NOT NULL,
-	`status`	varchar(15)	NOT NULL	COMMENT 'Pending, Completed , Failed, Refunded',
-	`transaction_id`	varchar(100)	NOT NULL,
-	`payment_date`	datetime	NOT NULL	DEFAULT now(),
-	`created_at`	datetime	NOT NULL	DEFAULT now(),
-	`updated_at`	datetime	NOT NULL	DEFAULT now()
+	`payment_id`		int 			NOT NULL,
+	`reservation_id`	int				NOT NULL,
+	`payment_method`	varchar(100)	NOT NULL	COMMENT '카드, 계좌이체, pay 등',
+	`amount`			decimal(10, 2)	NOT NULL,
+	`status`			varchar(15)		NOT NULL	COMMENT '결제완료, 입금대기, 결제취소, 환불대기, 환불완료',
+	`created_at`		datetime		NOT NULL	DEFAULT now(),
+	`updated_at`		datetime		NOT NULL	DEFAULT now()
 );
 
 ALTER TABLE `Payments`
@@ -229,6 +241,45 @@ ADD CONSTRAINT `FK_Reviews_TO_Reply_1`
 FOREIGN KEY (`review_id`)
 REFERENCES `Reviews` (`review_id`);
 
+-- 질문 테이블
+CREATE TABLE `Questions` (
+	`question_id`		int 			NOT NULL,
+	`host_space_id`		int				NOT NULL,
+	`user_id`			varchar(30)		NOT NULL,
+	`user_id`			varchar(30)		NOT NULL,
+	`question_content`	varchar(200)	NOT NULL,
+	`answer_status`		char(1)			NOT NULL	DEFAULT 'N',
+	`created_at`		datetime		NOT NULL	DEFAULT now()
+);
+
+ALTER TABLE `Questions`
+MODIFY `question_id` INT NOT NULL AUTO_INCREMENT,
+ADD PRIMARY KEY (`question_id`);
+
+ALTER TABLE `Questions` 
+ADD CONSTRAINT `FK_Host_space_TO_Questions_1` 
+FOREIGN KEY (`host_space_id`)
+REFERENCES `Host_space` (`host_space_id`);
+
+
+-- 답변 테이블
+CREATE TABLE `Answer` (
+	`answer_id`			int 			NOT NULL,
+	`question_id`		int				NOT NULL,
+	`answer_content`	varchar(200)	NOT NULL,
+	`created_at`		datetime		NOT NULL	DEFAULT now()
+);
+
+ALTER TABLE `Answer`
+MODIFY `answer_id` INT NOT NULL AUTO_INCREMENT,
+ADD PRIMARY KEY (`answer_id`);
+
+ALTER TABLE `Answer` 
+ADD CONSTRAINT `FK_Question_TO_Answer_1` 
+FOREIGN KEY (`question_id`)
+REFERENCES `Questions` (`question_id`)
+on cascade delete;
+
 
 -- 찜 목록
 CREATE TABLE `Wishlist` (
@@ -273,11 +324,12 @@ REFERENCES `Reservations` (`reservation_id`);
 
 -- 이미지 테이블
 CREATE TABLE `Images` (
-	`image_id`		int 			NOT NULL,
-	`entity_type`	varchar(15)		NOT NULL	COMMENT 'Host_Guide, Products, Reviews',
-	`entity_id`		int				NOT NULL	COMMENT '회원 아이디',
-	`image_url`		varchar(255)	NOT NULL,
-	`created_at`	datetime		NOT NULL	DEFAULT now()
+	`image_id`			int 			NOT NULL,
+	`entity_type`		varchar(30)		NOT NULL	COMMENT 'host_space, Products, Reviews',
+	`entity_id`			int				NOT NULL	COMMENT '테이블 아이디',
+	`image_up_folder`	varchar(255)	NOT NULL,
+	`image_name`		varchar(100)	NOT NULL,
+	`created_at`		datetime		NOT NULL	DEFAULT now()
 );
 
 ALTER TABLE `Images`
@@ -296,25 +348,3 @@ CREATE TABLE `loginlog` (
 ALTER TABLE `loginlog`
 MODIFY `log_id` INT NOT NULL AUTO_INCREMENT,
 ADD PRIMARY KEY (`log_id`);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

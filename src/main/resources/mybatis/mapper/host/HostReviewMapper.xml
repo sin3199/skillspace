@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.skillspace.sgs.host.review.HostReviewMapper">
+
+    <!-- 유저 아이디로 조회하는 이용후기 목록 -->
+    <select id="getReviewListByUserId" resultMap="hostReviewResultMap">
+        select
+            r.review_id,
+            r.reservation_id,
+            r.rating,
+            r.review_text,
+            r.created_at as review_created_at,
+            r.updated_at as review_updated_at,
+
+            rep.reply_id,
+            rep.review_id,
+            rep.reply_text,
+            rep.created_at as reply_created_at,
+            rep.updated_at as reply_updated_at,
+
+            img.image_id,
+            img.entity_type,
+            img.entity_id,
+            img.image_up_folder,
+            img.image_name,
+            img.created_at as image_created_at,
+
+            hs.main_title,
+            ui.user_id,
+            ui.user_nick
+            
+        from
+            reviews r
+        left join
+            images img
+        on 
+            img.entity_type = 'reviews' and img.entity_id = r.review_id
+        left outer join
+            reply rep
+        on
+            r.review_id = rep.review_id
+        inner join
+            reservations res
+        on
+            r.reservation_id = res.reservation_id
+        inner join
+            products pro
+        on
+            res.product_id = pro.product_id
+        inner join 
+            host_space hs 
+        on 
+            hs.host_space_id = pro.host_space_id
+        inner join
+            userinfo ui
+        on
+            res.user_id = ui.user_id
+        where
+            hs.user_id = #{user_id}
+            <include refid="search"></include>
+            <include refid="period"></include>
+            <include refid="answer_status"></include>
+            <include refid="space"></include>
+        order by
+            r.created_at <if test="cri.orderBy.equals('desc')">desc</if>
+        limit #{cri.pageStart}, #{cri.perPageNum} 
+    </select>
+
+    <resultMap type="com.skillspace.sgs.host.review.ReviewHostDTO" id="hostReviewResultMap">
+        <id property="review_id" column="review_id"/>
+        <result property="reservation_id" column="reservation_id"/>
+        <result property="rating" column="rating"/>
+        <result property="review_text" column="review_text"/>
+        <result property="created_at" column="review_created_at"/>
+        <result property="updated_at" column="review_updated_at"/>
+        <result property="user_nick" column="user_nick"/>
+        <association property="hostSpace" javaType="java.util.Map">
+            <result property="main_title" column="main_title"/>
+        </association>
+        <!-- 답변 1:1 매핑-->
+        <association property="reply" javaType="java.util.Map">
+            <result property="reply_id" column="reply_id"/>
+            <result property="reply_text" column="reply_text"/>
+            <result property="reply_created_at" column="reply_created_at"/>
+            <result property="reply_updated_at" column="reply_updated_at"/>
+        </association>
+        <!-- Images 1:N 매핑 -->
+        <collection
+        property="images"
+        ofType="com.skillspace.sgs.admin.images.ImagesDTO">
+            <id property="image_id"             column="image_id"/>
+            <result property="entity_type"      column="entity_type"/>
+            <result property="entity_id"        column="entity_id"/>
+            <result property="image_up_folder"  column="image_up_folder"/>
+            <result property="image_name"       column="image_name"/>
+            <result property="created_at"       column="image_created_at"/>
+        </collection>
+    </resultMap>
+
+    <!-- 유저 아이디로 조회하는 이용후기 개수 --> 
+    <select id="getCountReviewListByUserId" resultType="int">
+        select
+            count(*)
+        from
+            reviews r
+        left outer join
+            reply rep
+        on
+            r.review_id = rep.review_id
+        inner join
+            reservations res
+        on
+            r.reservation_id = res.reservation_id
+        inner join
+            products pro
+        on
+            res.product_id = pro.product_id
+        inner join 
+            host_space hs 
+        on 
+            hs.host_space_id = pro.host_space_id
+        inner join
+            userinfo ui
+        on
+            res.user_id = ui.user_id
+        where
+            hs.user_id = #{user_id}
+            <include refid="search"></include>
+            <include refid="period"></include>
+            <include refid="answer_status"></include>
+            <include refid="space"></include>
+    </select> 
+
+    <!-- 질문 ID로 해당 질문이 속한 공간의 소유자 user_id 조회 -->
+    <select id="getReviewOwnerUserId" parameterType="int" resultType="string">
+        select 
+            hs.user_id
+        from 
+            reviews r
+        inner join
+            reservations res
+        on
+            r.reservation_id = res.reservation_id
+        inner join
+            products pro
+        on
+            res.product_id = pro.product_id
+        inner join
+            host_space hs
+        on
+            pro.host_space_id = hs.host_space_id
+        where 
+            r.review_id = #{review_id}
+    </select>
+
+    <!-- 질문 ID로 질문 삭제 -->
+    <delete id="deleteReviewById" parameterType="int">
+        delete from 
+            reviews 
+        where 
+            review_id = #{review_id}
+    </delete>
+
+    <sql id="search">
+        <if test="cri.searchType != null and !cri.searchType.equals('')">
+            <if test="cri.searchType == 'main_title'">
+                and hs.main_title like concat('%', #{cri.keyword}, '%')
+            </if>
+            <if test="cri.searchType == 'reply_text'">
+                and rep.reply_text like concat('%', #{cri.keyword}, '%')
+            </if>
+            <if test="cri.searchType == 'user_nick'">
+                and ui.user_nick like concat('%', #{cri.keyword}, '%') 
+            </if>
+        </if>
+    </sql>
+
+    <sql id="period">
+        <if test="cri.start_date != null and !cri.start_date.equals('')">
+            <![CDATA[
+                and r.created_at >= date(#{cri.start_date})
+                ]]>
+        </if>
+        <if test="cri.end_date != null and !cri.end_date.equals('')">
+            <![CDATA[
+                and r.created_at < date(#{cri.end_date}) + 1
+                ]]>
+        </if>
+    </sql>
+
+    <sql id="answer_status">
+        <if test="cri.answer_status != null and !cri.answer_status.equals('')">
+            <choose>
+                <when test="cri.answer_status == 'Y'.toString()">
+                    and rep.reply_id IS NOT NULL
+                </when>
+                <when test="cri.answer_status == 'N'.toString()">
+                    and rep.reply_id IS NULL
+                </when>
+            </choose>
+        </if>
+    </sql>
+
+    <sql id="space">
+        <if test="cri.space_id != null and !cri.space_id.equals('')">
+            and hs.host_space_id = #{cri.space_id}
+        </if>
+    </sql>
+</mapper>

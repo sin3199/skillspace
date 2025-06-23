@@ -22,7 +22,7 @@ public class QnaWithSpaceDTO {
 	private String 			answer_status;	// 답변 상태 Y,N
 	private LocalDateTime 	question_created_at;// 생성일
 	
-	private Map<String, Object> 		answer;				// 답변
+	private Map<String, Object> 	answer;				// 답변
 	private Map<String, Object> 	hostSpace;			// 공간 정보
 
 }

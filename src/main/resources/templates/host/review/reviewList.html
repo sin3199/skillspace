@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{host/layouts/host-layout}">
+
+<th:block layout:fragment="css">
+   <style>
+      
+      .answer-status-badge {
+         font-size: 0.8em; /* 배지 크기 조정 */
+      }
+
+      /* 답변 카드 스타일 */
+      .reply-card {
+         font-size: 0.8rem; 
+         background-color: transparent; 
+         border-left: 3px solid #6c757d; 
+         margin-top: 0.5rem;
+      }
+      .reply-card .card-header {
+         padding: 0.3rem 0.5rem;
+         background-color: transparent;
+         font-weight: bold;
+      }
+      .reply-card .card-body {
+         padding: 0.5rem;
+      }
+
+      .reply-card .btn-secondary {
+         background-color: #aeaeb9;
+         border-color: #aeaeb9;
+      }
+
+      .reply-card .btn-light {
+         border-color: #606070;
+      }
+
+      /* 모달 스타일 */
+      .btn-purple {
+			background-color: #704de4;
+			color: #fff;
+			border: none;
+			border-radius: 5px;
+		}
+
+		.btn-purple:hover {
+			background-color: #563bb7;
+			color: #fff;
+		}
+
+		.modal-header {
+			background-color: #6c5ce7;
+			color: #fff;
+		}
+		
+		textarea {
+			resize: none;
+		}
+
+      /* 자동 줄바 꿈*/
+      .text-pre-wrap {
+         white-space: pre-wrap;
+      }
+
+      /* 별 색상 변경 */
+      i.bi.text-warning {
+         color: #6c5ce7 !important;
+      }
+   </style>
+</th:block>
+
+<th:block layout:fragment="content">
+   <div class="card mb-3">
+      <div class="card-header">
+         <h2>이용후기 관리</h2>
+      </div>
+      <div class="card-body">
+         <div class="card p-3">
+            <form action="/host/review/reviewList" method="get" id="searchForm">
+               <!-- 날짜 검색 -->
+               <div class="row mb-3 align-items-center">
+                  <div class="col-md-2">
+                     <label class="col-form-label">리뷰 등록일</label>
+                  </div>
+                  <div class="col-md-10">
+                     <div class="row">
+                        <div class="col-4">
+                           <div class="input-group">
+                              <input type="date" class="form-control form-control-sm" id="search_start_date" name="start_date" th:value="${pageMaker.cri.start_date}" min="2019-01-01" max="2025-12-31">
+                           </div>
+                        </div>
+                        <div class="col-auto align-content-center px-md-0">-</div>
+                        <div class="col-4">
+                           <div class="input-group">
+                              <input type="date" class="form-control form-control-sm" id="search_end_date" name="end_date" th:value="${pageMaker.cri.end_date}" min="2019-01-01" max="2025-12-31">
+                           </div>
+                        </div>
+                        <div class="col-md-auto mt-2 mt-md-0 align-content-center">
+                           <div class="btn-group" role="group">
+                              <button type="button" class="btn btn-outline-secondary btn-sm date-range-btn" data-range="today">오늘</button>
+                              <button type="button" class="btn btn-outline-secondary btn-sm date-range-btn" data-range="1week">1주일</button>
+                              <button type="button" class="btn btn-outline-secondary btn-sm date-range-btn" data-range="1month">1개월</button>
+                              <button type="button" class="btn btn-outline-secondary btn-sm date-range-btn" data-range="1year">1년</button>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               <!-- 답변 상태 필터 -->
+               <div class="row mb-3 align-items-center">
+                  <div class="col-md-2">
+                     <label class="col-form-label">답변상태</label>
+                  </div>
+                  <div class="col-md-10">
+                     <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="answer_status" id="answer_status_all" value="" th:checked="${pageMaker.cri.answer_status == null or pageMaker.cri.answer_status == ''}">
+                        <label class="form-check-label" for="answer_status_all">전체</label>
+                     </div>
+                     <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="answer_status" id="answer_status_answered" value="Y" th:checked="${pageMaker.cri.answer_status == 'Y'}">
+                        <label class="form-check-label" for="answer_status_answered">답변완료</label>
+                     </div>
+                     <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="answer_status" id="answer_status_pending" value="N" th:checked="${pageMaker.cri.answer_status == 'N'}">
+                        <label class="form-check-label" for="answer_status_pending">답변대기</label>
+                     </div>
+                  </div>
+               </div>
+
+               <!-- 공간 선택 필터 -->
+               <div class="row mb-3 align-items-center">
+                  <div class="col-md-2">
+                     <label for="space_id" class="col-form-label">공간 선택</label>
+                  </div>
+                  <div class="col-md-4">
+                     <select class="form-select form-select-sm" name="space_id" id="space_id">
+                        <option value="">-- 전체 공간 --</option>
+                        <option th:each="space : ${spaceList}" th:value="${space.host_space_id}" th:text="${space.space_name}" th:selected="${pageMaker.cri.space_id == space.host_space_id}"></option>
+                     </select>
+                  </div>
+               </div>
+
+               <!-- 검색어 -->
+               <div class="row align-items-center">
+                  <div class="col-md-2">
+                     <label for="keyword" class="col-form-label">검색어</label>
+                  </div>
+                  <div class="col-md-10">
+                     <div class="row">
+                        <div class="col-3 pe-0">
+                           <select class="form-select form-select-sm" name="searchType" id="searchType">
+                              <option value="">검색종류 선택</option>
+                              <option value="question_title" th:selected="${pageMaker.cri.searchType == 'main_title'}">공간명</option>
+                              <option value="product_name" th:selected="${pageMaker.cri.searchType == 'reply_text'}">후기내용</option>
+                              <option value="user_name" th:selected="${pageMaker.cri.searchType == 'user_nick'}">작성자</option>
+                           </select>
+                        </div>
+                        <div class="col-md-6 col-auto">
+                           <div class="input-group">
+                              <input type="text" class="form-control form-control-sm" name="keyword" id="keyword" th:value="${pageMaker.cri.keyword}" placeholder="검색어 입력">
+                              <button class="btn btn-outline-secondary btn-sm" type="submit">
+                                 <i class="bi bi-search"></i>
+                              </button>
+                           </div>
+                        </div>
+                        <div class="col-md-auto">
+                           <button type="button" class="btn btn-secondary btn-sm" id="btn_searchReset">초기화</button>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               <input type="hidden" name="perPageNum"     th:value="${pageMaker.cri.perPageNum}">
+               <input type="hidden" name="orderBy"        th:value="${pageMaker.cri.orderBy}"   >
+
+            </form>
+         </div> <!-- 검색 카드 end -->
+      </div>
+   </div> <!-- 상단 카드 end -->
+
+   <div class="card">
+      <div class="card-body">
+         <div class="d-flex justify-content-between mb-2">
+            <div>
+               <button class="btn btn-outline-danger text-nowrap btn-sm" id="btn_seletedDelete">선택삭제</button>
+            </div>
+            <div class="d-flex gap-1">
+               <select class="form-select form-select-sm w-auto" id="change_orderBy">
+                  <option value="desc" th:selected= "${pageMaker.cri.orderBy == 'desc'}">등록일 ▼</option>
+                  <option value="" th:selected= "${pageMaker.cri.orderBy == '' || pageMaker.cri.orderBy == null}">등록일 ▲</option>
+               </select>
+               <select class="form-select form-select-sm w-auto" id="change_perPageNum">
+                  <option value="5" th:selected= "${pageMaker.cri.perPageNum == 5}">5개씩</option>
+                  <option value="10" th:selected= "${pageMaker.cri.perPageNum == 10}">10개씩</option>
+               </select>
+            </div>
+         </div>
+         <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+               <thead class="table-light text-center text-nowrap">
+                  <tr>
+                     <th style="width: 5%;"><input type="checkbox" id="checkAll"></th>
+                     <th style="width: 5%;">번호</th>
+                     <th style="width: 5%;">답변상태</th>
+                     <th style="width: 15%;">공간명</th>
+                     <th style="width: 25%;">평점/내용</th>
+                     <th style="width: 10%;">작성자</th>
+                     <th style="width: 10%;">등록일</th>
+                     <th style="width: 10%;">관리</th>
+                  </tr>
+               </thead>
+               <tbody class="text-center align-middle">
+                  <!--/* 데이터가 없을 경우 */-->
+                  <tr th:if="${#lists.isEmpty(reviewList)}">
+                     <td colspan="9">등록된 이용후기가 없습니다.</td>
+                  </tr>
+                  <!--/* 데이터가 있을 경우 */-->
+                  <tr th:each="review, iterStat : ${reviewList}" th:unless="${#lists.isEmpty(reviewList)}">
+                     <td><input type="checkbox" class="itemCheckbox" name="itemCheckbox" th:value="${review.review_id}"></td>
+                     <!--/* 페이지 번호와 상관없이 순번 표시 ( (현재페이지-1)*페이지당개수 + 반복인덱스+1 ) */-->
+                     <td>
+                        <span th:if="${pageMaker.cri.orderBy == 'desc'}" th:text="${(pageMaker.totalCount - (pageMaker.cri.page - 1) * pageMaker.cri.perPageNum) - iterStat.index}"></span>
+                        <span th:unless="${pageMaker.cri.orderBy == 'desc'}" th:text="${((pageMaker.cri.page - 1) * pageMaker.cri.perPageNum) + (iterStat.index + 1)}"></span>
+                     </td>
+                     <td>
+                        <span class="badge rounded-pill text-bg-success answer-status-badge" th:if="${review.reply}">답변완료</span>
+                        <span class="badge rounded-pill text-bg-warning answer-status-badge" th:unless="${review.reply}">답변대기</span>
+                     </td>
+                     <td class="text-start" th:text="${review.hostSpace?.main_title ?: '-'}">공간명</td> <!-- Null-safe operator -->
+                     <td class="text-start align-content-start ">
+                        <!-- 별점 표시 -->
+                        <div class="rating">
+                           <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                              <i class="bi bi-star-fill text-warning" th:if="${review.rating >= i}"></i>
+                              <i class="bi bi-star text-warning" th:unless="${review.rating >= i}"></i>
+                           </th:block>
+                        </div>
+                        <hr class="my-1">
+                        <span class="question-title" th:text="${review.review_text}"></span>
+                        <div class="review-images-container d-flex flex-wrap my-2"
+                             style="gap: 8px;">
+                            <th:block th:each="image : ${review.images}">
+                                <img th:src="@{|/api/image/display/${image.image_up_folder}/s_${image.image_name}|}"
+                                alt="리뷰 이미지"
+                                style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid #e0e0e0;">
+                            </th:block>
+                        </div>
+                        <div class="card reply-card" th:if="${review.reply != null}">
+                           <div class="card-header d-flex justify-content-between align-items-center">
+                              <span class="text-nowrap"><i class="bi bi-arrow-return-right me-1"></i>답글</span>
+                              <span class="text-muted text-end">[[${#temporals.format(review.reply.reply_created_at, 'yyyy-MM-dd (HH:mm:ss)')}]]</span>
+                           </div>
+                           <div class="card-body">
+                              <span class="text-pre-wrap">[[${review.reply.reply_text}]]</span>
+                           </div>
+                           <div class="p-2 pt-0">
+                              <button class="btn btn-sm btn-secondary" style="font-size: 10px;" name="btn_answer_modify" th:data-review_id="${review.review_id}">수정</button>
+                              <button class="btn btn-sm btn-light" style="font-size: 10px;" name="btn_answer_delete" th:data-reply_id="${review.reply.reply_id}" th:data-review_id="${review.review_id}">삭제</button>
+                           </div>
+                        </div>
+                     </td>
+                     <td th:text="${review.user_nick ?: '알수없음'}">작성자</td>
+                     <td><small th:text="${#temporals.format(review.created_at, 'yyyy-MM-dd (HH:mm:ss)')}"></small></td>
+                     <td>
+                        <div class="d-flex flex-column gap-1">
+                           <button class="btn btn-outline-primary btn-sm text-nowrap" name="btn_answer" th:data-review_id="${review.review_id}" th:if="${review.reply == null}">답변하기</button>
+                           <button class="btn btn-outline-danger btn-sm text-nowrap" name="btn_delete" th:data-review_id="${review.review_id}">후기삭제</button>
+                        </div>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+         <!-- 답변하기 모달 시작 -->
+         <div class="modal fade" id="answerModal" tabindex="-1" aria-labelledby="answerModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+               <div class="modal-content">
+                  <div class="modal-header">
+                     <h5 class="modal-title" id="answerModalLabel">이용후기 답변하기</h5>
+                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                     <!-- 이용후기 정보를 표시할 부분 -->
+                     <div class="mb-3">
+                        <label for="modalSpaceName" class="form-label"><strong>공간명</strong></label>
+                        <p id="modalSpaceName" class="form-control-plaintext"></p>
+                     </div>
+                     <div class="mb-3">
+                        <label for="modalQuestionContent" class="form-label"><strong>이용후기 내용</strong></label>
+                        <p id="modalQuestionContent" class="form-control-plaintext"></p>
+                     </div>
+                     <hr>
+                     <!-- 답변 입력 부분 -->
+                     <div class="mb-3">
+                        <div class="d-flex justify-content-between align-content-center">
+                           <label for="modalReplyText" class="form-label"><strong>답변 내용</strong></label>
+                           <span><span id="textCount">0</span> / 200</span>
+                        </div>
+                        <textarea class="form-control" id="modalReplyText" rows="5" maxlength="200" required placeholder="답변을 입력하세요..."></textarea>
+                     </div>
+                     <!-- 숨겨진 필드로 review_id 저장 -->
+                     <input type="hidden" id="modalReviewId">
+                     <input type="hidden" id="modalReplyId">
+                  </div>
+                  <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                     <button type="button" class="btn btn-purple" id="btn_modal_answer_save">답변 저장</button>
+                     <button type="button" class="btn btn-purple" id="btn_modal_answer_modify">답변 수정</button>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- 답변하기 모달 끝 -->
+      </div><!-- card-body end -->
+      <div class="card-footer d-flex justify-content-center" th:if="${!#lists.isEmpty(reviewList)}">
+         <!-- Pagination -->
+         <ul class="pagination pagination-sm m-0 float-right">
+            <th:block th:if="${pageMaker.prev}">
+               <li class="page-item"><a class="page-link"
+                     th:href="|/host/review/reviewList${pageMaker.makeSearch(pageMaker.startPage - 1)}|">«</a>
+               </li>
+            </th:block>
+
+            <th:block th:each="num : ${#numbers.sequence(pageMaker.startPage, pageMaker.endPage)}">
+               <li class="page-item" th:classappend="${pageMaker.cri.page == num ? 'active' : ''}"><a
+                     class="page-link" th:href="|/host/review/reviewList${pageMaker.makeSearch(num)}|"
+                     th:text="${num}"></a></li>
+            </th:block>
+
+            <th:block th:if="${pageMaker.next}">
+               <li class="page-item"><a class="page-link"
+                     th:href="|/host/review/reviewList${pageMaker.makeSearch(pageMaker.endPage + 1)}|">»</a>
+               </li>
+            </th:block>
+         </ul>
+      </div>
+   </div>   <!-- card end -->
+
+   <!-- 페이징과 검색 파라미터 정보 유지를 위한 Form -->
+   <form id="criteriaForm" action="" method="get">
+      <!-- 페이징 & 정렬 파라미터 -->
+      <input type="hidden" name="page"           th:value="${pageMaker.cri.page}"         id="page">
+      <input type="hidden" name="perPageNum"     th:value="${pageMaker.cri.perPageNum}"   id="perPageNum">
+      <input type="hidden" name="orderBy"        th:value="${pageMaker.cri.orderBy}"      id="orderBy">
+      <!-- 검색 파라미터 -->
+      <input type="hidden" name="searchType"     th:value="${pageMaker.cri.searchType}">
+      <input type="hidden" name="keyword"        th:value="${pageMaker.cri.keyword}">
+      <!-- 날짜 검색 파라미터 -->
+      <input type="hidden" name="start_date"     th:value="${pageMaker.cri.start_date}">
+      <input type="hidden" name="end_date"       th:value="${pageMaker.cri.end_date}">
+      <!-- 답변상태 필터 파라미터 -->
+      <input type="hidden" name="answer_status"  th:value="${pageMaker.cri.answer_status}">
+      <!-- 공간 선택 필터 파라미터 -->
+      <input type="hidden" name="space_id"       th:value="${pageMaker.cri.space_id}">
+
+      <!-- 수정, 삭제 시 사용할 이용후기 ID -->
+      <input type="hidden" name="review_id" id="review_id">
+   </form>
+
+</th:block>
+
+<th:block layout:fragment="scriptBottom">
+   <script th:inline="javascript">
+      document.addEventListener("DOMContentLoaded", function() {
+         /*<![CDATA[*/
+         const reviewList = /*[[${reviewList}]]*/ [];
+         const pageMaker = /*[[${pageMaker}]]*/ {};
+         
+         console.log("reviewList:", reviewList);
+         console.log("PageMaker:", pageMaker);
+         /*]]>*/
+
+         /* successMessage, errorMessage 가 있을경우 alert 메시지 출력 */
+         const successMessage = /*[[${successMessage}]]*/ null;
+         const errorMessage = /*[[${errorMessage}]]*/ null;
+
+         if (successMessage) {
+            alert(successMessage);
+         }
+         if (errorMessage) {
+            alert(errorMessage);
+         }
+         
+
+         // 체크 박스 기능
+         const checkAll = document.getElementById('checkAll');
+         const itemCheckboxes = document.querySelectorAll('.itemCheckbox');
+
+         checkAll.addEventListener('change', function() {
+            itemCheckboxes.forEach(checkbox => {
+               checkbox.checked = this.checked;
+            });
+         });
+
+         itemCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+               const allChecked = Array.from(itemCheckboxes).every(cb => cb.checked);
+               checkAll.checked = allChecked;
+            });
+         });
+
+         // 선택된 이용후기 삭제
+         document.getElementById('btn_seletedDelete').addEventListener('click', function() {
+            const selectedItemIds = [];
+            const checkedItems = document.querySelectorAll('.itemCheckbox:checked');
+
+            if (checkedItems.length === 0) {
+               alert("선택된 이용후기가 없습니다.");
+               return;
+            }
+
+            if (!confirm("선택된 " + checkedItems.length + "개의 이용후기를 정말로 삭제하시겠습니까?")) return;
+
+            checkedItems.forEach(check => {
+               selectedItemIds.push(check.value);
+            });
+
+            fetch('/host/review/selectedDelete', {
+               method: 'POST',
+               headers: {
+                  'Content-Type': 'application/json'
+               },
+               body: JSON.stringify(selectedItemIds)
+            })
+            .then(response => {
+               if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+               }
+               return response.text();
+            })
+            .then(data => {
+               alert("선택된 이용후기가 삭제되었습니다.");
+               location.reload(); // 페이지 새로고침
+            })
+            .catch(error => {
+               console.error('삭제 요청 실패:', error);
+               alert('삭제 처리 중 오류가 발생했습니다.');
+            });
+         });
+
+         // 기존 페이지 정보 form
+         const criteriaForm = document.getElementById('criteriaForm');
+
+         // 답변하기, 후기삭제, 답변수정, 답변삭제 버튼 이벤트 리스너
+         const btnAnswerList = document.querySelectorAll('button[name=btn_answer]');
+         const btnDeleteList = document.querySelectorAll('button[name=btn_delete]');
+         const btnAnswerModifyList = document.querySelectorAll('button[name=btn_answer_modify]');
+         const btnAnswerDeleteList = document.querySelectorAll('button[name=btn_answer_delete]');
+         
+
+
+         // 모달 객체 생성
+         const replyModalElement = document.getElementById('answerModal');
+         const answerModal = new bootstrap.Modal(replyModalElement);
+         const btnModalAnswerSave = document.getElementById('btn_modal_answer_save');
+         const btnModalAnswerModify = document.getElementById('btn_modal_answer_modify')
+
+         // 답변하기
+         btnAnswerList.forEach(btnAnswer => {
+            btnAnswer.addEventListener('click', function() {
+               const reviewId = this.dataset.review_id;
+
+               // reviewList 배열에서 해당 ID의 후기 데이터 찾기
+               const reviewData = reviewList.find(r => r.review_id == reviewId);
+
+               if (reviewData) {
+                  // 모달 내용 채우기
+                  document.getElementById('modalSpaceName').textContent = reviewData.hostSpace?.main_title || '정보 없음'; // Null-safe
+                  document.getElementById('modalQuestionContent').textContent = reviewData.review_text || '내용 없음';
+                  document.getElementById('modalReplyText').value = ''; // 답변 입력칸 초기화
+                  document.getElementById('modalReviewId').value = reviewId; // 숨겨진 review_id 필드에 ID 저장
+                  document.getElementById('modalReplyId').value = ''; // 숨겨진 reply_id 필드 초기화
+                  document.getElementById('textCount').textContent = '0'; // 글자 수 초기화
+
+                  // 모달 버튼 보이기, 숨기기
+                  btnModalAnswerSave.style.display = 'block';
+                  btnModalAnswerModify.style.display = 'none';
+
+                  // 모달 띄우기
+                  answerModal.show();
+               } else {
+                  alert("후기 정보를 찾을 수 없습니다.");
+               }
+            });
+         });
+
+         // 모달의 '답변 저장' 버튼 이벤트 리스너
+         document.getElementById('btn_modal_answer_save').addEventListener('click', function() {
+            const reviewId = document.getElementById('modalReviewId').value;
+            const replyText = document.getElementById('modalReplyText').value.trim();
+
+            if (!replyText) {
+               alert("답변 내용을 입력해주세요.");
+               document.getElementById('modalReplyText').focus();
+               return;
+            }
+
+            const replyData = {
+               review_id: reviewId,
+               reply_text: replyText
+            };
+
+            fetch('/host/reply/createReply', {
+               method: 'POST',
+               headers: {
+                  'Content-Type': 'application/json'
+               },
+               body: JSON.stringify(replyData)
+            })
+            .then(response => {
+               if (!response.ok) {
+                  return response.text().then(text => { throw new Error(text || `HTTP error! status: ${response.status}`) });
+               }
+               return response.text();
+            })
+            .then(data => {
+               console.log("Reply saved successfully:", data);
+               alert("답변이 성공적으로 저장되었습니다.");
+               answerModal.hide();
+               location.reload();
+            })
+            .catch(error => {
+               console.error('답변 저장 실패:', error);
+               alert("답변 저장 중 오류가 발생했습니다.");
+            });
+         });
+
+         // 답변수정
+         btnAnswerModifyList.forEach(btnAnswerModify => {
+            btnAnswerModify.addEventListener('click', function() {
+               const reviewId = this.dataset.review_id;
+               const reviewData = reviewList.find(r => r.review_id == reviewId);
+
+               if (reviewData && reviewData.reply) {
+                  const replyId = reviewData.reply.reply_id;
+                  // 모달 내용 채우기
+                  document.getElementById('modalSpaceName').textContent = reviewData.hostSpace?.main_title || '정보 없음'; // Null-safe
+                  document.getElementById('modalQuestionContent').textContent = reviewData.review_text || '내용 없음';
+                  document.getElementById('modalReplyText').value = reviewData.reply.reply_text; // 답변 내용 채우기
+                  document.getElementById('modalReplyId').value = replyId;  // 숨겨진 reply_id 필드에 ID 저장
+                  document.getElementById('modalReviewId').value = '';      // 숨겨진 review_id 필드에 ID 저장
+                  document.getElementById('textCount').textContent = reviewData.reply.reply_text.length; // 글자 수 초기화
+
+                  // 모달 버튼 보이기, 숨기기
+                  btnModalAnswerSave.style.display = 'none';
+                  btnModalAnswerModify.style.display = 'block';
+
+                  // 모달 띄우기
+                  answerModal.show();
+               } else {
+                  alert("후기 정보를 찾을 수 없습니다.");
+               }
+            });
+         });
+
+         // 모달의 '답변 수정' 버튼 이벤트
+         document.getElementById('btn_modal_answer_modify').addEventListener('click', function() {
+            const replyId = document.getElementById('modalReplyId').value;
+            const ReplyText = document.getElementById('modalReplyText').value.trim();
+
+            if (!ReplyText) {
+               alert("답변 내용을 입력해주세요.");
+               document.getElementById('modalReplyText').focus();
+               return;
+            }
+
+            const replyData = {
+               reply_id: replyId,
+               reply_text: ReplyText
+            };
+
+            fetch('/host/reply/modifyReply', {
+               method: 'POST',
+               headers: {
+                  'Content-Type': 'application/json'
+               },
+               body: JSON.stringify(replyData)
+            })
+            .then(response => {
+               if (!response.ok) {
+                  return response.text().then(text => { throw new Error(text || `HTTP error! status: ${response.status}`) });
+               }
+               return response.text();
+            })
+            .then(data => {
+               console.log("Reply modify successfully:", data);
+               alert("답변이 성공적으로 수정되었습니다.");
+               answerModal.hide();
+               location.reload();
+            })
+            .catch(error => {
+               console.error('답변 수정 실패:', error);
+               alert("답변 수정 중 오류가 발생했습니다.");
+            });
+         });
+         
+
+         // 답변삭제
+         btnAnswerDeleteList.forEach(btnAnswerDelete => {
+            btnAnswerDelete.addEventListener('click', function() {
+               if (!confirm("정말로 이 답변을 삭제하시겠습니까?")) return;
+               const reviewId = this.dataset.review_id;
+               const replyId = this.dataset.reply_id;
+
+               fetch('/host/reply/deleteReply', {
+                  method: 'POST',
+                  headers: {
+                     'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                     review_id: reviewId,
+                     reply_id: replyId
+                  })
+               })
+               .then(response => {
+                  if (!response.ok) {
+                     throw new Error(`HTTP error! status: ${response.status}`);
+                  }
+                  return response.text();
+               })
+               .then(data => {
+                  alert("답변이 삭제되었습니다.");
+                  location.reload();
+               })
+               .catch(error => {
+                  console.error('답변 삭제 실패:', error);
+                  alert("답변 삭제 중 오류가 발생했습니다.");
+               });
+               
+
+            });
+         });
+
+
+         // 모달 답변 글자 수 카운트 이벤트
+         document.getElementById('modalReplyText').addEventListener('input', function() {
+            const textLength = this.value.length;
+            const textCount = document.getElementById('textCount');
+            textCount.textContent = textLength;
+
+         });
+
+
+         // 개별 삭제
+         btnDeleteList.forEach(btnDelete => {
+            btnDelete.addEventListener('click', function() {
+               if (!confirm("정말로 이 이용후기를 삭제하시겠습니까?")) return;
+               const review_id = this.dataset.review_id;
+               document.getElementById('review_id').value = review_id;
+               criteriaForm.action = '/host/review/deleteReview';
+               criteriaForm.method = 'post';
+               criteriaForm.submit();
+            });
+         });
+
+         // 날짜 범위 버튼 클릭 이벤트
+         const dateRangeButtons = document.querySelectorAll('.date-range-btn');
+         dateRangeButtons.forEach(button => {
+            button.addEventListener('click', function () {
+               const range = this.dataset.range;
+               let startDate = '';
+               let endDate = '';
+               const today = new Date();
+               const todayString = today.toISOString().slice(0, 10);
+
+               if (range === 'today') {
+                  startDate = todayString;
+                  endDate = todayString;
+               } else if (range === '1week') {
+                  const oneWeekAgo = new Date(today);
+                  oneWeekAgo.setDate(today.getDate() - 7);
+                  startDate = oneWeekAgo.toISOString().slice(0, 10);
+                  endDate = todayString;
+               } else if (range === '1month') {
+                  const oneMonthAgo = new Date(today);
+                  oneMonthAgo.setMonth(today.getMonth() - 1);
+                  startDate = oneMonthAgo.toISOString().slice(0, 10);
+                  endDate = todayString;
+               } else if (range === '1year') {
+                  const oneYearAgo = new Date(today);
+                  oneYearAgo.setFullYear(today.getFullYear() - 1);
+                  startDate = oneYearAgo.toISOString().slice(0, 10);
+                  endDate = todayString;
+               }
+
+               document.querySelector('#search_start_date').value = startDate;
+               document.querySelector('#search_end_date').value = endDate;
+            });
+         });
+
+         // 검색 조건 초기화
+         const searchForm = document.getElementById('searchForm');
+         const btn_searchReset = document.getElementById('btn_searchReset');
+
+         btn_searchReset.addEventListener('click', function () {
+            document.getElementById('search_start_date').value = "";
+            document.getElementById('search_end_date').value = "";
+            // 답변 상태 라디오 버튼 초기화 (전체 선택)
+            document.getElementById('answer_status_all').checked = true;
+            // 공간 선택 드롭다운 초기화
+            document.getElementById('space_id').selectedIndex = 0;
+            // 검색 종류 및 키워드 초기화
+            document.getElementById('searchType').selectedIndex = 0;
+            document.getElementById('keyword').value = "";
+
+            // 초기화 후 폼 제출하여 전체 목록 로드 (선택사항)
+            // searchForm.submit();
+         });
+
+         // 페이지당 데이터 갯수 변경
+         const change_perPageNum = document.getElementById('change_perPageNum');
+         change_perPageNum.addEventListener('change', function() {
+            document.getElementById('perPageNum').value = this.value;
+            document.getElementById('page').value = 1; // 페이지 번호 1로 초기화
+            criteriaForm.action = '/host/review/reviewList';
+            criteriaForm.method = 'get';
+            criteriaForm.submit();
+         });
+
+         // 데이터 조회 정렬 변경
+         const change_orderBy = document.getElementById('change_orderBy');
+         change_orderBy.addEventListener('change', function() {
+            document.getElementById('orderBy').value = this.value;
+            document.getElementById('page').value = 1;
+            criteriaForm.action = '/host/review/reviewList';
+            criteriaForm.method = 'get';
+            criteriaForm.submit();
+         });
+
+      });   // DOMContentLoaded event end
+   </script>
+</th:block>
+</html>

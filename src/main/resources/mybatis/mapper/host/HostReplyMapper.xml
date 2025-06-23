@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.skillspace.sgs.host.reply.HostReplyMapper">
+
+<!-- 답변 등록 -->
+<insert id="createReply">
+    insert into
+        reply(
+            review_id,
+            reply_text
+        )
+    values(
+        #{review_id},
+        #{reply_text}
+    )
+</insert>
+<!-- 답변 수정 -->
+<update id="modifyReply">
+    update
+        reply
+    set
+        reply_text = #{reply_text},
+        updated_at = now()
+    where
+        reply_id = #{reply_id}
+</update>
+
+<!-- 답변 삭제 -->
+<delete id="deleteReply">
+    delete from
+        reply
+    where
+        reply_id = #{reply_id}
+</delete>
+
+
+</mapper>
