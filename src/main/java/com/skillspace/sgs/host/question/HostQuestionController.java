@@ -61,6 +61,7 @@ public class HostQuestionController {
         model.addAttribute("spaceList", spaceList);
     }
 
+    // 개별 삭제
     @PostMapping("/deleteQuestion")
     public String deleteQuestion(Integer question_id, SearchCriteria cri, 
                                  HttpSession session, RedirectAttributes rttr) {
@@ -117,7 +118,6 @@ public class HostQuestionController {
     @ResponseBody
     public ResponseEntity<String> selectedDelete(@RequestBody List<Integer> selectedIds, HttpSession session) {
 
-        
         String loggedInUserId = ((GuestDTO)session.getAttribute("login_auth")).getUser_id();
         if (loggedInUserId == null || loggedInUserId.trim().isEmpty()) {
              log.warn("User ID is empty in session for bulk delete.");

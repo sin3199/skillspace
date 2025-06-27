@@ -1,7 +1,6 @@
 package com.skillspace.sgs.guest.reserve;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -51,7 +50,7 @@ public class GuestReserveService {
             paymentDTO.setStatus("결제완료");
         }
         
-        paymentDTO.setAmounts(dto.getTotal_payment());
+        paymentDTO.setAmount(dto.getTotal_payment());
 
         guestPaymentMapper.payment_create(paymentDTO);
             

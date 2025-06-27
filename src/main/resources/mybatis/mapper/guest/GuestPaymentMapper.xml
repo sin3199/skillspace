@@ -13,7 +13,7 @@
 		values(
 		#{reservation_id},
 		#{payment_method},
-		#{amounts},
+		#{amount},
 		#{status}
 		)
 </insert>

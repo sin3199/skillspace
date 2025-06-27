@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.skillspace.sgs.host.reserve.HostReserveMapper">
+
+<!-- 유저 아이디로 조회하는 예약 목록 -->
+    <select id="getReservationListByUserId" resultMap="ReservationResultMap">
+        select
+            res.reservation_id,
+            res.user_id,
+            res.product_id,
+            res.total_payment,
+            res.status as reservation_status,
+            res.reservation_date,
+            res.start_time,
+            res.end_time,
+            res.headcount,
+            res.is_review,
+            res.reservation_name,
+            res.reservation_phone,
+            res.reservation_email,
+            res.created_at as reservation_created_at,
+            res.updated_at as reservation_updated_at,
+
+            pay.payment_id,
+            pay.reservation_id,
+            pay.payment_method,
+            pay.amount,
+            pay.status as payment_status,
+            pay.created_at as payment_created_at,
+            pay.updated_at as payment_updated_at,
+
+            hs.main_title as space_main_title,
+            p.name as product_name
+
+        from
+            reservations res
+        inner join 
+            products p
+        on 
+            res.product_id = p.product_id
+        inner join
+            host_space hs
+        on 
+            p.host_space_id = hs.host_space_id
+        left outer join
+            payments pay
+        on
+            res.reservation_id = pay.reservation_id
+        where
+            p.user_id = #{user_id}
+            <include refid="search"></include>
+            <include refid="period"></include>
+            <include refid="answer_status"></include>
+            <include refid="space"></include>
+        order by
+            res.created_at <if test="cri.orderBy.equals('desc')">desc</if>
+        limit #{cri.pageStart}, #{cri.perPageNum} 
+    </select>
+
+    <resultMap type="com.skillspace.sgs.host.reserve.ReservManageDTO" id="ReservationResultMap">
+        <id property="reservation_id"           column="reservation_id"/>
+        <result property="user_id"              column="user_id"/>
+        <result property="product_id"           column="product_id"/>
+        <result property="total_payment"        column="total_payment"/>
+        <result property="status"               column="reservation_status"/>
+        <result property="reservation_date"     column="reservation_date"/>
+        <result property="start_time"           column="start_time"/>
+        <result property="end_time"             column="end_time"/>
+        <result property="headcount"            column="headcount"/>
+        <result property="is_review"            column="is_review"/>
+        <result property="reservation_name"     column="reservation_name"/>
+        <result property="reservation_phone"    column="reservation_phone"/>
+        <result property="reservation_email"    column="reservation_email"/>
+        <result property="created_at"           column="reservation_created_at"/>
+        <result property="updated_at"           column="reservation_updated_at"/>
+        <result property="space_main_title"     column="space_main_title"/>
+        <result property="product_name"         column="product_name"/>
+        
+        <association property="payment"         javaType="com.skillspace.sgs.guest.payment.PaymentDTO">
+            <result property="payment_id"       column="payment_id"/>
+            <result property="payment_method"   column="payment_method"/>
+            <result property="amount"           column="amount"/>
+            <result property="status"           column="payment_status"/>
+            <result property="created_at"       column="payment_created_at"/>
+            <result property="updated_at"       column="payment_updated_at"/>
+        </association>
+    </resultMap>
+
+    <!-- 유저 아이디로 조회하는 예약 개수 --> 
+    <select id="getCountReservationListByUserId" resultType="int">
+        select
+            count(*)
+        from
+            reservations res
+        inner join 
+            products p
+        on 
+            res.product_id = p.product_id
+        inner join
+            host_space hs
+        on 
+            p.host_space_id = hs.host_space_id
+        left outer join
+            payments pay
+        on
+            res.reservation_id = pay.reservation_id
+        where
+            p.user_id = #{user_id}
+            <include refid="search"></include>
+            <include refid="period"></include>
+            <include refid="answer_status"></include>
+            <include refid="space"></include>
+
+    </select>  
+
+    <!-- 유저 아이디로 조회하는 예약대기 목록 -->
+    <select id="getReservationWaitListByUserId">
+        select
+            res.reservation_id,
+            res.user_id,
+            res.product_id,
+            res.total_payment,
+            res.status as reservation_status,
+            res.reservation_date,
+            res.start_time,
+            res.end_time,
+            res.headcount,
+            res.is_review,
+            res.reservation_name,
+            res.reservation_phone,
+            res.reservation_email,
+            res.created_at as reservation_created_at,
+            res.updated_at as reservation_updated_at,
+
+            hs.main_title as space_main_title,
+            p.name as product_name,
+
+            pay.payment_method
+        from
+            reservations res
+        inner join
+            payments pay
+        on 
+            res.reservation_id = pay.reservation_id
+        inner join 
+            products p
+        on 
+            res.product_id = p.product_id
+        inner join
+            host_space hs
+        on 
+            p.host_space_id = hs.host_space_id
+        where
+            p.user_id = #{user_id}
+            and res.status = '예약대기'
+        order by
+            res.created_at <if test="cri.orderBy.equals('desc')">desc</if>
+    </select>
+
+    <!-- 유저 아이디로 조회하는 예약대기 개수 -->
+    <select id="getCountReservationWaitListByUserId">
+        select
+            count(*)
+        from
+            reservations res
+        inner join 
+            products p
+        on 
+            res.product_id = p.product_id
+        inner join
+            host_space hs
+        on 
+            p.host_space_id = hs.host_space_id
+        where
+            p.user_id = #{user_id}
+            and res.status = '예약대기'
+    
+    </select>
+
+    <!-- 예약 ID로 공간 소유자 유저 조회 -->
+    <select id="getReservationSpaceOwnerUserId">
+        select
+            p.user_id
+        from
+            reservations res
+        inner join
+            products p
+        on
+            res.product_id = p.product_id
+        where
+            res.reservation_id = #{reservation_id}
+            
+    </select>
+
+    <!-- 예약 취소 -->
+    <delete id="deleteReservation">
+        delete from
+            reservations
+        where
+            reservation_id = #{reservation_id}
+    </delete>
+
+    <!-- 여러개 예약 취소 -->
+    <delete id="deleteReservationByIdsAndOwner">
+        delete from
+            reservations
+        where
+            reservation_id in
+                <foreach collection="selectedIds" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            
+            and product_id in 
+            (select product_id from products where user_id = #{loggedInUserId})
+    </delete>
+
+    <!-- 예약상태 변경 -->
+    <update id="updateReservationStatus">
+        update
+            reservations
+        set
+            status = #{status}
+        where
+            reservation_id = #{reservation_id}
+    </update>
+
+
+    <sql id="search">
+        <if test="cri.searchType != null and !cri.searchType.equals('')">
+            <if test="cri.searchType == 'main_title'">
+                and hs.main_title like concat('%', #{cri.keyword}, '%')
+            </if>
+            <if test="cri.searchType == 'question_content'">
+                and q.question_content like concat('%', #{cri.keyword}, '%')
+            </if>
+            <if test="cri.searchType == 'user_nick'">
+                and q.user_nick like concat('%', #{cri.keyword}, '%') 
+            </if>
+        </if>
+    </sql>
+
+    <sql id="period">
+        <if test="cri.start_date != null and !cri.start_date.equals('')">
+            <![CDATA[
+                and q.created_at >= date(#{cri.start_date})
+                ]]>
+        </if>
+        <if test="cri.end_date != null and !cri.end_date.equals('')">
+            <![CDATA[
+                and q.created_at < date(#{cri.end_date}) + 1
+                ]]>
+        </if>
+    </sql>
+
+    <sql id="answer_status">
+        <if test="cri.answer_status != null and !cri.answer_status.equals('')">
+            and q.answer_status = #{cri.answer_status}
+        </if>
+    </sql>
+
+    <sql id="space">
+        <if test="cri.space_id != null and !cri.space_id.equals('')">
+            and hs.host_space_id = #{cri.space_id}
+        </if>
+    </sql>
+
+</mapper>

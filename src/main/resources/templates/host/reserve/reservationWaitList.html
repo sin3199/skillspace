@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{host/layouts/host-layout}">
+
+<th:block layout:fragment="css">
+   <style>
+      
+      .answer-status-badge {
+         font-size: 0.8em; /* 배지 크기 조정 */
+      }
+
+      /* 답변 카드 스타일 */
+      .reply-card {
+         font-size: 0.8rem; 
+         background-color: transparent; 
+         border-left: 3px solid #6c757d; 
+         margin-top: 0.5rem;
+      }
+      .reply-card .card-header {
+         padding: 0.3rem 0.5rem;
+         background-color: transparent;
+         font-weight: bold;
+      }
+      .reply-card .card-body {
+         padding: 0.5rem;
+      }
+
+      .reply-card .btn-secondary {
+         background-color: #aeaeb9;
+         border-color: #aeaeb9;
+      }
+
+      .reply-card .btn-light {
+         border-color: #606070;
+      }
+
+      /* 모달 스타일 */
+      .list-group-item {
+			background-color: rgba(255, 255, 255, 0.05);
+			margin-bottom: 8px;
+			padding: 6px 12px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.list-group-item strong{
+			width: 110px;
+			display: inline-block;
+			flex-shrink: 0;
+		}
+
+      .hr-custom {
+			border: none;
+			border-top: 3px solid #704de4;
+			opacity: 1;
+		}
+
+		#payment_amount {
+			color: #704de4;
+			font-weight: bold;
+			font-size: 25px;
+		}
+
+      .modal-header {
+			background-color: #6c5ce7;
+			color: #fff;
+		}
+
+      .modal-body {
+         background-color: #dee2e6;
+      }
+      
+      .modal-footer {
+         background-color: #dee2e6;
+      }
+
+
+      /* 자동 줄바 꿈*/
+      .text-pre-wrap {
+         white-space: pre-wrap;
+      }
+   </style>
+</th:block>
+
+<th:block layout:fragment="content">
+   <div class="card mb-3">
+      <div class="card-header">
+         <h2>예약대기 관리</h2>
+      </div>
+      <div class="card-body">
+         <div class="d-flex justify-content-between mb-2">
+            <div>
+               <button class="btn btn-outline-danger text-nowrap btn-sm" id="btn_seletedDelete">선택취소</button>
+            </div>
+            <div class="d-flex gap-1">
+               <select class="form-select form-select-sm w-auto" id="change_orderBy">
+                  <option value="desc" th:selected= "${pageMaker.cri.orderBy == 'desc'}">등록일 ▼</option>
+                  <option value="" th:selected= "${pageMaker.cri.orderBy == '' || pageMaker.cri.orderBy == null}">등록일 ▲</option>
+               </select>
+               
+            </div>
+         </div>
+         <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+               <thead class="table-light text-center text-nowrap">
+                  <tr>
+                     <th style="width: 5%;"><input type="checkbox" id="checkAll"></th>
+                     <th style="width: 5%;">번호</th>
+                     <th style="width: 20%;">공간명</th>
+                     <th style="width: 15%;">이용시간</th>
+                     <th style="width: 10%;">예약자 이름</th>
+                     <th style="width: 15%;">예약일</th>
+                     <th style="width: 10%;">결제금액</th>
+                     <th style="width: 10%;">예약상태</th>
+                     <th style="width: 10%;">관리</th>
+                  </tr>
+               </thead>
+               <tbody class="text-center align-middle">
+                  <!--/* 데이터가 없을 경우 */-->
+                  <tr th:if="${#lists.isEmpty(reservationWaitList)}">
+                     <td colspan="9">예약대기 상태가 없습니다.</td>
+                  </tr>
+                  <!--/* 데이터가 있을 경우 */-->
+                  <tr th:each="reservation, iterStat : ${reservationWaitList}" th:unless="${#lists.isEmpty(reservationWaitList)}">
+                     <td><input type="checkbox" class="itemCheckbox" name="itemCheckbox" th:value="${reservation.reservation_id}"></td>
+                     <!--/* 페이지 번호와 상관없이 순번 표시 ( (현재페이지-1)*페이지당개수 + 반복인덱스+1 ) */-->
+                     <td>
+                        <span th:if="${pageMaker.cri.orderBy == 'desc'}" th:text="${(pageMaker.totalCount - (pageMaker.cri.page - 1) * pageMaker.cri.perPageNum) - iterStat.index}"></span>
+                        <span th:unless="${pageMaker.cri.orderBy == 'desc'}" th:text="${((pageMaker.cri.page - 1) * pageMaker.cri.perPageNum) + (iterStat.index + 1)}"></span>
+                     </td>
+                     <td class="text-start" th:text="${reservation.space_main_title ?: '-'}">공간명</td>
+                     <td th:text="|${#dates.format(reservation.start_time, 'HH:mm')} ~ ${#dates.format(reservation.end_time, 'HH:mm')}|">
+                        09:00 ~ 18:00
+                     </td>
+                     <td th:text="${reservation.reservation_name ?: '-'}">예약자 이름</td>
+                     <td th:text="${#dates.format(reservation.reservation_date, 'yyyy-MM-dd')}">2023-12-20</td>
+                     <td th:text="|${#numbers.formatInteger(reservation.total_payment, 0, 'COMMA')}원|">50,000원</td>
+                     <td>
+                        <span class="badge text-bg-secondary" th:text="${reservation.reservation_status}"
+                              th:classappend="
+                                 ${reservation.reservation_status} == '예약대기' ? 'text-bg-warning' :
+                                 (${reservation.reservation_status} == '예약완료' ? 'text-bg-secondary' :
+                                 (${reservation.reservation_status} == '예약취소' ? 'text-bg-danger' : 
+                                 (${reservation.reservation_status} == '이용완료' ? 'text-bg-success' : '')))
+                                 ">
+                              예약완료</span>
+                     </td>
+                     <td>
+                        <div class="d-flex flex-column gap-1">
+                           <button class="btn btn-outline-success btn-sm text-nowrap" name="btn_detail" th:data-reservation_id="${reservation.reservation_id}">상세보기</button>
+                           <button class="btn btn-outline-primary btn-sm text-nowrap" name="btn_check" th:data-reservation_id="${reservation.reservation_id}">예약완료</button>
+                           <button class="btn btn-outline-danger btn-sm text-nowrap" name="btn_delete" th:data-reservation_id="${reservation.reservation_id}">예약취소</button>
+                        </div>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+         <!-- 상세보기 모달 -->
+         <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="answerModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <h5 class="modal-title" id="answerModalLabel">예약 상세보기</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                     </div>
+                     <div class="modal-body">
+                        <!-- 리스트 그룹 -->
+                        <ul class="list-group">
+                              <h4 id="space_main_title" class="fw-bold">공간명</h4>
+                              <span id="product_name" class="text-muted">상품명</span>
+                              <hr class="hr-custom">
+                              <li class="list-group-item"><strong>예약날짜</strong> <span id="reserveDate">2025-05-05</span></li>
+                              <li class="list-group-item"><strong>예약시간</strong> <span id="reserveTime">13:00 ~ 16:00</span></li>
+                              <li class="list-group-item"><strong>예약인원</strong> <span id="headcount">1명</span></li>
+                              <li class="list-group-item"><strong>결제방식</strong> <span id="payment_method">카카오페이</span></li>
+                              <li class="list-group-item"><strong>예약자</strong> <span id="reservation_name">홍길동</span></li>
+                              <li class="list-group-item">
+                                 <strong>연락처</strong>
+                                 <span id="reservation_phone">010-1234-5678</span>
+                              </li>
+                              <li class="list-group-item"><strong>이메일</strong> <span id="reservation_email">asdf@naver.com</span>
+                              </li>
+                              <li class="list-group-item"><strong>예약상태</strong> <span class="badge text-bg-success"
+                                    id="reservation_status">예약대기</span></li>
+                              <hr class="hr-custom">
+                              <li class="list-group-item m-0">
+                                 <strong>결제금액</strong>
+                                 <span id="payment_amount">￦137,700</span>
+                              </li>
+                        </ul>
+                     </div>
+                  </div>
+         
+            </div>
+         </div>
+      </div><!-- card-body end -->
+   </div> <!-- 상단 카드 end -->
+
+   <!-- 페이징과 검색 파라미터 정보 유지를 위한 Form -->
+   <form id="criteriaForm" action="" method="get">
+      <!-- 페이징 & 정렬 파라미터 -->
+      <input type="hidden" name="orderBy"        th:value="${pageMaker.cri.orderBy}"      id="orderBy">
+      <!-- 취소, 수정시 사용할 예약 ID -->
+      <input type="hidden" name="reservation_id" id="reservation_id">
+      <input type="hidden" name="status"         id="status">
+   </form>
+
+</th:block>
+
+<th:block layout:fragment="scriptBottom">
+   <script th:inline="javascript">
+      document.addEventListener("DOMContentLoaded", function() {
+         /*<![CDATA[*/
+         const reservationWaitList = /*[[${reservationWaitList}]]*/ [];
+         const pageMaker = /*[[${pageMaker}]]*/ {};
+         
+         console.log("예약 목록:", reservationWaitList);
+         console.log("PageMaker:", pageMaker);
+         /*]]>*/
+
+         /* successMessage, errorMessage 가 있을경우 alert 메시지 출력 */
+         const successMessage = /*[[${successMessage}]]*/ null;
+         const errorMessage = /*[[${errorMessage}]]*/ null;
+
+         if (successMessage) {
+            alert(successMessage);
+         }
+         if (errorMessage) {
+            alert(errorMessage);
+         }
+         
+
+         // 체크 박스 기능
+         const checkAll = document.getElementById('checkAll');
+         const itemCheckboxes = document.querySelectorAll('.itemCheckbox');
+
+         checkAll.addEventListener('change', function() {
+            itemCheckboxes.forEach(checkbox => {
+               checkbox.checked = this.checked;
+            });
+         });
+
+         itemCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+               const allChecked = Array.from(itemCheckboxes).every(cb => cb.checked);
+               checkAll.checked = allChecked;
+            });
+         });
+
+         // 선택된 예약 취소
+         document.getElementById('btn_seletedDelete').addEventListener('click', function() {
+            const selectedItemIds = [];
+            const checkedItems = document.querySelectorAll('.itemCheckbox:checked');
+
+            if (checkedItems.length === 0) {
+               alert("선택된 예약이 없습니다.");
+               return;
+            }
+
+            if (!confirm("선택된 " + checkedItems.length + "개의 예약을 정말로 취소하시겠습니까?")) return;
+
+            checkedItems.forEach(check => {
+               selectedItemIds.push(check.value);
+            });
+
+            fetch('/host/reserve/selectedDelete', {
+               method: 'POST',
+               headers: {
+                  'Content-Type': 'application/json'
+               },
+               body: JSON.stringify(selectedItemIds)
+            })
+            .then(response => {
+               if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+               }
+               return response.text();
+            })
+            .then(data => {
+               alert("선택된 예약이 취소되었습니다.");
+               location.reload(); // 페이지 새로고침
+            })
+            .catch(error => {
+               console.error('취소 요청 실패:', error);
+               alert('취소 처리 중 오류가 발생했습니다.');
+            });
+         });
+
+         // 기존 페이지 정보 form
+         const criteriaForm = document.getElementById('criteriaForm');
+
+         // 상세보기, 예약확인, 예약취소 버튼 이벤트 리스너
+         const btnDetailList = document.querySelectorAll('button[name=btn_detail]');
+         const btnDeleteList = document.querySelectorAll('button[name=btn_delete]');
+         const btnCheckList  = document.querySelectorAll('button[name=btn_check]');
+
+         // 모달 객체 생성
+         const detailModalElement = document.getElementById('detailModal');
+         const detailModal = new bootstrap.Modal(detailModalElement);
+
+         // 예약 상세보기
+         btnDetailList.forEach(btnDetail => 
+            btnDetail.addEventListener('click', function() {
+               // #detailModal 에 내용 채우기
+               const reservation_id = $(this).data("reservation_id");
+   
+               const reservationData = reservationWaitList.find(r => r.reservation_id === reservation_id);
+   
+               console.log("reservation_id",reservation_id);
+               console.log("상세보기",reservationData);
+               if (reservationData) {
+                  $("#space_main_title").text(reservationData.space_main_title);
+                  $("#product_name").text(reservationData.product_name);
+                  $("#reserveDate").text(reservationData.reservation_date);
+                  $("#reserveTime").text(`${reservationData.start_time.slice(0, -3)} ~ ${reservationData.end_time.slice(0, -3)}`);
+                  $("#headcount").text(`${reservationData.headcount}명`);
+                  $("#payment_method").text(reservationData.payment_method);
+                  $("#reservation_phone").text(formatPhoneNumber(reservationData.reservation_phone));
+                  $("#reservation_email").text(reservationData.reservation_email);
+                  $("#payment_amount").text(`￦${reservationData.total_payment.toLocaleString()}`);
+                  $("#reservation_status").text(reservationData.reservation_status);
+               }
+               detailModal.show();
+
+            })
+         );
+
+         // 전화번호 형식 함수
+            function formatPhoneNumber(input) {
+               // 숫자만 남기기
+               const cleanInput = input.replace(/[^0-9]/g, "");
+               const length = cleanInput.length;
+               let result = "";
+
+               if (length === 8) {
+                  // 8자리(예: 1588-0000)
+                  result = cleanInput.replace(/(\d{4})(\d{4})/, '$1-$2');
+               } else if (cleanInput.startsWith("02") && (length === 9 || length === 10)) {
+                  // 서울번호(02-xxx-xxxx, 02-xxxx-xxxx)
+                  result = cleanInput.replace(/(\d{2})(\d{3,4})(\d{4})/, '$1-$2-$3');
+               } else if (!cleanInput.startsWith("02") && (length === 10 || length === 11)) {
+                  // 휴대폰, 지역번호(010-xxxx-xxxx, 031-xxx-xxxx 등)
+                  result = cleanInput.replace(/(\d{3})(\d{3,4})(\d{4})/, '$1-$2-$3');
+               } else {
+                  result = input; // 인식 불가 시 원본 반환
+               }
+               return result;
+            }
+
+         // 개별 취소
+         btnDeleteList.forEach(btnDelete => {
+            btnDelete.addEventListener('click', function() {
+               if (!confirm("정말로 이 예약을 취소하시겠습니까?")) return;
+               const reservation_id = this.dataset.reservation_id;
+               document.getElementById('reservation_id').value = reservation_id;
+               criteriaForm.action = '/host/reserve/deleteReservation';
+               criteriaForm.method = 'post';
+               criteriaForm.submit();
+            });
+         });
+
+         // 예약확인 버튼 이벤트
+         btnCheckList.forEach(btnCheck => {
+            btnCheck.addEventListener('click', function() {
+               if (!confirm("정말로 이 예약을 완료하시겠습니까?")) return;
+               const reservation_id = this.dataset.reservation_id;
+               document.getElementById('reservation_id').value = reservation_id;
+               document.getElementById('status').value = "예약완료";
+               criteriaForm.action = '/host/reserve/updateStatus';
+               criteriaForm.method = 'post';
+               criteriaForm.submit();
+            })
+         });
+         
+
+         
+
+         // 데이터 조회 정렬 변경
+         const change_orderBy = document.getElementById('change_orderBy');
+         change_orderBy.addEventListener('change', function() {
+            document.getElementById('orderBy').value = this.value;
+            document.getElementById('page').value = 1;
+            criteriaForm.action = '/host/reserve/reservationWaitList';
+            criteriaForm.method = 'get';
+            criteriaForm.submit();
+         });
+
+      });   // DOMContentLoaded event end
+   </script>
+</th:block>
+</html>

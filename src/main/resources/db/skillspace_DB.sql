@@ -200,7 +200,8 @@ ADD PRIMARY KEY (`payment_id`);
 ALTER TABLE `Payments` 
 ADD CONSTRAINT `FK_Reservations_TO_Payments_1` 
 FOREIGN KEY (`reservation_id`)
-REFERENCES `Reservations` (`reservation_id`);
+REFERENCES `Reservations` (`reservation_id`)
+ON DELETE CASCADE;
 
 
 -- 리뷰 테이블
@@ -279,7 +280,7 @@ ALTER TABLE `Answer`
 ADD CONSTRAINT `FK_Question_TO_Answer_1` 
 FOREIGN KEY (`question_id`)
 REFERENCES `Questions` (`question_id`)
-on cascade delete;
+ON DELETE CASCADE;
 
 
 -- 찜 목록
