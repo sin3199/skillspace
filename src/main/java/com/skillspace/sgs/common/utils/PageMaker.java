@@ -147,6 +147,16 @@ public class PageMaker {
 				if (cri.getSpace_id() != null) {
 					builder.queryParam("space_id", cri.getSpace_id());
 				}
+
+				// 예약상태 필터 파라미터
+				if (cri.getReservation_status() != null && !cri.getReservation_status().isEmpty()) {
+					builder.queryParam("reservation_status", cri.getReservation_status());
+				}
+
+				// 결제상태 관련 필터 파라미터
+				if (cri.getPayment_status() != null && !cri.getPayment_status().isEmpty()) {
+					builder.queryParam("payment_status", cri.getPayment_status());
+				}
 		
 				UriComponents uriComponents = builder.build();
 		

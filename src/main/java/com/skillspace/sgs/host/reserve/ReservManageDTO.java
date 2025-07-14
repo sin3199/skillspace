@@ -32,6 +32,8 @@ public class ReservManageDTO {
     private LocalDateTime 	created_at; 		// 생성 날짜
     private LocalDateTime 	updated_at;         // 수정 날짜
 
+    private String          user_nick;          // 예약자 닉네임
+
     private String          space_main_title;   // 공간명
     private String          product_name;       // 상품명
 

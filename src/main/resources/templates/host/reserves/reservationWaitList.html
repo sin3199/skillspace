@@ -266,7 +266,7 @@
                selectedItemIds.push(check.value);
             });
 
-            fetch('/host/reserve/selectedDelete', {
+            fetch('/host/reserves/selectedDelete', {
                method: 'POST',
                headers: {
                   'Content-Type': 'application/json'
@@ -356,7 +356,7 @@
                if (!confirm("정말로 이 예약을 취소하시겠습니까?")) return;
                const reservation_id = this.dataset.reservation_id;
                document.getElementById('reservation_id').value = reservation_id;
-               criteriaForm.action = '/host/reserve/deleteReservation';
+               criteriaForm.action = '/host/reserves/deleteReservation';
                criteriaForm.method = 'post';
                criteriaForm.submit();
             });
@@ -369,7 +369,7 @@
                const reservation_id = this.dataset.reservation_id;
                document.getElementById('reservation_id').value = reservation_id;
                document.getElementById('status').value = "예약완료";
-               criteriaForm.action = '/host/reserve/updateStatus';
+               criteriaForm.action = '/host/reserves/updateStatus';
                criteriaForm.method = 'post';
                criteriaForm.submit();
             })
@@ -383,7 +383,7 @@
          change_orderBy.addEventListener('change', function() {
             document.getElementById('orderBy').value = this.value;
             document.getElementById('page').value = 1;
-            criteriaForm.action = '/host/reserve/reservationWaitList';
+            criteriaForm.action = '/host/reserves/reservationWaitList';
             criteriaForm.method = 'get';
             criteriaForm.submit();
          });

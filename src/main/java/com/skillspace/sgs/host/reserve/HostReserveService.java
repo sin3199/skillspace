@@ -57,4 +57,9 @@ public class HostReserveService {
     public boolean updateReservationStatus(Integer reservation_id, String status) {
         return hostReserveMapper.updateReservationStatus(reservation_id, status);
     }
+
+    // 여러개 예약 상태 변경
+    public void updateReservationStatusByIds(List<Integer> selectedIds, String status, String loggedInUserId){
+        hostReserveMapper.updateReservationStatusByIds(selectedIds, status, loggedInUserId);
+    }
 }

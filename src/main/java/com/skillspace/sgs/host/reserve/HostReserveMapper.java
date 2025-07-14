@@ -40,6 +40,14 @@ public interface HostReserveMapper {
                 @Param("loggedInUserId") String loggedInUserId);
 
     // 예약상태 변경
-    boolean updateReservationStatus(Integer reservation_id, String status);
+    boolean updateReservationStatus(
+                @Param("reservation_id") Integer reservation_id, 
+                @Param("status") String status);
+
+    // 여러개 예약상태 변경
+	void updateReservationStatusByIds(
+                @Param("selectedIds") List<Integer> selectedIds,
+                @Param("status") String status,
+                @Param("loggedInUserId") String loggedInUserId);
 
 }
